@@ -1,0 +1,1 @@
+./core/pi_fm_adv --ps "$1" --rt "$2" --freq "$3" --ctl rds_ctl
