@@ -5,7 +5,7 @@
 Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. Installer will use NPM, but you can change to Yarn or PNPM. Then edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started).
 
 ## Running:
-Type `sudo node start.js`. You can change RDS in `config.json` file. Visit `rpi_ip:1080/fmradiostreamer/list` to show available music and play it with `rpi_ip:1080/fmradiostreamer/play/music_name`.
+Rename `config.json.example` to `config.json`. Type `sudo node radio.js`. You can change RDS in `config.json` file. Go to API Docs section for more.
 
 ## Functions:
 - Show RDS on screen
@@ -14,8 +14,20 @@ Type `sudo node start.js`. You can change RDS in `config.json` file. Visit `rpi_
 - API - download music from YT and play
 - Change frequency with buttons
 
+## API Docs
+- /fmradiostreamer/yt/(song) - Downloads song from YT and save with filename of request text
+- /fmradiostreamer/list - Returns song list
+- /fmradiostreamer/change/(setting)/(value) - Changes setting of PS, RT, TA and PTY. Saves to config, so changes are effective when you restart application or change music.
+- /fmradiostreamer/play/(song) - Starts streaming and playing song.
+
 ## Dependencies note
 This project uses Pi_Fm_Adv and my own fork of i2c-bus: i2c-bus-i2c-1, and other stuff listed in packages.json.
+
+## Hardware
+SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, female-male and male-male cables. Tested on Raspberry Pi Zero W with goldpins soldered by me. :D
+
+## What if I haven't got that hardware?
+Minimum requirement is RPi. FmRadioStreamer SHOULD work without them (untested).
 
 ## Gallery
 Don't blame me pls.

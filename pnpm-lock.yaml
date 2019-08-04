@@ -1,10 +1,11 @@
 dependencies:
   express: 4.17.1
+  express-progressbar: 2.0.0
   i2c-bus-i2c-1: 4.0.11
   oled-font-5x7: 1.0.3
   oled-i2c-bus: 1.0.11
   onoff: 4.1.3
-  ytdl-core: 0.29.3
+  ytdl-core: 0.29.5
   ytsearcher: 1.2.2
 lockfileVersion: 5.1
 packages:
@@ -120,6 +121,10 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
+  /express-progressbar/2.0.0:
+    dev: false
+    resolution:
+      integrity: sha512-z3qb1D8jfzP2Vnl5tFVcayqtmckFI9nFiQE0x0O/M8PPhWgw7RZUBjm76lluD1Hh97Rr1Uo2rFI374PbOe+mqA==
   /express/4.17.1:
     dependencies:
       accepts: 1.3.7
@@ -476,7 +481,7 @@ packages:
       node: '>= 0.8'
     resolution:
       integrity: sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
-  /ytdl-core/0.29.3:
+  /ytdl-core/0.29.5:
     dependencies:
       html-entities: 1.2.1
       m3u8stream: 0.6.2
@@ -486,16 +491,17 @@ packages:
     engines:
       node: '>=6'
     resolution:
-      integrity: sha512-IqMjkTvGjB2Shu9W2HhzyquIo8Pv6AGogc7+Vv3bcxDXjYCgYUPt+LX0CqL76GTmjftnMSVpI1dO79Uzj4f5mQ==
+      integrity: sha512-6WOoLQCeovo/aFYeMKeEXjvS/L+0j/vq85AYF86KSmkSA3lMzUzMdtmlo0GjsrOUN79S03MDkSgXEWOZBWL1Rg==
   /ytsearcher/1.2.2:
     dev: false
     resolution:
       integrity: sha512-nQ38akKe3O2OGfQba0aTetMx25U/V+jD+MN1v26/lR497KyzpPIolQuNEf5x4O0ANvLLIS9iPSc91Zle1OP+ww==
 specifiers:
   express: ^4.17.1
+  express-progressbar: ^2.0.0
   i2c-bus-i2c-1: ^4.0.11
   oled-font-5x7: ^1.0.3
   oled-i2c-bus: ^1.0.11
   onoff: ^4.1.3
-  ytdl-core: ^0.29.3
+  ytdl-core: ^0.29.5
   ytsearcher: ^1.2.2

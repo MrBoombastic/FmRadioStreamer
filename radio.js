@@ -10,13 +10,13 @@ process.on('SIGINT', () => {
 	led3.unexport();
 	led4.unexport();
 	ledWarn.unexport();
+	exec(`sudo pkill -2 pi_fm_adv`)
 	process.exit();
 })
 process.title = "fmradiostreamer"
 const config = require("./config.json")
 const { YTSearcher } = require('ytsearcher');
 const ytsearcher = new YTSearcher(config.apikey);
-const ytdl = require('ytdl-core');
 const fs = require('fs')
 const express = require("express");
 const app = express();
@@ -31,7 +31,7 @@ const opts = {
 	address: 0x3C
 };
 const { exec } = require("child_process");
-
+var spawn = require('child_process').spawn
 const Gpio = require('onoff').Gpio;
 const led4 = new Gpio(26, 'out');
 const led3 = new Gpio(13, 'out');
@@ -42,18 +42,39 @@ const buttonLow = new Gpio(21, 'in', 'rising', { debounceTimeout: 40 });
 const buttonHigh = new Gpio(20, 'in', 'rising', { debounceTimeout: 40 });
 const buttonSet = new Gpio(16, 'in', 'rising', { debounceTimeout: 40 });
 const buttonMultiplier = new Gpio(12, 'in', 'rising', { debounceTimeout: 40 });
-
+const ytdl = require('ytdl-core');
+const { Progress } = require('express-progressbar');
+function timeString2ms(a, b, c) {// time(HH:MM:SS.mss)
+	return c = 0,
+		a = a.split('.'),
+		!a[1] || (c += a[1] * 1),
+		a = a[0].split(':'), b = a.length,
+		c += (b == 3 ? a[0] * 3600 + a[1] * 60 + a[2] * 1 : b == 2 ? a[0] * 60 + a[1] * 1 : s = a[0] * 1) * 1e3,
+		c
+}
 const sleeptime = 500
-const sleep = (howLong) => {
+function sleep(time) {
 	return new Promise((resolve) => {
-		setTimeout(resolve, howLong)
+		setTimeout(resolve, time)
 	})
 }
 oled = new oled(i2cBus, opts);
 const font = require('oled-font-5x7');
 let freq = Number(config.freq).toFixed(1)
 let multiplier = 0.1
-
+function save(setting, value) {
+	fs.readFile('./config.json', 'utf8', (err, data) => {
+		if (err) throw err;
+		data = JSON.parse(data)
+		data[setting] = Math.round(value)
+		fs.writeFile('./config.json', JSON.stringify(data, null, 4), (err) => {
+			if (err) throw err;
+			oled.setCursor(1, 40);
+			oled.writeString(font, 2, "OK");
+			setTimeout(function () { updateScreen() }, 2000)
+		})
+	})
+}
 async function runLights() {
 	while (true) {
 		// led1
@@ -127,17 +148,7 @@ buttonHigh.watch(async (err) => {
 })
 buttonSet.watch(async (err) => {
 	if (err) throw err;
-	fs.readFile('./config.json', 'utf8', (err, data) => {
-		if (err) throw err;
-		data = JSON.parse(data)
-		data.freq = Math.round(freq)
-		fs.writeFile('./config.json', JSON.stringify(data), (err) => {
-			if (err) throw err;
-			oled.setCursor(1, 40);
-			oled.writeString(font, 2, "OK");
-			setTimeout(function () { updateScreen() }, 2000)
-		})
-	})
+	save('freq', Math.round(freq))
 })
 buttonMultiplier.watch(async (err) => {
 	if (err) throw err;
@@ -151,18 +162,47 @@ buttonMultiplier.watch(async (err) => {
 
 
 const prefix = "/fmradiostreamer/"
-app.post(prefix + "yt/:song", (req, res) => {
+app.get(prefix + "yt/:song", (req, res) => {
+	const safeSongName = req.params.song.replace(/[^a-zA-Z0-9\s]/g, "").replace(/ /g, "-")
 	ytsearcher.search(req.params.song, { type: 'video' })
 		.then(result => {
 			const music = result.first
-			ytdl.getInfo(music.id, (err, info) => {
+			ytdl.getInfo(music.id, (err) => {
 				if (err) throw err;
-				const audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
-				// eslint-disable-next-line no-unused-vars
-				ytdl(music.url, { filter: (format) => audioFormats[0] }).pipe(fs.createWriteStream(`./music/${search}.wav`)).then(res.send('ok'))
+				const p = new Progress(res);
+				const video = ytdl(music.url, { format: 'aac' })
+				video.pipe(fs.createWriteStream(`./ytdl-temp/${safeSongName}.aac`))
+				video.on('end', () => {
+					p.update(50, { stage: 'converting' })
+					let length = null;
+					let currenttime = 0;
+					let regex = /Duration:(.*), start:/;
+					let regex2 = /time=(.*) bitrate/;
+					ffmpegProgress = spawn('ffmpeg', ['-i', `./ytdl-temp/${safeSongName}.aac`, `./music/${safeSongName}.wav`]);
+					ffmpegProgress.stderr.on('data', function (data) {
+						let buff = Buffer.from(data);
+						let str = buff.toString('utf8')
+						let Duration_matches = str.match(regex);
+						let Current_matches = str.match(regex2);
+						if (Duration_matches) length = timeString2ms(Duration_matches[1]);
+						if (Current_matches) currenttime = timeString2ms(Current_matches[1]);
+						p.update(Math.ceil((currenttime / length) * 50 + 50, { stage: 'converting' }))
+					});
+
+					ffmpegProgress.on('exit', function (code) {
+						if (code == 0) { p.update(100); p.close() }
+						else { p.update(0, { stage: 'failed', errorcode: code.toString() }); p.close() }
+						exec('sudo rm -r ./ytdl-temp/*')
+					});
+				})
+				video.on("progress", (chunkLength, downloaded, total) => {
+					const percent = downloaded / total * 50;
+					p.update(percent, { stage: 'downloading' });
+				});
 			});
 		});
 })
+
 app.get(prefix + "list", (req, res) => {
 	let finallist = ""
 	const musiclist = fs.readdirSync('./music/')
@@ -173,8 +213,30 @@ app.get(prefix + "list", (req, res) => {
 })
 app.get(prefix + "play/:song", (req, res) => {
 	exec(`sudo pkill -2 pi_fm_adv`, () => {
-		exec(`sudo ./radioPlay.sh '${config.PS}' '${config.RT}' ${config.freq} '${req.params.song}'`)
+		exec(`mkfifo rds_ctl`)
+		const execWithStd = spawn('sudo', ['./core/pi_fm_adv',
+			"--ps", config.PS,
+			"--rt", config.RT,
+			"--freq", config.freq,
+			"--tp", config.TA,
+			"--pty", config.PTY,
+			"--audio", "./music/" + req.params.song + ".wav",
+			"--ctl", "rds_ctl"])
+		//In case of debugging, you can uncomment this safely:
+		//execWithStd.stdout.on('data', function (data) { console.log('stdout: ' + data.toString()); });
+		execWithStd.stderr.on('data', function (data) { console.log('stderr: ' + data.toString()); });
 		res.send("ok")
 	})
 })
-app.listen(1080, () => console.log(`FmRadioStreamer working!\nPort: 1080\nFreq: ${Number(config.freq).toFixed(1)}\nPS: ${config.PS}\nRT: ${config.RT}`))
+app.get(prefix + "change/:setting/:value", (req, res) => {
+	const setting = req.params.setting.toString()
+	const value = req.params.value.toString()
+	if (setting != "PS" && setting != "RT" && setting != "TA" && setting != "PTY") return res.status(405).send("Allowed settings: PT, RT, TA, PTY.")
+	else {save(setting, value);res.send(setting.toString() + ", " + value.toString());}
+})
+/*
+app.get(prefix + "set/:setting/:value", (req, res) => {
+	if (setting != "PS" && setting != "RT" && setting != "TA" && setting != "PTY") return res.status(405).send("Allowed settings: PT, RT, TA, PTY.")
+	else {save(setting, value);res.send(setting.toString() + ", " + value.toString())}
+})*/
+app.listen(config.port, () => console.log(`FmRadioStreamer working!\nPort: ${config.port}\nFreq: ${Number(config.freq).toFixed(1)}\nPS: ${config.PS}\nRT: ${config.RT}\nTA: ${config.TA}\nPTY: ${config.PTY}`))

@@ -5,10 +5,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+config.json
 .eslintrc.js
 music/*
 !music/www-bensound-com-summer.wav
-#config.json
+ytdl-temp/
+!ytdl-temp/placeholder.txt
+config.json
 # Runtime data
 pids
 *.pid
