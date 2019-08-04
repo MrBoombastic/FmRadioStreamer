@@ -1,6 +1,6 @@
 {
 	"name": "fmradiostreamer",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "PiFmAdv based FM streamer with LEDs, buttons, screen and web server support.",
 	"main": "start/js",
 	"dependencies": {
