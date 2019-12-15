@@ -9,7 +9,7 @@
 		"i2c-bus-i2c-1": "^4.0.11",
 		"oled-font-5x7": "^1.0.3",
 		"oled-i2c-bus": "^1.0.11",
-		"onoff": "^4.1.3",
+		"onoff": "^5.0.0",
 		"ytdl-core": "^0.29.5",
 		"ytsearcher": "^1.2.2"
 	},
