@@ -171,14 +171,14 @@ app.get(prefix + "yt/:song", (req, res) => {
 				if (err) throw err;
 				const p = new Progress(res);
 				const video = ytdl(music.url, { format: 'aac' })
-				video.pipe(fs.createWriteStream(`./ytdl-temp/${safeSongName}.aac`))
-				video.on('end', () => {
-					p.update(100, {stage: 'done'})
-				})
+				video.pipe(fs.createWriteStream(`./music/${safeSongName}.aac`))
 				video.on("progress", (chunkLength, downloaded, total) => {
 					const percent = downloaded / total * 50;
 					p.update(percent, { stage: 'downloading' });
 				});
+				video.on('end', () => {
+					p.update(100, {stage: 'done'})
+				})
 			});
 		});
 })
