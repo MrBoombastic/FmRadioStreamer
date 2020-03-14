@@ -11,7 +11,7 @@ music/*
 !music/www-bensound-com-summer.wav
 ytdl-temp/
 !ytdl-temp/placeholder.txt
-config.json
+.idea
 # Runtime data
 pids
 *.pid
