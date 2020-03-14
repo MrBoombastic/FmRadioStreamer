@@ -214,12 +214,12 @@ app.get(prefix + "list", (req, res) => {
 app.get(prefix + "play/:song", (req, res) => {
 	exec(`sudo pkill -2 pi_fm_rds`, () => {
 		exec(`mkfifo rds_ctl`)
-		const execWithStd = spawn('sudo', [`sox -t mp3 music/${req.params.song}.mp3 -t wav -  | sudo ./src/pi_fm_rds`,
-			"-ps", config.PS,
-			"-rt", config.RT,
-			"-freq", config.freq,
-			"-audio", "-",
-			"-ctl", "rds_ctl"])
+		const execWithStd = spawn('pwd', [`sudo sox -t mp3 music/${req.params.song}.mp3 -t wav -  | sudo ./src/pi_fm_rds` +
+			`-ps ${config.PS}` +
+			`-rt ${config.RT}` +
+			`-freq ${config.freq}` +
+			`-audio -,` +
+			`-ctl ${rds_ctl}`])
 		//In case of debugging, you can uncomment this safely:
 		//execWithStd.stdout.on('data', function (data) { console.log('stdout: ' + data.toString()); });
 		execWithStd.stderr.on('data', function (data) { console.log('stderr: ' + data.toString()); });
