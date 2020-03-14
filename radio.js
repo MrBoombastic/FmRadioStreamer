@@ -31,7 +31,7 @@ const opts = {
 	address: 0x3C
 };
 const { exec } = require("child_process");
-var spawn = require('child_process').spawn
+const spawn = require('child_process').spawn
 const Gpio = require('onoff').Gpio;
 const led4 = new Gpio(26, 'out');
 const led3 = new Gpio(13, 'out');
@@ -49,7 +49,7 @@ function timeString2ms(a, b, c) {// time(HH:MM:SS.mss)
 		a = a.split('.'),
 		!a[1] || (c += a[1] * 1),
 		a = a[0].split(':'), b = a.length,
-		c += (b == 3 ? a[0] * 3600 + a[1] * 60 + a[2] * 1 : b == 2 ? a[0] * 60 + a[1] * 1 : s = a[0] * 1) * 1e3,
+		c += (b === 3 ? a[0] * 3600 + a[1] * 60 + a[2] * 1 : b === 2 ? a[0] * 60 + a[1] * 1 : s = a[0] * 1) * 1e3,
 		c
 }
 const sleeptime = 500
@@ -133,7 +133,6 @@ buttonLow.watch(async (err) => {
 		ledWarn.writeSync(1)
 		await sleep(sleeptime)
 		ledWarn.writeSync(0)
-		return;
 	} else { freq = Number(freq) - multiplier; updateScreen() }
 })
 buttonHigh.watch(async (err) => {
@@ -143,7 +142,6 @@ buttonHigh.watch(async (err) => {
 		ledWarn.writeSync(1)
 		await sleep(sleeptime)
 		ledWarn.writeSync(0)
-		return;
 	} else { freq = Number(freq) + multiplier; updateScreen() }
 })
 buttonSet.watch(async (err) => {
