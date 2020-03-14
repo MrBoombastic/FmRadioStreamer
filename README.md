@@ -1,8 +1,8 @@
 # FmRadioStreamer
-[ALPHA] RPI based FM radio streamer with OLED, buttons and LEDs support.
+[ALPHA] RPI based FM streamer with OLED, buttons and LEDs support
 
 ## Installation:
-Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. Installer will use NPM, but you can change to Yarn or PNPM. Then edit `config.json` file and enter your [YT API key](https://developers.google.com/youtube/v3/getting-started).
+Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. Installer will use NPM, but you can change to Yarn or PNPM. Then edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started).
 
 ## Running:
 Rename `config.json.example` to `config.json`. Type `sudo node radio.js`. You can change RDS in `config.json` file. Go to API Docs section for more.
@@ -39,14 +39,14 @@ Don't blame me pls.
 - Files are in a mess
 
 ## What is in progress?
-- ~~Android app~~ maybe in future
+- Android app
 - More stuff to change
 
-## GPIOs
+## GPIO
 - 1 - 3V3 Power
 - 3 - GPIO 2 - button
 - 5 - GPIO 3 - button
-- 6 - GND - for screen
+- 6 - GND for screen
 - 7 - GPIO 4 -  antenna
 - 29 - GPIO 5 - LED YELLOW
 - 31 - GPIO 6 - LED

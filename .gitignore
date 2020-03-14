@@ -8,10 +8,10 @@ yarn-error.log*
 config.json
 .eslintrc.js
 music/*
-.idea/*
 !music/www-bensound-com-summer.wav
 ytdl-temp/
 !ytdl-temp/placeholder.txt
+config.json
 # Runtime data
 pids
 *.pid
