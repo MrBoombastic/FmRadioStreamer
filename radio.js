@@ -173,27 +173,7 @@ app.get(prefix + "yt/:song", (req, res) => {
 				const video = ytdl(music.url, { format: 'aac' })
 				video.pipe(fs.createWriteStream(`./ytdl-temp/${safeSongName}.aac`))
 				video.on('end', () => {
-					p.update(50, { stage: 'converting' })
-					let length = null;
-					let currenttime = 0;
-					let regex = /Duration:(.*), start:/;
-					let regex2 = /time=(.*) bitrate/;
-					ffmpegProgress = spawn('ffmpeg', ['-i', `./ytdl-temp/${safeSongName}.aac`, `./music/${safeSongName}.aac`]);
-					ffmpegProgress.stderr.on('data', function (data) {
-						let buff = Buffer.from(data);
-						let str = buff.toString('utf8')
-						let Duration_matches = str.match(regex);
-						let Current_matches = str.match(regex2);
-						if (Duration_matches) length = timeString2ms(Duration_matches[1]);
-						if (Current_matches) currenttime = timeString2ms(Current_matches[1]);
-						p.update(Math.ceil((currenttime / length) * 50 + 50, { stage: 'converting' }))
-					});
-
-					ffmpegProgress.on('exit', function (code) {
-						if (code == 0) { p.update(100); p.close() }
-						else { p.update(0, { stage: 'failed', errorcode: code.toString() }); p.close() }
-						exec('sudo rm -r ./ytdl-temp/*')
-					});
+					p.update(100, {stage: 'done'})
 				})
 				video.on("progress", (chunkLength, downloaded, total) => {
 					const percent = downloaded / total * 50;
