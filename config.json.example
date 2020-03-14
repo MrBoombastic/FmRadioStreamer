@@ -2,7 +2,6 @@
     "freq": 108.0,
     "PS": "FmRadStr",
     "RT": "RPi based radio streamer. It is working!",
-    "PTY": 0,
     "TA": "OFF",
     "apikey": "",
     "port": 1080

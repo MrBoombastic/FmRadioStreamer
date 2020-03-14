@@ -178,7 +178,7 @@ app.get(prefix + "yt/:song", (req, res) => {
 					let currenttime = 0;
 					let regex = /Duration:(.*), start:/;
 					let regex2 = /time=(.*) bitrate/;
-					ffmpegProgress = spawn('ffmpeg', ['-i', `./ytdl-temp/${safeSongName}.aac`, `./music/${safeSongName}.wav`]);
+					ffmpegProgress = spawn('ffmpeg', ['-i', `./ytdl-temp/${safeSongName}.aac`, `./music/${safeSongName}.aac`]);
 					ffmpegProgress.stderr.on('data', function (data) {
 						let buff = Buffer.from(data);
 						let str = buff.toString('utf8')
@@ -212,16 +212,14 @@ app.get(prefix + "list", (req, res) => {
 	res.json(JSON.parse(`{"list": "${finallist.slice(0, -2)}"}`))
 })
 app.get(prefix + "play/:song", (req, res) => {
-	exec(`sudo pkill -2 pi_fm_adv`, () => {
+	exec(`sudo pkill -2 pi_fm_rds`, () => {
 		exec(`mkfifo rds_ctl`)
-		const execWithStd = spawn('sudo', ['./core/pi_fm_adv',
-			"--ps", config.PS,
-			"--rt", config.RT,
-			"--freq", config.freq,
-			"--tp", config.TA,
-			"--pty", config.PTY,
-			"--audio", "./music/" + req.params.song + ".wav",
-			"--ctl", "rds_ctl"])
+		const execWithStd = spawn('sudo', [`sox -t aac ../music/${req.params.song}.aac -t wav -  | sudo ./pi_fm_rds`,
+			"-ps", config.PS,
+			"-rt", config.RT,
+			"-freq", config.freq,
+			"-audio", "-",
+			"-ctl", "rds_ctl"])
 		//In case of debugging, you can uncomment this safely:
 		//execWithStd.stdout.on('data', function (data) { console.log('stdout: ' + data.toString()); });
 		execWithStd.stderr.on('data', function (data) { console.log('stderr: ' + data.toString()); });
@@ -231,7 +229,7 @@ app.get(prefix + "play/:song", (req, res) => {
 app.get(prefix + "change/:setting/:value", (req, res) => {
 	const setting = req.params.setting.toString()
 	const value = req.params.value.toString()
-	if (setting != "PS" && setting != "RT" && setting != "TA" && setting != "PTY") return res.status(405).send("Allowed settings: PT, RT, TA, PTY.")
+	if (setting !== "PS" && setting !== "RT") return res.status(405).send("Allowed settings: PT, RT, TA, PTY.")
 	else {save(setting, value);res.send(setting.toString() + ", " + value.toString());}
 })
 /*
