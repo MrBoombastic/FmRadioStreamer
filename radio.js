@@ -219,7 +219,7 @@ app.get(prefix + "play/:song", (req, res) => {
 			`-rt ${config.RT}` +
 			`-freq ${config.freq}` +
 			`-audio -,` +
-			`-ctl ${rds_ctl}`])
+			`-ctl rds_ctl`])
 		//In case of debugging, you can uncomment this safely:
 		//execWithStd.stdout.on('data', function (data) { console.log('stdout: ' + data.toString()); });
 		execWithStd.stderr.on('data', function (data) { console.log('stderr: ' + data.toString()); });
