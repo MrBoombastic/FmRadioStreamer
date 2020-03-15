@@ -9,7 +9,7 @@ config.json
 .eslintrc.js
 music/*
 !music/www-bensound-com-summer.wav
-!music/www-bensound-com-summer.mp3
+package-lock.json/
 ytdl-temp/
 !ytdl-temp/placeholder.txt
 .idea

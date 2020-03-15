@@ -1,8 +1,8 @@
 # FmRadioStreamer
-[ALPHA] RPI based FM streamer with OLED, buttons and LEDs support
+[ALPHA] RPi based FM streamer with OLED, buttons and LEDs support
 
 ## Installation:
-Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. Installer will use NPM, but you can change to Yarn or PNPM. Then edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started).
+Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. Installer will use NPM, but you can change it to Yarn or PNPM. Then edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started).
 
 ## Running:
 Rename `config.json.example` to `config.json`. Type `sudo node radio.js`. You can change RDS in `config.json` file. Go to API Docs section for more.
@@ -12,7 +12,7 @@ Rename `config.json.example` to `config.json`. Type `sudo node radio.js`. You ca
 - LEDs blinking when all is OK
 - Yellow LED blinks if frequency is out of limit
 - API - download music from YT and play
-- Change frequency with buttons
+- Change and save frequency with buttons
 
 ## API Docs
 - /fmradiostreamer/yt/(song) - Downloads song from YT and save with filename of request text
@@ -21,10 +21,10 @@ Rename `config.json.example` to `config.json`. Type `sudo node radio.js`. You ca
 - /fmradiostreamer/play/(song) - Starts streaming and playing song.
 
 ## Dependencies note
-This project uses Pi_Fm_Adv and my own fork of i2c-bus: i2c-bus-i2c-1, and other stuff listed in packages.json.
+This project uses PiFmRds and other stuff listed in packages.json.
 
 ## Hardware
-SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, female-male and male-male cables. Tested on Raspberry Pi Zero W with goldpins soldered by me. :D
+SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, ~20k Ohm resistors, leds, female-male and male-male cables. Tested on Raspberry Pi Zero W with goldpins soldered by me. :D
 
 ## What if I haven't got that hardware?
 Minimum requirement is RPi. FmRadioStreamer SHOULD work without them (untested).
@@ -36,7 +36,7 @@ Don't blame me pls.
 
 ## What is NOT working a.k.a. bugs
 - Optimisation sucks
-- Files are in a mess
+- ~~Files are in a mess~~
 
 ## What is in progress?
 - Android app
@@ -44,11 +44,12 @@ Don't blame me pls.
 
 ## GPIO
 - 1 - 3V3 Power
-- 3 - GPIO 2 - button
-- 5 - GPIO 3 - button
-- 6 - GND for screen
+- 3 - GPIO 2 - screen
+- 5 - GPIO 3 - screen
+- 6 - GND - for screen
 - 7 - GPIO 4 -  antenna
-- 29 - GPIO 5 - LED YELLOW
+- 26 - GPIO 7 - BLUE WORKING LED
+- 29 - GPIO 5 - YELLOW WARNING LED
 - 31 - GPIO 6 - LED
 - 32 - GPIO 12 - button
 - 33 - GPIO 13 - LED
