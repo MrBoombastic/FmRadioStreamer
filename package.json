@@ -9,7 +9,7 @@
 		"oled-font-5x7": "^1.0.3",
 		"oled-i2c-bus": "^1.0.11",
 		"onoff": "^5.0.0",
-		"ytdl-core": "^1.0.3",
+		"ytdl-core": "^2.0.0",
 		"ytsearcher": "^1.2.2"
 	},
 	"author": {
