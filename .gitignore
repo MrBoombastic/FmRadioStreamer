@@ -8,7 +8,6 @@ yarn-error.log*
 config.json
 .eslintrc.js
 package-lock.json/
-ytdl-temp/
 !ytdl-temp/placeholder.txt
 .idea
 # Runtime data
