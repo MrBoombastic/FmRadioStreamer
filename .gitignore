@@ -7,8 +7,6 @@ yarn-error.log*
 
 config.json
 .eslintrc.js
-music/*
-!music/www-bensound-com-summer.wav
 package-lock.json/
 ytdl-temp/
 !ytdl-temp/placeholder.txt

@@ -5,7 +5,7 @@
 Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. Installer will use NPM, but you can change it to Yarn or PNPM. Then edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started).
 
 ## Running:
-Rename `config.json.example` to `config.json`. Type `sudo node radio.js`. You can change RDS in `config.json` file. Go to API Docs section for more.
+Rename `config.json.example` to `config.json`. Type `sudo node index.js`. You can change RDS in `config.json` file. Go to API Docs section for more.
 
 ## Functions:
 - Show RDS on screen
@@ -26,7 +26,7 @@ This project uses PiFmRds and other stuff listed in packages.json.
 ## Hardware
 SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, ~20k Ohm resistors, leds, female-male and male-male cables. Tested on Raspberry Pi Zero W with goldpins soldered by me. :D
 
-## What if I haven't got that hardware?
+## What if I don't have that hardware?
 Minimum requirement is RPi. FmRadioStreamer SHOULD work without them (untested).
 
 ## Gallery
