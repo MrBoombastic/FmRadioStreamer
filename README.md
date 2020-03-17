@@ -1,5 +1,6 @@
 # FmRadioStreamer
-[ALPHA] RPi based FM streamer with OLED, buttons and LEDs support
+[BETA] RPi based FM streamer with OLED, buttons and LEDs support.
+Using https://github.com/MrBoombastic/PiFMRDS-Extra for better quality sound.
 
 ## Installation:
 Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. Installer will use NPM, but you can change it to Yarn or PNPM. Then edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started).
@@ -15,10 +16,10 @@ Rename `config.json.example` to `config.json`. Type `sudo node index.js`. You ca
 - Change and save frequency with buttons
 
 ## API Docs
-- /fmradiostreamer/yt/(song) - Downloads song from YT and save with filename of request text
-- /fmradiostreamer/list - Returns song list
-- /fmradiostreamer/change/(setting)/(value) - Changes setting of PS, RT, TA and PTY. Saves to config, so changes are effective when you restart application or change music.
-- /fmradiostreamer/play/(song) - Starts streaming and playing song.
+- /fmradiostreamer/yt/(song) - Downloads song from YT and save with filename of requested text.
+- /fmradiostreamer/list - Returns song list.
+- /fmradiostreamer/change/(setting)/(value) - Changes settings. Saves to config, so changes are effective when you restart application or change music.
+- /fmradiostreamer/play/(song) - Starts song.
 
 ## Dependencies note
 This project uses PiFmRds and other stuff listed in packages.json.
@@ -30,16 +31,16 @@ SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, ~20k Ohm resistors, leds, fem
 Minimum requirement is RPi. FmRadioStreamer SHOULD work without them (untested).
 
 ## Gallery
-Don't blame me pls.
-![Image](docs/IMG_20190728_172941.jpg?raw=true "Image")
-![Image](docs/IMG_20190728_172930.jpg?raw=true "Image")
+In the `docs` directory there are pictures of first version of this project. Watching is on your risk!
+![Image](docs/hwv2_1.jpg?raw=true "Image")
+![Image](docs/hwv2_2.jpg?raw=true "Image")
 
 ## What is NOT working a.k.a. bugs
-- Optimisation sucks
-- ~~Files are in a mess~~
+- ~~Optimisation sucks~~ maybe not
+- ~~Files are in a mess~~ definitly not
 
 ## What is in progress?
-- Android app
+- ~~Android app~~ not too much time
 - More stuff to change
 
 ## GPIO

@@ -56,7 +56,7 @@ module.exports = class webserver {
                 exec(`sudo pkill -2 pi_fm_rds`, () => {
                     exec(`mkfifo rds_ctl`);
                     const execWithStd = spawn(`sudo`, [
-                            'src/pi_fm_rds',
+                            'core/pi_fm_rds',
                             `-ps "${config.PS}"`,
                             `-rt "${config.RT}"`,
                             '-freq', config.freq,
