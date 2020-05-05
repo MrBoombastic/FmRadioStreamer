@@ -53,10 +53,10 @@ module.exports = class webserver {
                 res.json(JSON.parse(`{"list": "${finallist.slice(0, -2)}"}`));
             });
             app.get(prefix + "play/:song", (req, res) => {
-                exec(`sudo pkill -2 pi_fm_rds`, () => {
+                exec(`sudo pkill -2 pi_fm_adv`, () => {
                     exec(`mkfifo rds_ctl`);
                     const execWithStd = spawn(`sudo`, [
-                            'core/pi_fm_rds',
+                            'core/pi_fm_adv',
                             `--ps "${config.PS}"`,
                             `--rt "${config.RT}"`,
                             '--freq', config.freq,
