@@ -57,12 +57,12 @@ module.exports = class webserver {
                     exec(`mkfifo rds_ctl`);
                     const execWithStd = spawn(`sudo`, [
                             'core/pi_fm_rds',
-                            `-ps "${config.PS}"`,
-                            `-rt "${config.RT}"`,
-                            '-freq', config.freq,
-                            '-ctl', 'rds_ctl',
-                            '-cutoff', `${config.quality}`,
-                            '-audio', `"./music/${req.params.song}.wav"`],
+                            `--ps "${config.PS}"`,
+                            `--rt "${config.RT}"`,
+                            '--freq', config.freq,
+                            '--ctl', 'rds_ctl',
+                            //'-cutoff', `${config.quality}`,
+                            '--audio', `"./music/${req.params.song}.wav"`],
                         {shell: true});
                     //In case of debugging, you can uncomment this safely:
                     //execWithStd.stdout.on('data', function (data) { console.log('stdout: ' + data.toString()); });
