@@ -1,14 +1,14 @@
 {
 	"name": "fmradiostreamer",
-	"version": "0.2.1",
-	"description": "PiFmRds based FM streamer with LEDs, buttons, screen and web server support.",
+	"version": "0.2.2",
+	"description": "RPi based FM radio streamer with OLED, buttons and LEDs support.",
 	"main": "start/js",
 	"dependencies": {
 		"express": "^4.17.1",
 		"i2c-bus": "^5.1.0",
 		"oled-font-5x7": "^1.0.3",
 		"oled-i2c-bus": "^1.0.11",
-		"onoff": "^5.0.0",
+		"onoff": "^6.0.0",
 		"ytdl-core": "^2.0.0",
 		"ytsearcher": "^1.2.2"
 	},

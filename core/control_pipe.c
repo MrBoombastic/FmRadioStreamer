@@ -1,30 +1,11 @@
 /*
-    PiFmRds - FM/RDS transmitter for the Raspberry Pi
-    Copyright (C) 2014 Christophe Jacquet, F8FTK
-    
-    See https://github.com/ChristopheJacquet/PiFmRds
-    
-    rds_wav.c is a test program that writes a RDS baseband signal to a WAV
-    file. It requires libsndfile.
+    PiFmAdv - Advanced FM transmitter for the Raspberry Pi
+    Copyright (C) 2017 Miegl
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-    
-    control_pipe.c: handles command written to a non-blocking control pipe,
-    in order to change RDS PS and RT at runtime.
+    See https://github.com/Miegl/PiFmAdv
 */
 
-
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -41,6 +22,7 @@ FILE *f_ctl;
 /*
  * Opens a file (pipe) to be used to control the RDS coder, in non-blocking mode.
  */
+
 int open_control_pipe(char *filename) {
 	int fd = open(filename, O_RDONLY | O_NONBLOCK);
     if(fd == -1) return -1;
@@ -61,6 +43,7 @@ int open_control_pipe(char *filename) {
  * Polls the control file (pipe), non-blockingly, and if a command is received,
  * processes it and updates the RDS data.
  */
+
 int poll_control_pipe() {
 	static char buf[CTL_BUFFER_SIZE];
 
@@ -88,14 +71,52 @@ int poll_control_pipe() {
             if(ta) printf("ON\n"); else printf("OFF\n");
             return CONTROL_PIPE_TA_SET;
         }
+	if(res[0] == 'T' && res[1] == 'P') {
+            int tp = ( strcmp(arg, "ON") == 0 );
+            set_rds_tp(tp);
+            printf("Set TP to ");
+            if(tp) printf("ON\n"); else printf("OFF\n");
+            return CONTROL_PIPE_TP_SET;
+        }
+	if(res[0] == 'M' && res[1] == 'S') {
+            int ms = ( strcmp(arg, "ON") == 0 );
+            set_rds_ms(ms);
+            printf("Set MS to ");
+            if(ms) printf("ON\n"); else printf("OFF\n");
+            return CONTROL_PIPE_MS_SET;
+        }
+	if(res[0] == 'A' && res[1] == 'B') {
+            int ab = ( strcmp(arg, "ON") == 0 );
+            set_rds_ab(ab);
+            printf("Set AB to ");
+            if(ab) printf("ON\n"); else printf("OFF\n");
+            return CONTROL_PIPE_AB_SET;
+        }
     }
-    
+
+    if(strlen(res) > 4 && res[3] == ' ') {
+        char *arg = res+4;
+        if(arg[strlen(arg)-1] == '\n') arg[strlen(arg)-1] = 0;
+        if(res[0] == 'P' && res[1] == 'T' && res[2] == 'Y') {
+            int pty = atoi(arg);
+            if (pty >= 0 && pty <= 31) {
+                set_rds_pty(pty);
+                if (!pty) {
+                    printf("PTY disabled\n");
+                } else {
+                    printf("PTY set to: %i\n", pty);
+                }
+            }
+            else {
+                printf("Wrong PTY identifier! The PTY range is 0 - 31.\n");
+            }
+            return CONTROL_PIPE_PTY_SET;
+        }
+    }
+
     return -1;
 }
 
-/*
- * Closes the control pipe.
- */
 int close_control_pipe() {
     if(f_ctl) return fclose(f_ctl);
     else return 0;

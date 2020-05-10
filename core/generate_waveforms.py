@@ -1,23 +1,11 @@
 #!/usr/bin/python
 
 
-#   PiFmRds - FM/RDS transmitter for the Raspberry Pi
-#   Copyright (C) 2014 Christophe Jacquet, F8FTK
-#   
-#   See https://github.com/ChristopheJacquet/PiFmRds
+#   PiFmAdv - Advanced featured FM transmitter for the Raspberry Pi
+#   Copyright (C) 2017 Miegl
 #
-#   This program is free software: you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation, either version 3 of the License, or
-#   (at your option) any later version.
-#
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License
-#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   See https://github.com/Miegl/PiFmAdv
+
 
 #   This program generates the waveform of a single biphase symbol
 #
@@ -49,17 +37,17 @@ def generate_bit(name):
     offset = 240
     l = 96
     count = 2
-    
+
 
     sample = numpy.zeros(3*l)
     sample[l] = 1
     sample[2*l] = -1
-    
+
     # Apply the data-shaping filter
     sf = rds.pulse_shaping_filter(96*8, 228000)
     shapedSamples = numpy.convolve(sample, sf)
 
-   
+
     out = shapedSamples[528-288:528+288] #[offset:offset+l*count]
     #plt.plot(sf)
     #plt.plot(out)
@@ -67,13 +55,13 @@ def generate_bit(name):
 
     iout = (out * 20000./max(abs(out)) ).astype(numpy.dtype('>i2'))
     wavfile.write(u"waveform_{}.wav".format(name), sample_rate, iout)
-    
+
     outc.write(u"float waveform_{name}[] = {{{values}}};\n\n".format(
         name = name,
         values = u", ".join(map(unicode, out/2.5))))
         # note: need to limit the amplitude so as not to saturate when the biphase
         # waveforms are summed
-    
+
     outh.write(u"extern float waveform_{name}[{size}];\n".format(name=name, size=len(out)))
 
 

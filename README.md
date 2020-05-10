@@ -1,9 +1,10 @@
 # FmRadioStreamer
 [BETA] RPi based FM streamer with OLED, buttons and LEDs support.
-Using https://github.com/MrBoombastic/PiFMRDS-Extra for better quality sound.
+Using PiFmAdv for better quality sound.
 
 ## Installation:
 Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. Installer will use NPM, but you can change it to Yarn or PNPM. Then edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started).
+Also, you have to add `gpu_freq=250` in `/boot/config.txt`.
 
 ## Running:
 Rename `config.json.example` to `config.json`. Type `sudo node index.js`. You can change RDS in `config.json` file. Go to API Docs section for more.
@@ -16,22 +17,22 @@ Rename `config.json.example` to `config.json`. Type `sudo node index.js`. You ca
 - Change and save frequency with buttons
 
 ## API Docs
-- /fmradiostreamer/yt/(song) - Downloads song from YT and save with filename of requested text.
+- /fmradiostreamer/yt/(song) - Downloads song from YT and save with a filename of requested text.
 - /fmradiostreamer/list - Returns song list.
 - /fmradiostreamer/change/(setting)/(value) - Changes settings. Saves to config, so changes are effective when you restart application or change music.
 - /fmradiostreamer/play/(song) - Starts song.
 
 ## Dependencies note
-This project uses PiFmRds and other stuff listed in packages.json.
+This project uses PiFmAdv, FFmpeg, libsndfile1-dev and other stuff listed in packages.json.
 
 ## Hardware
 SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, ~20k Ohm resistors, leds, female-male and male-male cables. Tested on Raspberry Pi Zero W with goldpins soldered by me. :D
 
 ## What if I don't have that hardware?
-Minimum requirement is RPi. FmRadioStreamer SHOULD work without them (untested).
+The minimum requirement is RPi. FmRadioStreamer SHOULD work without them (untested). If not, comment some lines in `index.js`.
 
 ## Gallery
-In the `docs` directory there are pictures of first version of this project. Watching is on your risk!
+In the `docs` directory there are pictures of first version of this project. Watch on your own risk!
 ![Image](docs/hwv2_1.jpg?raw=true "Image")
 ![Image](docs/hwv2_2.jpg?raw=true "Image")
 
@@ -41,7 +42,7 @@ In the `docs` directory there are pictures of first version of this project. Wat
 
 ## What is in progress?
 - ~~Android app~~ not too much time
-- More stuff to change
+- More stuff to change/improve
 
 ## GPIO
 - 1 - 3V3 Power

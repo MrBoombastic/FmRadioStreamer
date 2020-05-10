@@ -53,16 +53,16 @@ module.exports = class webserver {
                 res.json(JSON.parse(`{"list": "${finallist.slice(0, -2)}"}`));
             });
             app.get(prefix + "play/:song", (req, res) => {
-                exec(`sudo pkill -2 pi_fm_rds`, () => {
+                exec(`sudo pkill -2 pi_fm_adv`, () => {
                     exec(`mkfifo rds_ctl`);
                     const execWithStd = spawn(`sudo`, [
-                            'core/pi_fm_rds',
-                            `-ps "${config.PS}"`,
-                            `-rt "${config.RT}"`,
-                            '-freq', config.freq,
-                            '-ctl', 'rds_ctl',
-                            '-cutoff', `${config.quality}`,
-                            '-audio', `"./music/${req.params.song}.wav"`],
+                            'core/pi_fm_adv',
+                            `--ps "${config.PS}"`,
+                            `--rt "${config.RT}"`,
+                            '--freq', config.freq,
+                            '--ctl', 'rds_ctl',
+                            //'-cutoff', `${config.quality}`,
+                            '--audio', `"./music/${req.params.song}.wav"`],
                         {shell: true});
                     //In case of debugging, you can uncomment this safely:
                     //execWithStd.stdout.on('data', function (data) { console.log('stdout: ' + data.toString()); });
