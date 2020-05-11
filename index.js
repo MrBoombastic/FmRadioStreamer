@@ -3,14 +3,15 @@ const config = require("./config.json");
 global.multiplier = 0.1;
 global.freq = Math.round(config.freq * 10) / 10;
 global.ffmpegorytdlWorking = false;
-const led = require('./modules/led');
-const webserver = require('./modules/webserver');
 try {
     const oled = require('./modules/oled');
+    global.oledNotSupported = false
 } catch(e) {
     console.log("OLED not supported!")
     global.oledNotSupported = true
 }
+const led = require('./modules/led');
+const webserver = require('./modules/webserver');
 const buttons = require('./modules/buttons');
 const {exec} = require("child_process");
 if(!global.oledNotSupported) new oled().run();
