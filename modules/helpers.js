@@ -1,5 +1,5 @@
 const fs = require("fs");
-if(!oledNotSupported) const screen = require("./oled");
+if(!oledNotSupported) { const screen = require("./oled"); }
 
 module.exports = {
     save: async function (setting, value) {
