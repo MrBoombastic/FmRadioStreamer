@@ -1,5 +1,5 @@
 const fs = require("fs");
-const screen = require("./oled");
+if(!oledNotSupported) const screen = require("./oled");
 
 module.exports = {
     save: async function (setting, value) {
@@ -8,6 +8,6 @@ module.exports = {
         data[setting] = value;
         console.log(value);
         fs.writeFileSync('./config.json', JSON.stringify(data, null, 4), 'utf-8');
-        new screen().miniMessage("OK!");
+        if(!oledNotSupported) new screen().miniMessage("OK!");
     }
 };
