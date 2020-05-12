@@ -5,7 +5,7 @@ const buttonHigh = new Gpio(20, 'in', 'rising', {debounceTimeout: 40});
 const buttonSet = new Gpio(16, 'in', 'rising', {debounceTimeout: 40});
 const buttonMultiplier = new Gpio(12, 'in', 'rising', {debounceTimeout: 40});
 const led = require("./led");
-const screen = require("./oled");
+if(!oledNotSupported) { const screen = require("./oled"); }
 
 
 module.exports = class buttons {
@@ -14,21 +14,21 @@ module.exports = class buttons {
             buttonLow.watch(async (err) => {
                 if (err) throw err;
                 if (Number(freq) - multiplier <= 87.2) {
-                    new screen().miniMessage("MIN");
+                    if(!oledNotSupported) { new screen().miniMessage("MIN"); }
                     await new led().ledWarnBlink();
                 } else {
                     freq = Number(freq) - multiplier;
-                    new screen().updateScreen();
+                    if(!oledNotSupported) { new screen().updateScreen(); }
                 }
             });
             buttonHigh.watch(async (err) => {
                 if (err) throw err;
                 if (Number(freq) + multiplier >= 108.9) {
-                    new screen().miniMessage("MAX");
+                    if(!oledNotSupported) { new screen().miniMessage("MAX"); }
                     await new led().ledWarnBlink();
                 } else {
                     freq = Number(freq) + multiplier;
-                    new screen().updateScreen();
+                    if(!oledNotSupported) { new screen().updateScreen(); }
                 }
             });
             buttonSet.watch(async (err) => {
@@ -42,7 +42,7 @@ module.exports = class buttons {
                 else if (multiplier === 1) multiplier = 2;
                 else if (multiplier === 2) multiplier = 5;
                 else multiplier = 0.1;
-                new screen().updateScreen();
+                if(!oledNotSupported) { new screen().updateScreen(); }
             });
         };
         this.unexport = function () {
