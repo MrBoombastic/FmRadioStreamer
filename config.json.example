@@ -1,7 +1,8 @@
 {
-    "freq": 108.0,
-    "PS": "FmRadStr",
-    "RT": "RPi based radio streamer. It is working!",
-    "apikey": "",
-    "port": 1080
+  "freq": 108.0,
+  "PS": "FmRadStr",
+  "RT": "RPi based radio streamer. It is working!",
+  "apikey": "",
+  "port": 1080,
+  "power": 5
 }

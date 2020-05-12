@@ -7,19 +7,20 @@ Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. I
 Also, you have to add `gpu_freq=250` in `/boot/config.txt`.
 
 ## Running:
-Rename `config.json.example` to `config.json`. Type `sudo node index.js`. You can change RDS in `config.json` file. Go to API Docs section for more.
+Rename `config.json.example` to `config.json`. Then type `sudo node index.js`. You can change RDS in `config.json` file. Go to API Docs section for more.
 
 ## Functions:
 - Show RDS on screen
 - LEDs blinking when all is OK
 - Yellow LED blinks if frequency is out of limit
+- Blue LED blinks if music is being dowloaded from YouTube or converted
 - API - download music from YT and play
 - Change and save frequency with buttons
 
 ## API Docs
 - /fmradiostreamer/yt/(song) - Downloads song from YT and save with a filename of requested text.
 - /fmradiostreamer/list - Returns song list.
-- /fmradiostreamer/change/(setting)/(value) - Changes settings. Saves to config, so changes are effective when you restart application or change music.
+- ~~/fmradiostreamer/change/(setting)/(value) - Changes settings. Saves to config, so changes are effective when you restart application or change music.~~ disabled, need rewrite.
 - /fmradiostreamer/play/(song) - Starts song.
 
 ## Dependencies note
@@ -29,7 +30,7 @@ This project uses PiFmAdv, FFmpeg, libsndfile1-dev and other stuff listed in pac
 SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, ~20k Ohm resistors, leds, female-male and male-male cables. Tested on Raspberry Pi Zero W with goldpins soldered by me. :D
 
 ## What if I don't have that hardware?
-The minimum requirement is RPi. FmRadioStreamer SHOULD work without them (untested). If not, comment some lines in `index.js`.
+The minimum requirement is RPi. FmRadioStreamer SHOULD work without them.
 
 ## Gallery
 In the `docs` directory there are pictures of first version of this project. Watch on your own risk!

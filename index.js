@@ -8,17 +8,17 @@ try {
     oled = require('./modules/oled');
     global.oledNotSupported = false
 } catch(e) {
-    console.log("OLED not supported!")
+    console.log("OLED not present!")
     global.oledNotSupported = true
 }
 const led = require('./modules/led');
 const webserver = require('./modules/webserver');
 const buttons = require('./modules/buttons');
 const {exec} = require("child_process");
-if(!global.oledNotSupported) new oled().run();
 new led().run();
 new buttons().run();
 new webserver().run();
+if(!global.oledNotSupported) new oled().run();
 process.on('SIGINT', () => {
     if(!global.oledNotSupported) new oled().stop();
     new buttons().unexport();
