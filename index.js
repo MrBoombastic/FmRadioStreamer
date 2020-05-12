@@ -3,8 +3,9 @@ const config = require("./config.json");
 global.multiplier = 0.1;
 global.freq = Math.round(config.freq * 10) / 10;
 global.ffmpegorytdlWorking = false;
+let oled;
 try {
-    const oled = require('./modules/oled');
+    oled = require('./modules/oled');
     global.oledNotSupported = false
 } catch(e) {
     console.log("OLED not supported!")
