@@ -1,6 +1,6 @@
 {
 	"name": "fmradiostreamer",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"description": "RPi based FM radio streamer with OLED, buttons and LEDs support.",
 	"main": "start/js",
 	"dependencies": {

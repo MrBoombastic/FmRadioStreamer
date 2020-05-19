@@ -5,7 +5,8 @@ const buttonHigh = new Gpio(20, 'in', 'rising', {debounceTimeout: 40});
 const buttonSet = new Gpio(16, 'in', 'rising', {debounceTimeout: 40});
 const buttonMultiplier = new Gpio(12, 'in', 'rising', {debounceTimeout: 40});
 const led = require("./led");
-if(!oledNotSupported) { const screen = require("./oled"); }
+let screen
+if(!oledNotSupported) { screen = require("./oled"); }
 
 
 module.exports = class buttons {
