@@ -10,15 +10,15 @@ const spawn = require('child_process').spawn;
 const {exec} = require("child_process");
 const helpers = require('./helpers');
 const led = require('./led');
-const runConfig = [
+/*const runConfig = [
     'core/pi_fm_adv',
     `--ps "${config.PS}"`,
     `--rt "${config.RT}"`,
-    '--freq', config.freq,
+    '--freq', freq,
     '--ctl', 'rds_ctl',
     '--power', config.power
 ];
-
+*/
 module.exports = class webserver {
     constructor() {
         this.run = async function () {
@@ -63,7 +63,14 @@ module.exports = class webserver {
             app.get(prefix + "play/:song", (req, res) => {
                 exec(`sudo pkill -2 pi_fm_adv`, () => {
                     exec(`mkfifo rds_ctl`);
-                    const execWithStd = spawn(`sudo`, runConfig.concat(['--audio', `"./music/${req.params.song}.wav"`]), {shell: true});
+                    const execWithStd = spawn(`sudo`, [
+                        'core/pi_fm_adv',
+                        `--ps "${config.PS}"`,
+                        `--rt "${config.RT}"`,
+                        '--freq', freq,
+                        '--ctl', 'rds_ctl',
+                        '--power', config.power,
+                    '--audio', `"./music/${req.params.song}.wav"`], {shell: true});
                     //In case of debugging, you can uncomment this safely:
                     //execWithStd.stdout.on('data', function (data) { console.log('stdout: ' + data.toString()); });
                     execWithStd.stderr.on('data', function (data) {
@@ -87,10 +94,17 @@ module.exports = class webserver {
                 else {save(setting, value);res.send(setting.toString() + ", " + value.toString())}
             })*/
             exec(`sudo pkill -2 pi_fm_adv`, () => {
-                spawn(`sudo`, runConfig,
+                spawn(`sudo`, [
+                    'core/pi_fm_adv',
+                    `--ps "${config.PS}"`,
+                    `--rt "${config.RT}"`,
+                    '--freq', freq,
+                    '--ctl', 'rds_ctl',
+                    '--power', config.power
+                ],
                     {shell: true});
             });
-            app.listen(config.port, () => console.log(`FmRadioStreamer working!\nPort: ${config.port}\nFreq: ${Number(config.freq).toFixed(1)}\nPS: ${config.PS}\nRT: ${config.RT}`));
+            app.listen(config.port, () => console.log(`FmRadioStreamer working!\nPort: ${config.port}\nFreq: ${freq}\nPS: ${config.PS}\nRT: ${config.RT}`));
         };
     }
 };
