@@ -3,7 +3,9 @@
 Using PiFmAdv for better quality sound.
 
 ## Installation:
-Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. Installer will use NPM, but you can change it to Yarn or PNPM. Then edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started).
+Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. **WARNING!!!** Installer will use Yarn to install packages INSTEAD of NPM! 
+
+Edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started).
 Also, you have to add `gpu_freq=250` in `/boot/config.txt`.
 
 ## Running:
