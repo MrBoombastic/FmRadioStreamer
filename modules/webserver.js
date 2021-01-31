@@ -1,6 +1,5 @@
 const express = require("express"),
     app = express(),
-    prefix = "/fmradiostreamer/",
     {YTSearcher} = require('ytsearcher'),
     config = require("../config.json"),
     ytsearcher = new YTSearcher(config.apikey),
@@ -8,25 +7,22 @@ const express = require("express"),
     fs = require('fs'),
     spawn = require('child_process').spawn,
     {exec} = require("child_process"),
-    helpers = require('./helpers'),
     led = require('./led');
-/*const runConfig = [
-    'core/pi_fm_adv',
-    `--ps "${config.PS}"`,
-    `--rt "${config.RT}"`,
-    '--freq', freq,
-    '--ctl', 'rds_ctl',
-    '--power', config.power
-];
-*/
+
+app.set('view engine', 'ejs');
+
 module.exports = class webserver {
     constructor() {
         this.run = async function () {
-            app.get(prefix + "yt/:song", async (req, res) => {
-                const safeSongName = req.params.song.replace(/[^a-zA-Z0-9\s]/g, "").replace(/ /g, "-");
+            app.get("/", (req, res) => {
+                res.render('dash.ejs', {list: fs.readdirSync('./music/')});
+            });
+
+            app.get("/yt/:song", async (req, res) => {
                 ffmpegorytdlWorking = true;
                 const result = await ytsearcher.search(req.params.song, {type: 'video'});
                 const music = await result.first;
+                const safeSongName = music.title.replace(/[^a-zA-Z0-9\s]/g, "").replace(/ /g, "-");
                 const video = ytdl(music.url, {quality: "highestaudio", filter: "audioonly"});
                 video.pipe(fs.createWriteStream(`ytdl-temp/${safeSongName}`));
                 video.on('end', () => {
@@ -38,24 +34,29 @@ module.exports = class webserver {
                     ffmpegProgress.on('exit', function (code) {
                         ffmpegorytdlWorking = false;
                         if (code !== 0) {
-                            console.log("FFmpeg returned error:" + code);
-                            return res.send("FFmpeg error!");
+                            console.error("FFmpeg returned error: " + code);
+                            return res.status(500).json({
+                                status: "error",
+                                desc: "FFmpeg returned error: " + code
+                            });
                         }
                         exec('sudo rm -r ./ytdl-temp/*');
-                        res.send("Done!");
+                        res.json({
+                            status: "done",
+                            desc: safeSongName
+                        });
                     });
                 });
             });
 
-            app.get(prefix + "list", (req, res) => {
+            app.get("/list", (req, res) => {
                 let finallist = "";
                 const musiclist = fs.readdirSync('./music/');
-                musiclist.forEach(function (song) {
-                    finallist = finallist + song + ", ";
-                });
-                res.json(JSON.parse(`{"list": "${finallist.slice(0, -2)}"}`));
+                musiclist.forEach(song => finallist += (song + ", "));
+                res.json({status: "done", desc: finallist.slice(0, -2)});
             });
-            app.get(prefix + "play/:song", (req, res) => {
+            app.get("/play", (req, res) => {
+                if (!req.query.song) return res.status(404).json({status: "failed", desc: "not found"});
                 exec(`sudo pkill -2 pi_fm_adv`, () => {
                     exec(`mkfifo rds_ctl`);
                     const execWithStd = spawn(`sudo`, [
@@ -65,7 +66,7 @@ module.exports = class webserver {
                         '--freq', freq,
                         '--ctl', 'rds_ctl',
                         '--power', config.power,
-                        '--audio', `"./music/${req.params.song}.wav"`], {shell: true});
+                        '--audio', `"./music/${req.query.song}.wav"`], {shell: true});
                     //In case of debugging, you can uncomment this safely:
                     //execWithStd.stdout.on('data', function (data) { console.log('stdout: ' + data.toString()); });
                     execWithStd.stderr.on('data', function (data) {
@@ -74,7 +75,8 @@ module.exports = class webserver {
                     res.send("ok");
                 });
             });
-            app.get(prefix + "change/:setting/:value", (req, res) => {
+            /*
+            app.get("change/:setting/:value", (req, res) => {
                 const setting = req.params.setting.toString();
                 const value = req.params.value.toString();
                 if (setting !== "PS" && setting !== "RT") return res.status(405).send("Allowed settings: PT, RT, TA, PTY.");
@@ -82,12 +84,7 @@ module.exports = class webserver {
                     helpers.save(setting, value);
                     res.send(setting.toString() + ", " + value.toString());
                 }
-            });
-            /*
-            app.get(prefix + "set/:setting/:value", (req, res) => {
-                if (setting != "PS" && setting != "RT" && setting != "TA" && setting != "PTY") return res.status(405).send("Allowed settings: PT, RT, TA, PTY.")
-                else {save(setting, value);res.send(setting.toString() + ", " + value.toString())}
-            })*/
+            });*/
             exec(`sudo pkill -2 pi_fm_adv`, () => {
                 spawn(`sudo`, [
                         'core/pi_fm_adv',
@@ -99,7 +96,10 @@ module.exports = class webserver {
                     ],
                     {shell: true});
             });
-            app.listen(config.port, () => console.log(`FmRadioStreamer working!\nPort: ${config.port}\nFreq: ${freq}\nPS: ${config.PS}\nRT: ${config.RT}`));
+            let humanConfig = "";
+            for (const key in config) humanConfig += `     ${key}: ${config[key]}\n`;
+
+            app.listen(config.port, () => console.log(`FmRadioStreamer working!\nUsing configuration:\n${humanConfig.slice(0, -1)}`));
         };
     }
 };

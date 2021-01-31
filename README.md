@@ -20,13 +20,14 @@ Rename `config.json.example` to `config.json`. Then type `sudo node index.js`. Y
 - Change and save frequency with buttons
 
 ## API Docs
-- /fmradiostreamer/yt/(song) - Downloads song from YT and save with a filename of requested text.
-- /fmradiostreamer/list - Returns song list.
+- / - basic dashboard
+- /yt/(song name) - Downloads song from YT and save with a filename of requested text.
+- /list - Returns song list.
 - ~~/fmradiostreamer/change/(setting)/(value) - Changes settings. Saves to config, so changes are effective when you restart application or change music.~~ disabled, need rewrite.
-- /fmradiostreamer/play/(song) - Starts song.
+- /play/(song name) - Starts song.
 
 ## Dependencies note
-This project uses PiFmAdv, FFmpeg, libsndfile1-dev and other stuff listed in packages.json.
+This project uses PiFmAdv, FFmpeg, libsndfile1-dev and other stuff listed in package.json.
 
 ## Hardware
 SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, ~20k Ohm resistors, leds, female-male and male-male cables. Tested on Raspberry Pi Zero W with goldpins soldered by me. :D

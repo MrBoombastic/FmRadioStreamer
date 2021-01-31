@@ -1,0 +1,13 @@
+<label for="songPicker">Select music file and play</label><br><br>
+<select name="song" id="songPicker">
+    <% for(let name of list) {
+        name = name.slice(0, -4); %>
+    <option value="<%= name; %>"><%= name; %></option>
+    <% } %>
+</select>
+<button id="play">Play</button>
+<script>
+    document.getElementById("play").onclick = function () {
+        fetch("./play?song=" + document.getElementById("songPicker").value)
+    }
+</script>
