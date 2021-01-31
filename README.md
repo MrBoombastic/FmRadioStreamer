@@ -24,7 +24,7 @@ Rename `config.json.example` to `config.json`. Then type `sudo node index.js`. Y
 - /yt/(song name) - Downloads song from YT and save with a filename of requested text.
 - /list - Returns song list.
 - ~~/fmradiostreamer/change/(setting)/(value) - Changes settings. Saves to config, so changes are effective when you restart application or change music.~~ disabled, need rewrite.
-- /play/(song name) - Starts song.
+- /play?song=(song name) - Plays song.
 
 ## Dependencies note
 This project uses PiFmAdv, FFmpeg, libsndfile1-dev and other stuff listed in package.json.
