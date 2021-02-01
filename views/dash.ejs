@@ -10,6 +10,16 @@
 <br><br><br>
 Device:
 <button id="down">Radio DOWN (a.k.a Super Stop)</button>
+<br><br><br>
+YouTube:
+<input type="text" id="youtube-input">
+<button id="youtube-search">Search</button>
+<button id="youtube-download">Download</button>
+<br><br>
+https://www.youtube.com/watch?v=<div style="display: inline" id="youtube-id"></div>
+<div id="youtube-title"></div>
+<div id="youtube-channelTitle"></div>
+
 <script>
     document.getElementById("play").onclick = function () {
         fetch("./play?song=" + document.getElementById("songPicker").value)
@@ -20,6 +30,14 @@ Device:
     document.getElementById("down").onclick = function () {
         fetch("./mng?action=superstop")
     }
+    document.getElementById("youtube-search").onclick = async function () {
+        let data = await fetch(`./mng?action=yt&song=${encodeURIComponent(document.getElementById("youtube-input").value)}&searchOnly=true`)
+        data = await data.json();
+        ["id", "title", "channelTitle"].forEach(prop => {
+            document.getElementById("youtube-" + prop).textContent = data[prop]
+        })
+    }
+    document.getElementById("youtube-download").onclick = async function () {
+        await fetch(`./mng?action=yt&song=${encodeURIComponent(document.getElementById("youtube-input").value)}`)
+    }
 </script>
-<br><br><br>
-YouTube:

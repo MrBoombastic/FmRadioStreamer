@@ -1,14 +1,8 @@
 const express = require("express"),
     app = express(),
-    {YTSearcher} = require('ytsearcher'),
     config = require("../config.json"),
-    ytsearcher = new YTSearcher(config.apikey),
-    ytdl = require('ytdl-core'),
     fs = require('fs'),
-    helpers = require("./helpers"),
-    spawn = require('child_process').spawn,
-    {exec} = require("child_process"),
-    led = require('./led');
+    helpers = require("./helpers");
 
 app.set('view engine', 'ejs');
 
@@ -18,51 +12,43 @@ module.exports = class webserver {
             app.get("/", (req, res) => {
                 res.render('dash.ejs', {list: fs.readdirSync('./music/')});
             });
-            app.get("/mng", (req, res) => {
+            app.get("/mng", async (req, res) => {
                 switch (req.query.action) {
                     case 'loudstop':
-                        helpers.playPiFmADV(config);
+                        await helpers.playPiFmADV(config);
+                        res.sendStatus(200);
                         break;
                     case 'superstop':
-                        helpers.killPiFmADV();
+                        await helpers.killPiFmADV();
+                        res.sendStatus(200);
                         break;
-                    case 'Papayas':
-                        console.log('Mangoes and papayas are $2.79 a pound.');
-                        // expected output: "Mangoes and papayas are $2.79 a pound."
+                    case 'yt':
+                        if (req.query.searchOnly) res.json(await helpers.getYT(req.query.song, true));
+                        else {
+                            res.json({status: "done", desc: "Request understood. Processing now..."});
+                            await helpers.getYT(req.query.song);
+                        }
                         break;
                     default:
-                        console.log(`Sorry, we are out of ${expr}.`);
+                        return res.status(404).json({status: "failed", desc: "Action not found!"});
                 }
-
-                res.render('dash.ejs', {list: fs.readdirSync('./music/')});
             });
 
-            app.get("/yt/:song", async (req, res) => {
-                ffmpegorytdlWorking = true;
-                const result = await ytsearcher.search(req.params.song, {type: 'video'});
-                const music = await result.first;
-                const safeSongName = music.title.replace(/[^a-zA-Z0-9\s]/g, "").replace(/ /g, "-");
-                const video = ytdl(music.url, {quality: "highestaudio", filter: "audioonly"});
-                video.pipe(fs.createWriteStream(`ytdl-temp/${safeSongName}`));
-                video.on('end', async () => {
-                    const conversion = await helpers.convertToWav(safeSongName);
-                    if (conversion) {
-                        res.json({
-                            status: "done",
-                            desc: safeSongName
-                        });
-                    } else return res.status(500).json({
-                        status: "error",
-                        desc: "FFmpeg returned error: " + e
-                    });
+            app.get("/yt", async (req, res) => {
+                if (!req.query.song) return res.status(404).json({status: "failed", desc: "Song not specified!"});
+                const song = await helpers.getYT(req.query.song);
+                if (song) res.json({
+                    status: "done",
+                    desc: song
+                });
+                else res.status(500).json({
+                    status: "error",
+                    desc: "FFmpeg returned error: " + song
                 });
             });
 
             app.get("/list", (req, res) => {
-                let finallist = "";
-                const musiclist = fs.readdirSync('./music/');
-                musiclist.forEach(song => finallist += (song + ", "));
-                res.json({status: "done", desc: finallist.slice(0, -2)});
+                res.json({status: "done", desc: fs.readdirSync('./music/')});
             });
             app.get("/play", async (req, res) => {
                 if (!req.query.song) return res.status(404).json({status: "failed", desc: "not found"});

@@ -9,7 +9,7 @@ const webserver = require('./modules/webserver');
 const buttons = require('./modules/buttons');
 const {exec} = require("child_process");
 new led().run();
-new led().workingLed()
+new led().workingLed();
 new buttons().run();
 new webserver().run();
 if (config.screen) new oled().run();
@@ -24,4 +24,5 @@ process.on('SIGINT', () => {
 let humanConfig = "";
 for (const key in config) humanConfig += `     ${key}: ${config[key]}\n`;
 
-console.log(`FmRadioStreamer working!\nUsing configuration:\n${humanConfig.slice(0, -1)}`)
+console.log(`FmRadioStreamer working!\nUsing configuration:\n${humanConfig.slice(0, -1)}`);
+

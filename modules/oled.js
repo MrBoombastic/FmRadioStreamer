@@ -29,10 +29,11 @@ module.exports = class screen {
             oled.clearDisplay();
             oled.turnOffDisplay();
         };
-        this.miniMessage = function (message) {
+        this.miniMessage = function (message, live = true) {
+            if (message === "100") message = " "; //assuming this message is from FFmpeg
             oled.setCursor(1, 40);
             oled.writeString(font, 2, message);
-            setTimeout(function () {
+            if (!live) setTimeout(function () {
                 new screen().updateScreen();
             }, 2000);
         };

@@ -68,7 +68,7 @@ module.exports = class led {
                     await sleep(500);
                     ledWorking.writeSync(0);
                     await sleep(500);
-                } else break;
+                } else await sleep(1000);
             }
         };
     }
