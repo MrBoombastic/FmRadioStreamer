@@ -1,4 +1,4 @@
-<label for="songPicker">Select music file and play</label><br><br>
+<label for="songPicker">Playback</label><br><br>
 <select name="song" id="songPicker">
     <% for(let name of list) {
         name = name.slice(0, -4); %>
@@ -6,8 +6,20 @@
     <% } %>
 </select>
 <button id="play">Play</button>
+<button id="stop">Stop</button>
+<br><br><br>
+Device:
+<button id="down">Radio DOWN (a.k.a Super Stop)</button>
 <script>
     document.getElementById("play").onclick = function () {
         fetch("./play?song=" + document.getElementById("songPicker").value)
     }
+    document.getElementById("stop").onclick = function () {
+        fetch("./mng?action=loudstop")
+    }
+    document.getElementById("down").onclick = function () {
+        fetch("./mng?action=superstop")
+    }
 </script>
+<br><br><br>
+YouTube:

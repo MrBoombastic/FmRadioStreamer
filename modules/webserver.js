@@ -5,6 +5,7 @@ const express = require("express"),
     ytsearcher = new YTSearcher(config.apikey),
     ytdl = require('ytdl-core'),
     fs = require('fs'),
+    helpers = require("./helpers"),
     spawn = require('child_process').spawn,
     {exec} = require("child_process"),
     led = require('./led');
@@ -17,6 +18,24 @@ module.exports = class webserver {
             app.get("/", (req, res) => {
                 res.render('dash.ejs', {list: fs.readdirSync('./music/')});
             });
+            app.get("/mng", (req, res) => {
+                switch (req.query.action) {
+                    case 'loudstop':
+                        helpers.playPiFmADV(config);
+                        break;
+                    case 'superstop':
+                        helpers.killPiFmADV();
+                        break;
+                    case 'Papayas':
+                        console.log('Mangoes and papayas are $2.79 a pound.');
+                        // expected output: "Mangoes and papayas are $2.79 a pound."
+                        break;
+                    default:
+                        console.log(`Sorry, we are out of ${expr}.`);
+                }
+
+                res.render('dash.ejs', {list: fs.readdirSync('./music/')});
+            });
 
             app.get("/yt/:song", async (req, res) => {
                 ffmpegorytdlWorking = true;
@@ -25,26 +44,16 @@ module.exports = class webserver {
                 const safeSongName = music.title.replace(/[^a-zA-Z0-9\s]/g, "").replace(/ /g, "-");
                 const video = ytdl(music.url, {quality: "highestaudio", filter: "audioonly"});
                 video.pipe(fs.createWriteStream(`ytdl-temp/${safeSongName}`));
-                video.on('end', () => {
-                    new led().workingLed();
-                    const ffmpegProgress = spawn('ffmpeg', ['-i', `ytdl-temp/${safeSongName}`, `music/${safeSongName}.wav`]);
-                    //In case of debugging, uncomment this. Why FFmpeg produces data on stderr? idk
-                    //ffmpegProgress.stdout.on('data', function (data) { console.log('stdout: ' + data.toString()); });
-                    //ffmpegProgress.stderr.on('data', function (data) {console.log('stderr or ffmpeg: ' + data.toString());});
-                    ffmpegProgress.on('exit', function (code) {
-                        ffmpegorytdlWorking = false;
-                        if (code !== 0) {
-                            console.error("FFmpeg returned error: " + code);
-                            return res.status(500).json({
-                                status: "error",
-                                desc: "FFmpeg returned error: " + code
-                            });
-                        }
-                        exec('sudo rm -r ./ytdl-temp/*');
+                video.on('end', async () => {
+                    const conversion = await helpers.convertToWav(safeSongName);
+                    if (conversion) {
                         res.json({
                             status: "done",
                             desc: safeSongName
                         });
+                    } else return res.status(500).json({
+                        status: "error",
+                        desc: "FFmpeg returned error: " + e
                     });
                 });
             });
@@ -55,25 +64,10 @@ module.exports = class webserver {
                 musiclist.forEach(song => finallist += (song + ", "));
                 res.json({status: "done", desc: finallist.slice(0, -2)});
             });
-            app.get("/play", (req, res) => {
+            app.get("/play", async (req, res) => {
                 if (!req.query.song) return res.status(404).json({status: "failed", desc: "not found"});
-                exec(`sudo pkill -2 pi_fm_adv`, () => {
-                    exec(`mkfifo rds_ctl`);
-                    const execWithStd = spawn(`sudo`, [
-                        'core/pi_fm_adv',
-                        `--ps "${config.PS}"`,
-                        `--rt "${config.RT}"`,
-                        '--freq', freq,
-                        '--ctl', 'rds_ctl',
-                        '--power', config.power,
-                        '--audio', `"./music/${req.query.song}.wav"`], {shell: true});
-                    //In case of debugging, you can uncomment this safely:
-                    //execWithStd.stdout.on('data', function (data) { console.log('stdout: ' + data.toString()); });
-                    execWithStd.stderr.on('data', function (data) {
-                        console.log('stderr: ' + data.toString());
-                    });
-                    res.send("ok");
-                });
+                await helpers.playPiFmADV(config, req.query.song);
+                res.json({status: "done", desc: "If file exist, it will be played."});
             });
             /*
             app.get("change/:setting/:value", (req, res) => {
@@ -85,21 +79,9 @@ module.exports = class webserver {
                     res.send(setting.toString() + ", " + value.toString());
                 }
             });*/
-            exec(`sudo pkill -2 pi_fm_adv`, () => {
-                spawn(`sudo`, [
-                        'core/pi_fm_adv',
-                        `--ps "${config.PS}"`,
-                        `--rt "${config.RT}"`,
-                        '--freq', freq,
-                        '--ctl', 'rds_ctl',
-                        '--power', config.power
-                    ],
-                    {shell: true});
-            });
-            let humanConfig = "";
-            for (const key in config) humanConfig += `     ${key}: ${config[key]}\n`;
+            await helpers.playPiFmADV(config);
 
-            app.listen(config.port, () => console.log(`FmRadioStreamer working!\nUsing configuration:\n${humanConfig.slice(0, -1)}`));
+            app.listen(config.port, () => console.log("Webserver is up!"));
         };
     }
 };

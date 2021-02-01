@@ -4,5 +4,6 @@
   "RT": "RPi based radio streamer. It is working!",
   "apikey": "",
   "port": 1080,
-  "power": 5
+  "power": 5,
+  "screen": false
 }

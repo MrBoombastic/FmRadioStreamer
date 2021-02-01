@@ -5,8 +5,8 @@ const buttonHigh = new Gpio(20, 'in', 'rising', {debounceTimeout: 40});
 const buttonSet = new Gpio(16, 'in', 'rising', {debounceTimeout: 40});
 const buttonMultiplier = new Gpio(12, 'in', 'rising', {debounceTimeout: 40});
 const led = require("./led");
-let screen
-if(!oledNotSupported) { screen = require("./oled"); }
+const config = require("../config.json");
+const screen = config.screen ? require('./oled') : false;
 
 
 module.exports = class buttons {
@@ -15,21 +15,21 @@ module.exports = class buttons {
             buttonLow.watch(async (err) => {
                 if (err) throw err;
                 if (Number(freq) - multiplier <= 87.2) {
-                    if(!oledNotSupported) { new screen().miniMessage("MIN"); }
+                    if (config.screen) new screen().miniMessage("MIN");
                     await new led().ledWarnBlink();
                 } else {
                     freq = Number(freq) - multiplier;
-                    if(!oledNotSupported) { new screen().updateScreen(); }
+                    if (config.screen) new screen().updateScreen();
                 }
             });
             buttonHigh.watch(async (err) => {
                 if (err) throw err;
                 if (Number(freq) + multiplier >= 108.9) {
-                    if(!oledNotSupported) { new screen().miniMessage("MAX"); }
+                    if (config.screen) new screen().miniMessage("MAX");
                     await new led().ledWarnBlink();
                 } else {
                     freq = Number(freq) + multiplier;
-                    if(!oledNotSupported) { new screen().updateScreen(); }
+                    if (config.screen) new screen().updateScreen();
                 }
             });
             buttonSet.watch(async (err) => {
@@ -43,7 +43,8 @@ module.exports = class buttons {
                 else if (multiplier === 1) multiplier = 2;
                 else if (multiplier === 2) multiplier = 5;
                 else multiplier = 0.1;
-                if(!oledNotSupported) { new screen().updateScreen(); }
+                if (config.screen) new screen().updateScreen();
+
             });
         };
         this.unexport = function () {
