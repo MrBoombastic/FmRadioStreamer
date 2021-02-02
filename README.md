@@ -27,7 +27,7 @@ Rename `config.json.example` to `config.json`. Then type `sudo node index.js`. Y
 - /play?song=(song name) - Plays song.
 
 ## Dependencies note
-This project uses PiFmAdv, FFmpeg, libsndfile1-dev and other stuff listed in package.json.
+This project uses PiFmAdv, FFmpeg, libsndfile1-dev, Start Bootstrap - Bare and other stuff listed in package.json.
 
 ## Hardware
 SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, ~20k Ohm resistors, leds, female-male and male-male cables. Tested on Raspberry Pi Zero W with goldpins soldered by me. :D
