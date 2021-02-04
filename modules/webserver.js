@@ -5,12 +5,13 @@ const express = require("express"),
     helpers = require("./helpers");
 
 app.set('view engine', 'ejs');
+app.use('/public', express.static('./public'));
 
 module.exports = class webserver {
     constructor() {
         this.run = async function () {
             app.get("/", (req, res) => {
-                res.render('dash.ejs', {list: fs.readdirSync('./music/')});
+                res.render('index.ejs', {list: fs.readdirSync('./music/')});
             });
             app.get("/mng", async (req, res) => {
                 switch (req.query.action) {
@@ -23,8 +24,14 @@ module.exports = class webserver {
                         res.sendStatus(200);
                         break;
                     case 'yt':
-                        if (req.query.searchOnly) res.json(await helpers.getYT(req.query.song, true));
-                        else {
+                        if (req.query.searchOnly) {
+                            await helpers.getYT(req.query.song, true)
+                                .then(data => res.json(data))
+                                .catch(e => res.status(500).json({
+                                    status: "failed",
+                                    desc: e
+                                }));
+                        } else {
                             res.json({status: "done", desc: "Request understood. Processing now..."});
                             await helpers.getYT(req.query.song);
                         }
@@ -53,7 +60,7 @@ module.exports = class webserver {
             app.get("/play", async (req, res) => {
                 if (!req.query.song) return res.status(404).json({status: "failed", desc: "not found"});
                 await helpers.playPiFmADV(config, req.query.song);
-                res.json({status: "done", desc: "If file exist, it will be played."});
+                res.json({status: "done", desc: "If file exists, it will be played."});
             });
             /*
             app.get("change/:setting/:value", (req, res) => {

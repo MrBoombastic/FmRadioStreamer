@@ -1,12 +1,11 @@
 const fs = require("fs"),
+    config = require("../config.json"),
     screen = require("../config.json").screen ? require('./oled') : false,
     spawn = require('child_process').spawn,
     {exec} = require("child_process"),
     ffmpeg = require("fluent-ffmpeg"),
-    {YTSearcher} = require('ytsearcher'),
-    ytsearcher = new YTSearcher(require("../config.json").apikey),
+    fetch = require("node-fetch"),
     ytdl = require('ytdl-core');
-
 module.exports = {
     save: async function (setting, value) {
         const config = fs.readFileSync('./config.json', 'utf-8');
@@ -43,7 +42,7 @@ module.exports = {
                     console.error("FFmpeg returned error: " + err.message);
                     reject(err.message);
                 })
-                .on('progress', (progress) => new screen().miniMessage(Math.round(progress.percent).toString(), true))
+                .on('progress', async (progress) => new screen().miniMessage(Math.round(progress.percent).toString(), true))
                 .on('end', () => {
                     ffmpegorytdlWorking = false;
                     resolve(true);
@@ -52,24 +51,34 @@ module.exports = {
                 .save(`./music/${song}.wav`);
         });
     },
-    getYT: async function (song, searchOnly = false) {
-        //return console.log(screen)
+    ytSearch: async function (name) {
+        let response = await fetch(`https://youtube.googleapis.com/youtube/v3/search?key=${config.apikey}&q=${encodeURIComponent(name)}&part=snippet&maxResults=1&type=video`);
+        return await response.json();
+    },
+    getYT: function (song, searchOnly = false) {
         return new Promise(async (resolve, reject) => {
+            const result = await this.ytSearch(song);
+            if (!result || !result.items[0] || result.error) return reject("Error from YouTube. Possibly no results or being ratelimited!")
+            const music = result.items[0].snippet;
+            music.id = result.items[0].id.videoId;
+            music.url = "https://youtu.be/" + result.items[0].id.videoId;
+            if (searchOnly) return resolve(music);
             ffmpegorytdlWorking = true;
-            const result = await ytsearcher.search(song, {type: 'video'});
-            const music = await result.first;
-            if (searchOnly) {
-                ffmpegorytdlWorking = false;
-                return resolve(music);
-            }
             const safeSongName = music.title.replace(/[^a-zA-Z0-9\s]/g, "").replace(/ /g, "-");
             const video = ytdl(music.url, {quality: "highestaudio", filter: "audioonly"});
             video.pipe(fs.createWriteStream(`ytdl-temp/${safeSongName}`));
             video.on('end', async () => {
                 const conversion = await this.convertToWav(safeSongName);
                 if (conversion) resolve(safeSongName);
-                else return reject(conversion);
+                else reject(conversion);
+                ffmpegorytdlWorking = false;
             });
+        });
+    },
+    getWebserverAddr: function () {
+        return new Promise(async (resolve) => {
+            exec("hostname -I | awk '{print $1}'", {shell: true})
+                .stdout.on('data', (data) => resolve(data.replace(/\n|\r/g, "") + ":" + config.port));
         });
     }
 };

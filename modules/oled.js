@@ -11,9 +11,9 @@ module.exports = class screen {
         this.run = async function () {
             oled.clearDisplay();
             oled.turnOnDisplay();
-            this.updateScreen();
+            await this.updateScreen();
         };
-        this.updateScreen = function () {
+        this.updateScreen = async function () {
             oled.clearDisplay();
             oled.setCursor(100, 1);
             oled.writeString(font, 1, "x" + multiplier.toString());
@@ -21,8 +21,10 @@ module.exports = class screen {
             oled.writeString(font, 1, config.PS);
             oled.setCursor(1, 15);
             oled.writeString(font, 1, RT, 1, true);
-            oled.setCursor(40, 40);
+            oled.setCursor(40, 37);
             oled.writeString(font, 2, (Math.round(freq * 10) / 10).toFixed(1) + " FM");
+            oled.setCursor(1, 57);
+            oled.writeString(font, 1, await helpers.getWebserverAddr());
         };
         this.stop = function () {
             oled.update();
@@ -31,9 +33,9 @@ module.exports = class screen {
         };
         this.miniMessage = function (message, live = true) {
             if (message === "100") message = " "; //assuming this message is from FFmpeg
-            oled.setCursor(1, 40);
+            oled.setCursor(1, 37);
             oled.writeString(font, 2, message);
-            if (!live) setTimeout(function () {
+            if (!live) setTimeout( function () {
                 new screen().updateScreen();
             }, 2000);
         };
