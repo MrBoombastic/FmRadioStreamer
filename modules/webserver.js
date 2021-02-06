@@ -4,6 +4,7 @@ const express = require("express"),
     fs = require('fs'),
     helpers = require("./helpers");
 
+app.use(express.json());
 app.set('view engine', 'ejs');
 app.use('/public', express.static('./public'));
 
@@ -48,7 +49,10 @@ module.exports = class webserver {
                         return res.status(404).json({status: "failed", desc: "Action not found!"});
                 }
             });
-
+            app.post("/save", async (req, res) => {
+                fs.writeFileSync("./config.json", JSON.stringify(req.body, null, 3));
+                res.send({status: "done", desc: "Config saved!"});
+            });
             /*
             app.get("change/:setting/:value", (req, res) => {
                 const setting = req.params.setting.toString();

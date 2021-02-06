@@ -1,9 +1,8 @@
 <script src="./public/jquery.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
-        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
-        crossorigin="anonymous"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link rel="stylesheet" href="./public/bootstrap.min.css">
+<script src="./public/bootstrap.min.js"></script>
+<link href="./public/select2.min.css" rel="stylesheet"/>
+<script src="./public/select2.min.js"></script>
 <script>
     let logs;
     errorHandler = async (data, endpoint, errored = false) => {
@@ -13,25 +12,22 @@
         logs.scrollTop = logs.scrollHeight - logs.clientHeight;
         return data
     }
-    niceFetch = (value) => {
-        return fetch(value)
+    niceFetch = (value, method = "GET", body, headers) => {
+        return fetch(value, {method, body, headers})
             .then(async r => await errorHandler(r, value))
             .catch(async e => await errorHandler(e, value, true))
     }
     save = () => {
-        const inputs = $('input[id^="config"]');
         const config = {}
-        for (let data of inputs) {
+        for (let data of saveinputs) {
             data.id = data.id.replace("config-", "")
-            let newVal
-            if(data.attributes.type.value === "number") newVal = Number(data.value)
-            else if(data.attributes.type.value === "boolean") newVal = JSON.parse(data.value.toLowerCase());
-            else if(data.attributes.type.value === "string") newVal = data.value;
+            let newVal;
+            if (data.attributes.type.value === "number") newVal = Number(data.value);
+            else if (data.attributes.type.value === "boolean") newVal = JSON.parse(data.value.toLowerCase());
+            else if (data.attributes.type.value === "string") newVal = data.value;
             config[data.id] = newVal
-
         }
-        //todo: actually save data
-        console.log(config, typeof config.freq)
+        niceFetch("/save", "POST", JSON.stringify(config, null, 3), {'Content-Type': 'application/json'})
     }
 </script>
 
@@ -39,22 +35,16 @@
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="FmRadioStream Web Dashboard">
     <meta name="author" content="MrBoombastic">
-
     <title>FmRadioStreamer</title>
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-
 </head>
 
-<body>
+<body class="bg-dark">
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary static-top">
     <div class="container">
         <a class="navbar-brand" href="/">FmRadioStreamer</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
@@ -75,7 +65,7 @@
 <div class="container">
     <div class="row" style="padding-top: 2rem">
         <div class="col-md-3 col-sm-12" style="padding-bottom: 1rem">
-            <div class="card">
+            <div class="card bg-dark">
                 <div class="card-body">
                     <button type="button" class="btn btn-danger" onclick="niceFetch('./mng?action=superstop')"
                             style="width: 100%">Radio DOWN (a.k.a. Super Stop)
@@ -84,9 +74,9 @@
             </div>
         </div>
         <div class="col-md-9 col-sm-12" style="padding-bottom: 1rem">
-            <div class="card">
+            <div class="card bg-dark">
                 <div class="card-body">
-                    <p class="card-text">Pick your song and play!</p>
+                    <p class="card-text text-white">Pick your song and play!</p>
                     <select name="songpicker" class="songpicker" style="width: 100%">
                         <% list.forEach(el => {
                             el = el.slice(0, -4); %>
@@ -100,13 +90,13 @@
                 <button type="button" class="btn btn-warning" onclick="niceFetch('./mng?action=loudstop')">Stop</button>
             </div>
         </div>
-        <p>YouTube:</p>
-        <div class="card col-md-12" style="margin-bottom: 1rem">
+        <p class="text-white">YouTube:</p>
+        <div class="card col-md-12 bg-dark" style="margin-bottom: 1rem">
             <div class="row no-gutters">
                 <div class="col-md-6 col-sm-12">
-                    <div class="card" style="height: 100%; border: none">
+                    <div class="card bg-dark" style="height: 100%; border: none">
                         <div class="card-body">
-                            <p class="card-text">Search and download</p>
+                            <p class="card-text text-white">Search and download</p>
                             <div class="input-group">
                                 <input type="text" class="form-control" id="youtube-input">
                                 <div class="input-group-append">
@@ -129,8 +119,8 @@
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
-                                <h5 class="card-title" id="youtube-title">Title</h5>
-                                <p class="card-text" id="youtube-description">Description</p>
+                                <h5 class="card-title text-white" id="youtube-title">Title</h5>
+                                <p class="card-text text-white" id="youtube-description">Description</p>
                                 <p class="card-text"><small class="text-muted" id="youtube-channelTitle">Channel</small>
                                 </p>
                             </div>
@@ -140,13 +130,17 @@
             </div>
         </div>
         <div class="col-12" style="padding-bottom: 1rem">
-            <div class="card">
+            <div class="card bg-dark">
                 <div class="card-body">
-                    <div class="card-title">Configuration:</div>
+                    <div class="card-title text-white">Configuration:</div>
+                    <div class="card-description text-white">Note: some settings will be applied when next song will be played,
+                        after Super Stop or even after application reboot!
+                    </div>
+                    <br>
                     <div class="row">
                         <% for(const prop in config) { %>
                             <div class="col-md-6">
-                                <label for="config-<%= prop %>"><%= prop %>:</label>
+                                <label for="config-<%= prop %>" class="text-white"><%= prop %>:</label>
                                 <input type="<%= typeof config[prop] %>" class="form-control" id="config-<%= prop %>"
                                        value="<%= config[prop] %>">
                             </div>
@@ -159,10 +153,10 @@
             </div>
         </div>
         <div class="col-12" style="padding-bottom: 1rem">
-            <div class="card">
+            <div class="card bg-dark">
                 <div class="card-body">
-                    <div class="card-title">API requests and responses:</div>
-                    <pre style="max-height: 15rem" id="logs"></pre>
+                    <div class="card-title text-white">API requests and responses:</div>
+                    <pre style="max-height: 15rem" id="logs" class="text-white"></pre>
                 </div>
             </div>
         </div>
@@ -184,5 +178,6 @@
             document.getElementById("youtube-url").href = data.url;
         };
     });
+    const saveinputs = $('input[id^="config"]')
 </script>
 </html>
