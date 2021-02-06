@@ -4,6 +4,7 @@ global.multiplier = 0.1;
 global.freq = Math.round(config.freq * 10) / 10;
 global.ffmpegorytdlWorking = false;
 global.helpers = require("./modules/helpers")
+helpers.fetchWebserverAddr();
 const oled = config.screen ? require('./modules/oled') : false;
 const led = require('./modules/led');
 const webserver = require('./modules/webserver');

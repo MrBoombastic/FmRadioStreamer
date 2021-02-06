@@ -31,7 +31,7 @@ module.exports = class screen {
             oled.clearDisplay();
             oled.turnOffDisplay();
         };
-        this.miniMessage = function (message, live = true) {
+        this.miniMessage = function (message, live = false) {
             if (message === "100") message = " "; //assuming this message is from FFmpeg
             oled.setCursor(1, 37);
             oled.writeString(font, 2, message);

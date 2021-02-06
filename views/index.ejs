@@ -27,7 +27,7 @@
             else if (data.attributes.type.value === "string") newVal = data.value;
             config[data.id] = newVal
         }
-        niceFetch("/save", "POST", JSON.stringify(config, null, 3), {'Content-Type': 'application/json'})
+        niceFetch("./save", "POST", JSON.stringify(config, null, 3), {'Content-Type': 'application/json'})
     }
 </script>
 
