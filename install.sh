@@ -1,5 +1,5 @@
-sudo apt-get update
-sudo apt-get install ffmpeg libsndfile1-dev && echo "Successfully installed modules!" || echo "Failed to install modules!"
+sudo apt update
+sudo apt install ffmpeg libsndfile1-dev && echo "Successfully installed modules!" || echo "Failed to install modules!"
 rm core/placeholder.txt
 git clone https://github.com/miegl/PiFmAdv temp/ && echo "Successfully cloned PiFmAdv repo!" || echo "Failed to clone PiFmAdv repo!"
 mv temp/src/* core/ && echo "Moved it to core" || echo "Failed to move it to core"

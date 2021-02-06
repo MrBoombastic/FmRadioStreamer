@@ -19,7 +19,7 @@ module.exports = {
             exec(`sudo pkill -2 pi_fm_adv`, () => resolve(true));
         });
     },
-    playPiFmADV: async function (config, song = false) {
+    playPiFmADV: async function (song = false) {
         await this.killPiFmADV();
         const options = [
             'core/pi_fm_adv',
@@ -58,7 +58,7 @@ module.exports = {
     getYT: function (song, searchOnly = false) {
         return new Promise(async (resolve, reject) => {
             const result = await this.ytSearch(song);
-            if (!result || !result.items[0] || result.error) return reject("Error from YouTube. Possibly no results or being ratelimited!")
+            if (!result || !result.items[0] || result.error) return reject("Error from YouTube. Possibly no results or being ratelimited!");
             const music = result.items[0].snippet;
             music.id = result.items[0].id.videoId;
             music.url = "https://youtu.be/" + result.items[0].id.videoId;

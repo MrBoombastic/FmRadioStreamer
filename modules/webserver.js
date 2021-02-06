@@ -11,12 +11,12 @@ module.exports = class webserver {
     constructor() {
         this.run = async function () {
             app.get("/", (req, res) => {
-                res.render('index.ejs', {list: fs.readdirSync('./music/')});
+                res.render('index.ejs', {list: fs.readdirSync('./music/'), config});
             });
             app.get("/mng", async (req, res) => {
                 switch (req.query.action) {
                     case 'loudstop':
-                        await helpers.playPiFmADV(config);
+                        await helpers.playPiFmADV();
                         res.sendStatus(200);
                         break;
                     case 'superstop':
@@ -36,32 +36,19 @@ module.exports = class webserver {
                             await helpers.getYT(req.query.song);
                         }
                         break;
+                    case 'list':
+                        res.json({status: "done", desc: fs.readdirSync('./music/')});
+                        break;
+                    case 'play':
+                        if (!req.query.song) return res.status(404).json({status: "failed", desc: "not found"});
+                        await helpers.playPiFmADV(req.query.song);
+                        res.json({status: "done", desc: "If file exists, it will be played."});
+                        break;
                     default:
                         return res.status(404).json({status: "failed", desc: "Action not found!"});
                 }
             });
 
-            app.get("/yt", async (req, res) => {
-                if (!req.query.song) return res.status(404).json({status: "failed", desc: "Song not specified!"});
-                const song = await helpers.getYT(req.query.song);
-                if (song) res.json({
-                    status: "done",
-                    desc: song
-                });
-                else res.status(500).json({
-                    status: "error",
-                    desc: "FFmpeg returned error: " + song
-                });
-            });
-
-            app.get("/list", (req, res) => {
-                res.json({status: "done", desc: fs.readdirSync('./music/')});
-            });
-            app.get("/play", async (req, res) => {
-                if (!req.query.song) return res.status(404).json({status: "failed", desc: "not found"});
-                await helpers.playPiFmADV(config, req.query.song);
-                res.json({status: "done", desc: "If file exists, it will be played."});
-            });
             /*
             app.get("change/:setting/:value", (req, res) => {
                 const setting = req.params.setting.toString();
@@ -72,7 +59,7 @@ module.exports = class webserver {
                     res.send(setting.toString() + ", " + value.toString());
                 }
             });*/
-            await helpers.playPiFmADV(config);
+            await helpers.playPiFmADV();
 
             app.listen(config.port, () => console.log("Webserver is up!"));
         };

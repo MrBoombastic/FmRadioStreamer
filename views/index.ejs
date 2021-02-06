@@ -1,4 +1,3 @@
-<script src="./public/underscore.min.js"></script>
 <script src="./public/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
         integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
@@ -18,6 +17,21 @@
         return fetch(value)
             .then(async r => await errorHandler(r, value))
             .catch(async e => await errorHandler(e, value, true))
+    }
+    save = () => {
+        const inputs = $('input[id^="config"]');
+        const config = {}
+        for (let data of inputs) {
+            data.id = data.id.replace("config-", "")
+            let newVal
+            if(data.attributes.type.value === "number") newVal = Number(data.value)
+            else if(data.attributes.type.value === "boolean") newVal = JSON.parse(data.value.toLowerCase());
+            else if(data.attributes.type.value === "string") newVal = data.value;
+            config[data.id] = newVal
+
+        }
+        //todo: actually save data
+        console.log(config, typeof config.freq)
     }
 </script>
 
@@ -81,13 +95,13 @@
                     </select>
                 </div>
                 <button type="button" class="btn btn-success"
-                        onclick="niceFetch('./play?song=' + $('.songpicker').select2('data')[0].text)">Play
+                        onclick="niceFetch('./mng?action=play&song=' + $('.songpicker').select2('data')[0].text)">Play
                 </button>
                 <button type="button" class="btn btn-warning" onclick="niceFetch('./mng?action=loudstop')">Stop</button>
             </div>
         </div>
         <p>YouTube:</p>
-        <div class="card w-100" style="margin-bottom: 1rem">
+        <div class="card col-md-12" style="margin-bottom: 1rem">
             <div class="row no-gutters">
                 <div class="col-md-6 col-sm-12">
                     <div class="card" style="height: 100%; border: none">
@@ -128,6 +142,25 @@
         <div class="col-12" style="padding-bottom: 1rem">
             <div class="card">
                 <div class="card-body">
+                    <div class="card-title">Configuration:</div>
+                    <div class="row">
+                        <% for(const prop in config) { %>
+                            <div class="col-md-6">
+                                <label for="config-<%= prop %>"><%= prop %>:</label>
+                                <input type="<%= typeof config[prop] %>" class="form-control" id="config-<%= prop %>"
+                                       value="<%= config[prop] %>">
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-success" onclick="save()"
+                        style="width: 100%">Save
+                </button>
+            </div>
+        </div>
+        <div class="col-12" style="padding-bottom: 1rem">
+            <div class="card">
+                <div class="card-body">
                     <div class="card-title">API requests and responses:</div>
                     <pre style="max-height: 15rem" id="logs"></pre>
                 </div>
@@ -143,7 +176,7 @@
         $('.songpicker').select2();
         document.getElementById("youtube-search").onclick = async function () {
             const data = await niceFetch(`./mng?action=yt&song=${encodeURIComponent(document.getElementById("youtube-input").value)}&searchOnly=true`);
-            if(data.error) return;
+            if (data.error) return;
             ["title", "channelTitle", "description"].forEach(prop => {
                 document.getElementById("youtube-" + prop).textContent = decodeURIComponent(data[prop]);
             });
