@@ -4,7 +4,7 @@
 	"description": "RPi based FM radio streamer with OLED, buttons and LEDs support.",
 	"main": "start/js",
 	"dependencies": {
-		"ejs": "^3.1.5",
+		"ejs": "^3.1.6",
 		"express": "^4.17.1",
 		"fluent-ffmpeg": "^2.1.2",
 		"i2c-bus": "^5.2.1",
