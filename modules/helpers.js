@@ -6,7 +6,7 @@ const fs = require("fs"),
     ffmpeg = require("fluent-ffmpeg"),
     fetch = require("node-fetch"),
     ytdl = require('ytdl-core');
-let localAddress = "";
+let cachedLocalIP;
 module.exports = {
     save: async function (setting, value) {
         const config = fs.readFileSync('./config.json', 'utf-8');
@@ -76,16 +76,16 @@ module.exports = {
             });
         });
     },
-    getWebserverAddr: function () {
-        return localAddress;
+    getWebserverAddr: async function () {
+        return (cachedLocalIP || await this.fetchWebserverAddr())
     },
     fetchWebserverAddr: function () {
         return new Promise(async (resolve) => {
             exec("hostname -I | awk '{print $1}'", {shell: true})
                 .stdout.on('data', (data) => {
-                    const address = data.replace(/\n|\r/g, "") + ":" + config.port;
-                    resolve(address);
-                    localAddress = address;
+                    const ip = data.replace(/\n|\r/g, "") + ":" + config.port;
+                    resolve(ip);
+                    cachedLocalIP = ip;
                 }
             );
         });

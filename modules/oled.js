@@ -24,7 +24,7 @@ module.exports = class screen {
             oled.setCursor(40, 37);
             oled.writeString(font, 2, (Math.round(freq * 10) / 10).toFixed(1) + " FM");
             oled.setCursor(1, 57);
-            oled.writeString(font, 1, await helpers.getWebserverAddr());
+            oled.writeString(font, 1, await helpers.getWebserverAddr() || "No local IP address.");
         };
         this.stop = function () {
             oled.update();

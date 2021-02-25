@@ -1,6 +1,5 @@
 # FmRadioStreamer
-[BETA] RPi based FM streamer with OLED, buttons and LEDs support.
-Using PiFmAdv for better quality sound.
+[BETA] Raspberry Pi based FM streamer with OLED, buttons and LEDs support.
 
 ## Installation:
 Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. **WARNING!!!** Installer will use Yarn to install packages INSTEAD of NPM! 
@@ -18,13 +17,10 @@ Rename `config.json.example` to `config.json`. Then type `sudo node index.js`. Y
 - Blue LED blinks if music is being dowloaded from YouTube or converted
 - API - download music from YT and play
 - Change and save frequency with buttons
+- Web dashboard
 
 ## API Docs
-- / - basic dashboard
-- /yt/(song name) - Downloads song from YT and save with a filename of requested text.
-- /list - Returns song list.
-- ~~/fmradiostreamer/change/(setting)/(value) - Changes settings. Saves to config, so changes are effective when you restart application or change music.~~ disabled, need rewrite.
-- /play?song=(song name) - Plays song.
+Removed, but it's easy to reverse-engineer. I hope so.
 
 ## Dependencies note
 This project uses PiFmAdv, FFmpeg, libsndfile1-dev, Start Bootstrap - Bare and other stuff listed in package.json.
@@ -39,6 +35,7 @@ The minimum requirement is RPi. FmRadioStreamer SHOULD work without them.
 In the `docs` directory there are pictures of first version of this project. Watch on your own risk!
 ![Image](docs/hwv2_1.jpg?raw=true "Image")
 ![Image](docs/hwv2_2.jpg?raw=true "Image")
+![Image](docs/webserver.png?raw=true "Image")
 
 ## What is NOT working a.k.a. bugs
 - ~~Optimisation sucks~~ maybe not
