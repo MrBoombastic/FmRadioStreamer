@@ -7,6 +7,7 @@ const express = require("express"),
 app.use(express.json());
 app.set('view engine', 'ejs');
 app.use('/public', express.static('./public'));
+app.use('/favicon.ico', express.static('./public/favicon.ico'));
 
 module.exports = class webserver {
     constructor() {

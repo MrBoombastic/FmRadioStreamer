@@ -45,7 +45,7 @@ In the `docs` directory there are pictures of first version of this project. Wat
 - ~~Files are in a mess~~ definitly not
 
 ## What is in progress?
-- ~~Android app~~ not too much time
+- ~~Android app~~ not much time
 - More stuff to change/improve
 
 ## GPIO
