@@ -440,10 +440,10 @@ on-finished@~2.3.0:
   dependencies:
     ee-first "1.1.1"
 
-onoff@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/onoff/-/onoff-6.0.1.tgz#68ecaece4a4b4663fd59d72544dfec556d460ddd"
-  integrity sha512-lqnVyUiWLbb4T6sWTaOeCJn682EPyxaTyfJ5bP5LiTa0KMDlVPQR0ngVgzV3SkRkd0JnNxPvwTNj7QVvZTZsAw==
+onoff@^6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/onoff/-/onoff-6.0.2.tgz#a7a00a05906864f8a96d33b79e2450e9895915d6"
+  integrity sha512-jaffMtYtuGZEMh1T+FZDB9rv84YCm112JPJdUq8Qy2Rg+N3vYLvS+TFpMygvD2SB8Wl4Bl0XJ64LSDWPoh59qA==
   dependencies:
     epoll "^4.0.0"
     lodash.debounce "^4.0.8"
