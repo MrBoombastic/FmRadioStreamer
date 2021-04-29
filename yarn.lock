@@ -296,13 +296,13 @@ http-errors@~1.7.2:
     statuses ">= 1.5.0 < 2"
     toidentifier "1.0.0"
 
-i2c-bus@^5.2.1:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/i2c-bus/-/i2c-bus-5.2.1.tgz#ccbfff0a5f431cfcf7f17fb56624774323b7c5fd"
-  integrity sha512-ihfUEG8BPbmVkwLJv2vZmvXUNZ8TUCIqnTAVgSwzqH72jouT3HdpJOJCGIwJt8SQ8H7QpefvWqDuT40TnnUELQ==
+i2c-bus@^5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/i2c-bus/-/i2c-bus-5.2.2.tgz#0c727f5e99443c5734b4f0e05b45748ba85008fa"
+  integrity sha512-b2y/et08rqggEjqod6QxV0Ng+RlSkZXsdE+E1aZEQBahepZ9uFD9XfA77Y8O9SgyhwfGEn+CNxsw0gvXW1/m4g==
   dependencies:
     bindings "^1.5.0"
-    nan "^2.14.1"
+    nan "^2.14.2"
 
 iconv-lite@0.4.24:
   version "0.4.24"
@@ -408,7 +408,7 @@ ms@2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.1.tgz#30a5864eb3ebb0a66f2ebe6d727af06a09d86e0a"
   integrity sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==
 
-nan@^2.14.1, nan@^2.14.2:
+nan@^2.14.2:
   version "2.14.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.2.tgz#f5376400695168f4cc694ac9393d0c9585eeea19"
   integrity sha512-M2ufzIiINKCuDfBSAUr1vWQ+vuVcA9kqx8JJUsbQi6yf1uGRyb7HfpdfUr5qLXf3B/t8dPvcjhKMmlfnP47EzQ==
