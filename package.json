@@ -8,7 +8,7 @@
 		"express": "^4.17.1",
 		"fluent-ffmpeg": "^2.1.2",
 		"i2c-bus": "^5.2.1",
-		"node-fetch": "^2.6.1",
+		"node-fetch": "^3.0.0",
 		"oled-font-5x7": "^1.0.3",
 		"oled-i2c-bus": "^1.0.12",
 		"onoff": "^6.0.3",
