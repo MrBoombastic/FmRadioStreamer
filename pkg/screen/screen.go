@@ -29,7 +29,7 @@ func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
 	drawer.DrawString(s)
 }
 
-func initScreen() (*ssd1306.Dev, error) {
+func CreateScreen() (*ssd1306.Dev, error) {
 	if _, err := host.Init(); err != nil {
 		log.Fatal(err)
 	}
@@ -44,12 +44,8 @@ func initScreen() (*ssd1306.Dev, error) {
 
 }
 
-func CreateScreen() (*ssd1306.Dev, *image1bit.VerticalLSB) {
-	screen, err := initScreen()
-	if err != nil {
-		fmt.Println(err)
-	}
-	return screen, image1bit.NewVerticalLSB(screen.Bounds())
+func CreateImg(screen *ssd1306.Dev) *image1bit.VerticalLSB {
+	return image1bit.NewVerticalLSB(screen.Bounds())
 }
 
 func Draw(screen *ssd1306.Dev, img *image1bit.VerticalLSB) {
@@ -58,15 +54,9 @@ func Draw(screen *ssd1306.Dev, img *image1bit.VerticalLSB) {
 	}
 }
 
-func clearScreen(screen *ssd1306.Dev) {
+func FillScreen(screen *ssd1306.Dev) {
 	screen.StopScroll()
-	if err := screen.Draw(screen.Bounds(), image1bit.NewVerticalLSB(screen.Bounds()), image.Point{}); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func FillScreen(screen *ssd1306.Dev, img *image1bit.VerticalLSB) {
-	clearScreen(screen)
+	img := CreateImg(screen)
 	writer(img, 2, 11, cfg.PS)
 	writer(img, 99, 11, fmt.Sprintf("%.1fx", Multiplier))
 	maxRT := 15

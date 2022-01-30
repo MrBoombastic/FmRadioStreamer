@@ -1,3 +1,6 @@
+# Warning: rewrite in progres!
+## Here is latest "stable" version: [click](https://github.com/MrBoombastic/FmRadioStreamer/tree/bc3cae0455e9352db580cb24f56f9788ea515354)
+
 # FmRadioStreamer
 [BETA] Raspberry Pi based FM streamer with OLED, buttons and LEDs support.
 

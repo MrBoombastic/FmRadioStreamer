@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
@@ -20,16 +21,23 @@ func main() {
 	// Listen for process killing/exiting
 	go tools.EndHandler()
 
-	// Inits screen
-	screen, img := oled.CreateScreen()
+	// Init screen
+	screen, err := oled.CreateScreen()
+	if err != nil {
+		fmt.Println(err)
+	}
 	oled.Multiplier = multiplier
 	oled.Frequency = cfg.Frequency
-	oled.FillScreen(screen, img)
+	oled.FillScreen(screen)
 	time.Sleep(3 * time.Second)
+	oled.Multiplier = 69
+	oled.Frequency = 21.37
 	oled.MiniMessage = "XDDDDD"
-	oled.FillScreen(screen, img)
+	oled.FillScreen(screen)
 	time.Sleep(3 * time.Second)
+	oled.Multiplier = 420
+	oled.Frequency = 13.37
 	oled.MiniMessage = "OK"
-	oled.FillScreen(screen, img)
+	oled.FillScreen(screen)
 	time.Sleep(1 * time.Hour)
 }
