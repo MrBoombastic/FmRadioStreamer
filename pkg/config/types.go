@@ -1,7 +1,7 @@
 package config
 
 type Config struct {
-	Frequency     float32 `json:"freq"`
+	Frequency     float64 `json:"freq"`
 	PS            string  `json:"PS"`
 	RT            string  `json:"RT"`
 	YouTubeAPIKey string  `json:"apikey"`

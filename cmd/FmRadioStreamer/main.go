@@ -21,6 +21,15 @@ func main() {
 	go tools.EndHandler()
 
 	// Inits screen
-	oled.FillScreen(cfg.Frequency, multiplier, "OK", false)
+	screen, img := oled.CreateScreen()
+	oled.Multiplier = multiplier
+	oled.Frequency = cfg.Frequency
+	oled.FillScreen(screen, img)
+	time.Sleep(3 * time.Second)
+	oled.MiniMessage = "XDDDDD"
+	oled.FillScreen(screen, img)
+	time.Sleep(3 * time.Second)
+	oled.MiniMessage = "OK"
+	oled.FillScreen(screen, img)
 	time.Sleep(1 * time.Hour)
 }

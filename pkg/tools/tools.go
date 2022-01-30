@@ -3,7 +3,6 @@ package tools
 import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
-	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
 	"os"
 	"os/signal"
 	"syscall"
@@ -21,7 +20,7 @@ func EndHandler() {
 	fmt.Println()
 	fmt.Println("Exiting...")
 	leds.ClearLeds()
-	oled.FillScreen(0, 0, "")
+	//	oled.FillScreen(0.5)
 	//err := screen.StopScreen()
 	//if err != nil {
 	//	fmt.Println(err)

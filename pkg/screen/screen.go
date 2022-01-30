@@ -12,10 +12,12 @@ import (
 	"periph.io/x/periph/devices/ssd1306"
 	"periph.io/x/periph/devices/ssd1306/image1bit"
 	"periph.io/x/periph/host"
-	"strings"
 )
 
 var cfg = config.Get()
+var Frequency float64
+var MiniMessage string
+var Multiplier float64
 
 func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
 	drawer := font.Drawer{
@@ -27,7 +29,7 @@ func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
 	drawer.DrawString(s)
 }
 
-func FillScreen(freq float32, multiplier float64, miniMessage string) {
+func initScreen() (*ssd1306.Dev, error) {
 	if _, err := host.Init(); err != nil {
 		log.Fatal(err)
 	}
@@ -36,37 +38,52 @@ func FillScreen(freq float32, multiplier float64, miniMessage string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer b.Close()
+	//defer b.Close()
 
-	screen, _ := ssd1306.NewI2C(b, &ssd1306.DefaultOpts)
+	return ssd1306.NewI2C(b, &ssd1306.DefaultOpts)
 
-	img := image1bit.NewVerticalLSB(screen.Bounds())
-	writer(img, 2, 11, cfg.PS)
-	writer(img, 99, 11, fmt.Sprintf("%.1fx", multiplier))
+}
 
-	splittedRT := strings.Split(cfg.RT, "")
-	RTpart0 := ""
-	RTpart1 := ""
-	for i, char := range splittedRT {
-		line := i / 16
-		if line == 0 {
-			RTpart0 += char
-		} else if line == 1 {
-			RTpart1 += char
-		} else {
-			break
-		}
+func CreateScreen() (*ssd1306.Dev, *image1bit.VerticalLSB) {
+	screen, err := initScreen()
+	if err != nil {
+		fmt.Println(err)
 	}
-	writer(img, 1, 32, RTpart0)
-	writer(img, 1, 42, RTpart1)
-	writer(img, 2, 62, miniMessage)
-	writer(img, 71, 62, fmt.Sprintf("%.1f FM", freq))
+	return screen, image1bit.NewVerticalLSB(screen.Bounds())
+}
 
+func Draw(screen *ssd1306.Dev, img *image1bit.VerticalLSB) {
 	if err := screen.Draw(screen.Bounds(), img, image.Point{}); err != nil {
 		log.Fatal(err)
 	}
+}
 
-	err = screen.Scroll(ssd1306.Left, ssd1306.FrameRate2, 16, 48)
+func clearScreen(screen *ssd1306.Dev) {
+	screen.StopScroll()
+	if err := screen.Draw(screen.Bounds(), image1bit.NewVerticalLSB(screen.Bounds()), image.Point{}); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func FillScreen(screen *ssd1306.Dev, img *image1bit.VerticalLSB) {
+	clearScreen(screen)
+	writer(img, 2, 11, cfg.PS)
+	writer(img, 99, 11, fmt.Sprintf("%.1fx", Multiplier))
+	maxRT := 15
+	if len(cfg.RT) < 16 {
+		maxRT = len(cfg.RT) - 1
+	}
+	writer(img, 1, 32, cfg.RT[0:maxRT])
+	maxRT = 31
+	if len(cfg.RT) < 32 {
+		maxRT = len(cfg.RT) - 1
+	}
+	writer(img, 1, 42, cfg.RT[16:maxRT])
+	writer(img, 71, 62, fmt.Sprintf("%.1f FM", Frequency))
+	writer(img, 2, 62, MiniMessage)
+	Draw(screen, img)
+
+	err := screen.Scroll(ssd1306.Left, ssd1306.FrameRate5, 16, 48)
 	if err != nil {
 		return
 	}
