@@ -3,11 +3,12 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-config.json
+TO_REWRITE/*
+build/
 .eslintrc.js
 temp/
-!core/placeholder.txt
-core/*
+!TO_REWRITE/core/placeholder.txt
+TO_REWRITE/core/*
 !ytdl-temp/placeholder.txt
 ytdl-temp/*
 .idea
