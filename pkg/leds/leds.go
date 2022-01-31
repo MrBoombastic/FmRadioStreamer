@@ -5,10 +5,10 @@ import (
 	"time"
 )
 
-func Blink(led rpio.Pin, miliseconds time.Duration) {
+func Blink(led rpio.Pin, duration time.Duration) {
 	for x := 0; x < 2; x++ {
 		led.Toggle()
-		time.Sleep(miliseconds)
+		time.Sleep(duration)
 	}
 }
 func InitLeds() {

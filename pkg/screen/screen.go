@@ -17,10 +17,7 @@ import (
 	"strings"
 )
 
-var cfg = config.Get()
-var Frequency = cfg.Frequency
 var MiniMessage string
-var Multiplier float64
 var screenConnection i2c.BusCloser
 
 func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
@@ -33,7 +30,7 @@ func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
 	drawer.DrawString(s)
 }
 
-func CreateScreen() (*ssd1306.Dev, error) {
+func Create() (*ssd1306.Dev, error) {
 	_, err := host.Init()
 	if err != nil {
 		return nil, err
@@ -56,11 +53,12 @@ func draw(screen *ssd1306.Dev, img *image1bit.VerticalLSB) {
 	}
 }
 
-func FillScreen(screen *ssd1306.Dev) {
+func RefreshScreen(screen *ssd1306.Dev) {
+	cfg := config.Get()
 	screen.StopScroll()
 	img := createImg(screen)
 	writer(img, 2, 11, cfg.PS)
-	writer(img, 71, 11, fmt.Sprintf("%.1f FM", Frequency))
+	writer(img, 71, 11, fmt.Sprintf("%.1f FM", cfg.Frequency))
 	maxRT := 15
 	if len(cfg.RT) < 16 {
 		maxRT = len(cfg.RT)
@@ -71,7 +69,7 @@ func FillScreen(screen *ssd1306.Dev) {
 		maxRT = len(cfg.RT)
 	}
 	writer(img, 1, 42, cfg.RT[16:maxRT])
-	writer(img, 99, 62, fmt.Sprintf("%.1fx", Multiplier))
+	writer(img, 99, 62, fmt.Sprintf("%.1fx", cfg.Multiplier))
 	if MiniMessage == "100" { //assuming this message is from FFmpeg
 		MiniMessage = ""
 	}
