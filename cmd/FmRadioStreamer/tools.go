@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"os"
 	"os/signal"
+	"periph.io/x/periph/devices/ssd1306"
 	"syscall"
 )
 
-func endHandler() {
+func StopApplicationHandler(screen *ssd1306.Dev) {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	done := make(chan bool, 1)
@@ -20,8 +22,13 @@ func endHandler() {
 	<-done
 	fmt.Println()
 	fmt.Println("Exiting...")
+	oled.StopScreen(screen)
+	StopPeriphs(screen)
+	os.Exit(0)
+}
+
+func StopPeriphs(screen *ssd1306.Dev) {
 	leds.ClearLeds()
 	oled.StopScreen(screen)
-
-	os.Exit(1)
+	tools.StopGPIO()
 }

@@ -3,11 +3,13 @@ package screen
 import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
 	"golang.org/x/image/math/fixed"
 	"image"
 	"log"
+	"periph.io/x/periph/conn/i2c"
 	"periph.io/x/periph/conn/i2c/i2creg"
 	"periph.io/x/periph/devices/ssd1306"
 	"periph.io/x/periph/devices/ssd1306/image1bit"
@@ -19,6 +21,7 @@ var cfg = config.Get()
 var Frequency = cfg.Frequency
 var MiniMessage string
 var Multiplier float64
+var screenConnection i2c.BusCloser
 
 func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
 	drawer := font.Drawer{
@@ -31,25 +34,23 @@ func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
 }
 
 func CreateScreen() (*ssd1306.Dev, error) {
-	if _, err := host.Init(); err != nil {
-		log.Fatal(err)
+	_, err := host.Init()
+	if err != nil {
+		return nil, err
 	}
 
-	b, err := i2creg.Open("1")
+	screenConnection, err = i2creg.Open("1")
 	if err != nil {
 		log.Fatal(err)
 	}
-	//defer b.Close()
-
-	return ssd1306.NewI2C(b, &ssd1306.DefaultOpts)
-
+	return ssd1306.NewI2C(screenConnection, &ssd1306.DefaultOpts)
 }
 
-func CreateImg(screen *ssd1306.Dev) *image1bit.VerticalLSB {
+func createImg(screen *ssd1306.Dev) *image1bit.VerticalLSB {
 	return image1bit.NewVerticalLSB(screen.Bounds())
 }
 
-func Draw(screen *ssd1306.Dev, img *image1bit.VerticalLSB) {
+func draw(screen *ssd1306.Dev, img *image1bit.VerticalLSB) {
 	if err := screen.Draw(screen.Bounds(), img, image.Point{}); err != nil {
 		log.Fatal(err)
 	}
@@ -57,7 +58,7 @@ func Draw(screen *ssd1306.Dev, img *image1bit.VerticalLSB) {
 
 func FillScreen(screen *ssd1306.Dev) {
 	screen.StopScroll()
-	img := CreateImg(screen)
+	img := createImg(screen)
 	writer(img, 2, 11, cfg.PS)
 	writer(img, 71, 11, fmt.Sprintf("%.1f FM", Frequency))
 	maxRT := 15
@@ -77,20 +78,20 @@ func FillScreen(screen *ssd1306.Dev) {
 	if MiniMessage != "" {
 		writer(img, 2, 62, MiniMessage)
 	} else {
-		ip := strings.Split("192.168.1.103", ".")[2:4]
+		ip := strings.Split(tools.GetLocalIP().String(), ".")[2:4]
 		writer(img, 2, 62, fmt.Sprintf(".%v:%d", strings.Join(ip, "."), cfg.Port))
 	}
-	Draw(screen, img)
+	draw(screen, img)
 
 	err := screen.Scroll(ssd1306.Left, ssd1306.FrameRate5, 16, 48)
 	if err != nil {
 		return
 	}
 	//screen.Invert(true)
-	//screen.Halt()
 }
 
 func StopScreen(screen *ssd1306.Dev) {
-	Draw(screen, CreateImg(screen))
-	screen.Halt()
+	screen.StopScroll()
+	draw(screen, createImg(screen))
+	screenConnection.Close()
 }

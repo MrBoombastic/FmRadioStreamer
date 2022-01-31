@@ -1,9 +1,7 @@
 package leds
 
 import (
-	"fmt"
 	"github.com/stianeikeland/go-rpio/v4"
-	"os"
 	"time"
 )
 
@@ -14,10 +12,6 @@ func Blink(led rpio.Pin, miliseconds time.Duration) {
 	}
 }
 func InitLeds() {
-	if err := rpio.Open(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 	greenLed1.Output()
 	greenLed2.Output()
 	greenLed3.Output()
