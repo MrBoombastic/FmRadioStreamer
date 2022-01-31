@@ -19,7 +19,8 @@ func main() {
 	// Init and start leds
 	tools.InitGPIO()
 	leds.InitLeds()
-	//buttons.InitButtons()
+	buttons.InitButtons()
+	go buttons.ListenButtons()
 	go leds.QuadGreensLoopStart()
 	go leds.BlueLedLoopStart()
 	// Init screen
@@ -36,10 +37,8 @@ func main() {
 	oled.FillScreen(screen)
 
 	// Code here!
-	buttons.InitButtons()
-	go buttons.ListenButtons()
 
-	time.Sleep(30 * time.Second)
+	time.Sleep(90 * time.Second)
 	StopPeriphs(screen)
 	os.Exit(0)
 }
