@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 )
 
@@ -26,8 +27,8 @@ func Get() Config {
 
 func save(newConfig Config) {
 	currentConfig = newConfig
-	//file, _ := json.MarshalIndent(currentConfig, "", "	")
-	//_ = ioutil.WriteFile("config.json", file, 0644)
+	file, _ := json.MarshalIndent(currentConfig, "", "  ")
+	_ = ioutil.WriteFile("config.json", file, 0644)
 }
 
 var currentConfig Config

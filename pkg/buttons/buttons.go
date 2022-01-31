@@ -1,7 +1,6 @@
 package buttons
 
 import (
-	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
@@ -66,7 +65,6 @@ func Listen(screen *ssd1306.Dev) {
 						config.UpdateMultiplier(0.1)
 					}
 				}
-				fmt.Println(i)
 				oled.RefreshScreen(screen)
 			}
 		}

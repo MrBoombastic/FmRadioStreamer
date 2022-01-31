@@ -11,8 +11,6 @@ import (
 	"time"
 )
 
-//var cfg = config.Get()
-var multiplier = 0.1
 var screen *ssd1306.Dev
 
 func main() {
