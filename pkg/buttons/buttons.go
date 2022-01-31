@@ -13,12 +13,12 @@ import (
 var (
 	buttonUp         = rpio.Pin(20)
 	buttonDown       = rpio.Pin(21)
-	buttonSet        = rpio.Pin(16)
-	buttonMultiplier = rpio.Pin(12)
+	buttonMultiplier = rpio.Pin(16)
+	buttonSet        = rpio.Pin(12)
 )
 
 func Init() {
-	buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonSet, buttonMultiplier}
+	buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonMultiplier, buttonMultiplier}
 	for _, item := range buttons {
 		item.Input()
 		item.PullUp()
@@ -28,13 +28,13 @@ func Init() {
 
 func Listen(screen *ssd1306.Dev) {
 	for true {
-		buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonSet, buttonMultiplier}
+		buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonMultiplier, buttonSet}
 		for i, item := range buttons {
 			if item.EdgeDetected() {
 				if i == 0 {
 					currentFrequency := config.GetFrequency()
 					currentMultiplier := config.GetMultiplier()
-					if currentFrequency-currentMultiplier <= 87.2 {
+					if currentFrequency-currentMultiplier <= 76.0 {
 						oled.MiniMessage = "MIN"
 						leds.YellowBlink()
 					} else {
@@ -44,14 +44,14 @@ func Listen(screen *ssd1306.Dev) {
 				if i == 1 {
 					currentFrequency := config.GetFrequency()
 					currentMultiplier := config.GetMultiplier()
-					if currentFrequency+currentMultiplier >= 108.9 {
+					if currentFrequency+currentMultiplier >= 109.0 { //Theoretically 108, but who cares
 						oled.MiniMessage = "MAX"
 						go leds.YellowBlink()
 					} else {
 						config.UpdateFrequency(math.Floor((config.GetFrequency()+config.GetMultiplier())*10) / 10)
 					}
 				}
-				if i == 3 {
+				if i == 2 {
 					switch currentMultiplier := config.GetMultiplier(); currentMultiplier {
 					case 0.1:
 						config.UpdateMultiplier(0.5)

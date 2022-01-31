@@ -26,10 +26,11 @@ func main() {
 	leds.Init()
 	buttons.Init()
 	fmt.Println("Done preparing peripherals!")
+
 	time.Sleep(time.Second * 2)
+
 	fmt.Println("Starting peripherals...")
 	go leds.QuadGreensLoopStart()
-	//go leds.BlueLedLoopStart()
 	// Init screen
 	var err error
 	screen, err = oled.Create()
@@ -41,8 +42,6 @@ func main() {
 	oled.RefreshScreen(screen)
 	go buttons.Listen(screen)
 	fmt.Println("Done starting peripherals!")
-
-	// Code here!
 
 	time.Sleep(90 * time.Second)
 	StopPeriphs(screen)

@@ -6,10 +6,9 @@ import (
 )
 
 func Blink(led rpio.Pin, duration time.Duration) {
-	for x := 0; x < 2; x++ {
-		led.Toggle()
-		time.Sleep(duration)
-	}
+	led.High()
+	time.Sleep(duration)
+	led.Low()
 }
 func Init() {
 	greenLed1.Output()
