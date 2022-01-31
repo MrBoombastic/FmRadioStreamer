@@ -18,15 +18,16 @@ var (
 	buttonMultiplier = rpio.Pin(12)
 )
 
-func InitButtons() {
+func Init() {
 	buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonSet, buttonMultiplier}
 	for _, item := range buttons {
+		item.Input()
 		item.PullUp()
-		item.Detect(rpio.RiseEdge)
+		item.Detect(rpio.AnyEdge)
 	}
 }
 
-func ListenButtons(screen *ssd1306.Dev) {
+func Listen(screen *ssd1306.Dev) {
 	for true {
 		buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonSet, buttonMultiplier}
 		for i, item := range buttons {

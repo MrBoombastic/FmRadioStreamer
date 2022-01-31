@@ -11,17 +11,17 @@ func Blink(led rpio.Pin, duration time.Duration) {
 		time.Sleep(duration)
 	}
 }
-func InitLeds() {
+func Init() {
 	greenLed1.Output()
 	greenLed2.Output()
 	greenLed3.Output()
 	greenLed4.Output()
 	blueLed.Output()
 	yellowLed.Output()
-	ClearLeds()
+	Clear()
 }
 
-func ClearLeds() {
+func Clear() {
 	QuadGreensLoopStop()
 	BlueLedLoopStop()
 	yellowLed.Low()

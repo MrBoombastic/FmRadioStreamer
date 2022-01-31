@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"fmt"
 	"github.com/stianeikeland/go-rpio/v4"
 	"log"
 	"net"
@@ -30,5 +31,6 @@ func StopGPIO() error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("GPIO closed")
 	return nil
 }

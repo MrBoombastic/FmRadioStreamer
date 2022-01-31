@@ -16,10 +16,20 @@ var multiplier = 0.1
 var screen *ssd1306.Dev
 
 func main() {
+
+	if os.Geteuid() != 0 {
+		fmt.Println("Not running as sudo! Preventing system crash! Exiting...")
+		os.Exit(0)
+		return
+	}
 	// Init and start leds
+	fmt.Println("Preparing peripherals...")
 	tools.InitGPIO()
-	leds.InitLeds()
-	buttons.InitButtons()
+	leds.Init()
+	buttons.Init()
+	fmt.Println("Done preparing peripherals!")
+	time.Sleep(time.Second * 2)
+	fmt.Println("Starting peripherals...")
 	go leds.QuadGreensLoopStart()
 	//go leds.BlueLedLoopStart()
 	// Init screen
@@ -30,9 +40,9 @@ func main() {
 	}
 	// Listen for process killing/exiting
 	go StopApplicationHandler(screen)
-
 	oled.RefreshScreen(screen)
-	go buttons.ListenButtons(screen)
+	go buttons.Listen(screen)
+	fmt.Println("Done starting peripherals!")
 
 	// Code here!
 

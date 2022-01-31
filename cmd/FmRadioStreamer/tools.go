@@ -28,7 +28,7 @@ func StopApplicationHandler(screen *ssd1306.Dev) {
 }
 
 func StopPeriphs(screen *ssd1306.Dev) {
-	leds.ClearLeds()
+	leds.Clear()
 	oled.StopScreen(screen)
 	tools.StopGPIO()
 }
