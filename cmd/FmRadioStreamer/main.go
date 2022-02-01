@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/buttons"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/dashboard"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
@@ -42,7 +43,7 @@ func main() {
 	oled.RefreshScreen(screen)
 	go buttons.Listen(screen)
 	fmt.Println("Done starting peripherals!")
-
+	go dashboard.Init()
 	time.Sleep(90 * time.Second)
 	StopPeriphs(screen)
 	os.Exit(0)

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 )
 
@@ -16,13 +17,24 @@ func Get() Config {
 		fmt.Println(err)
 	}
 	defer file.Close()
-	decoder := json.NewDecoder(file)
 	configuration := Config{}
-	err = decoder.Decode(&configuration)
-	if err != nil {
-		fmt.Println(err)
+	if err := json.NewDecoder(file).Decode(&configuration); err != nil {
+		log.Fatal(err)
 	}
 	return configuration
+}
+
+func GetMap() map[string]interface{} {
+	file, err := os.Open("config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	var data map[string]interface{}
+	if err := json.NewDecoder(file).Decode(&data); err != nil {
+		log.Fatal(err)
+	}
+	return data
 }
 
 func save(newConfig Config) {
@@ -50,4 +62,8 @@ func UpdateMultiplier(value float64) {
 
 func GetMultiplier() float64 {
 	return Get().Multiplier
+}
+
+func GetPort() uint16 {
+	return Get().Port
 }
