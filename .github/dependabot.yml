@@ -1,12 +1,6 @@
 version: 2
 updates:
-- package-ecosystem: npm
-  directory: "/"
-  schedule:
-    interval: daily
-    time: "11:00"
-  open-pull-requests-limit: 99
-  ignore:
-  - dependency-name: onoff
-    versions:
-    - 6.0.2
+  - package-ecosystem: gomod
+    directory: "/"
+    schedule:
+      interval: daily
