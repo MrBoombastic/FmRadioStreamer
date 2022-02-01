@@ -1,14 +1,18 @@
-# Warning: rewrite in progres!
-## Here is latest "stable" version: [click](https://github.com/MrBoombastic/FmRadioStreamer/tree/bc3cae0455e9352db580cb24f56f9788ea515354)
+# Warning: rewrite in progress!
+
+## Here is the latest "stable" version: [click](https://github.com/MrBoombastic/FmRadioStreamer/tree/bc3cae0455e9352db580cb24f56f9788ea515354)
 
 # FmRadioStreamer
+
 [BETA] Raspberry Pi based FM streamer with OLED, buttons and LEDs support.
 
 ## Installation:
-Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. **WARNING!!!** Installer will use Yarn to install packages INSTEAD of NPM! 
 
-Edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started).
-Also, you have to add `gpu_freq=250` in `/boot/config.txt`.
+Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. **WARNING!!!** Installer will use Yarn to
+install packages INSTEAD of NPM!
+
+Edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started). Also, you have
+to add `gpu_freq=250` in `/boot/config.txt`.
 
 ## Running:
 Rename `config.json.example` to `config.json`. Then type `sudo node index.js`. You can change RDS in `config.json` file. Go to API Docs section for more.
