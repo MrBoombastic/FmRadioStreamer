@@ -1,10 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
 <link rel="stylesheet" href="public/bootstrap.min.css">
 <script src="public/bootstrap.min.js"></script>
 <script>
-    let logs;
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
     const errorHandler = async (data, endpoint, errored = false) => {
         const status = data.status;
         if (!errored) data = await data.json().catch(() => data);
+        console.log(logs);
         logs.innerText += (endpoint + "  " + status + "  " + JSON.stringify(data) + "\n");
         logs.scrollTop = logs.scrollHeight - logs.clientHeight;
         return data;
@@ -28,21 +35,26 @@
         return document.getElementById("musicpicker").value;
     };
     const save = () => {
-        const config = {};
-        for (let data of saveinputs) {
-            data.id = data.id.replace("config-", "");
-            let newVal;
-            if (data.attributes.type.value === "number") newVal = Number(data.value);
-            else if (data.attributes.type.value === "boolean") newVal = JSON.parse(data.value.toLowerCase());
-            else if (data.attributes.type.value === "string") newVal = data.value;
-            config[data.id] = newVal;
+        const inputs = document.getElementsByClassName("setting");
+        const settings = {};
+        for (let data of inputs) {
+            const key = capitalizeFirstLetter(data.id);
+            settings[key] = data;
         }
-        niceFetch("./save", "POST", JSON.stringify(config, null, 3), {'Content-Type': 'application/json'});
+        console.log(settings)
+        niceFetch("./save", "POST", JSON.stringify(settings), {'Content-Type': 'application/json'});
+    };
+
+    document.getElementById("youtube-search").onclick = async function () {
+        const data = await niceFetch(`./yt?song=${encodeURIComponent(document.getElementById("youtube-input").value)}&searchOnly=true`);
+        if (data.error) return;
+        ["title", "channelTitle", "description"].forEach(prop => {
+            document.getElementById("youtube-" + prop).textContent = decodeURIComponent(data[prop]);
+        });
+        document.getElementById("youtube-thumb").src = data.thumbnails.high.url;
+        document.getElementById("youtube-url").href = data.url;
     };
 </script>
-
-<!DOCTYPE html>
-<html lang="en">
 
 <head>
     <meta charset="utf-8">
@@ -149,8 +161,8 @@
                     <div class="row">
                         {{ range $key, $value := .Config }}
                             <div class="col-md-6">
-                                <label for="config-{{ $key }}" class="text-white">{{ $key }}:</label>
-                                <input class="form-control" id="config-{{ $key }}"
+                                <label for="{{ $key }}" class="text-white">{{ $key }}:</label>
+                                <input class="form-control setting" id="{{ $key }}"
                                        value="{{ $value }}">
                             </div>
                         {{end}}
@@ -171,21 +183,8 @@
         </div>
     </div>
 </div>
-
 </body>
 <script>
-    $(document).ready(function () {
-        logs = document.getElementById("logs");
-        document.getElementById("youtube-search").onclick = async function () {
-            const data = await niceFetch(`./yt?song=${encodeURIComponent(document.getElementById("youtube-input").value)}&searchOnly=true`);
-            if (data.error) return;
-            ["title", "channelTitle", "description"].forEach(prop => {
-                document.getElementById("youtube-" + prop).textContent = decodeURIComponent(data[prop]);
-            });
-            document.getElementById("youtube-thumb").src = data.thumbnails.high.url;
-            document.getElementById("youtube-url").href = data.url;
-        };
-    });
-    const saveinputs = $('input[id^="config"]');
+    const logs = document.getElementById("logs");
 </script>
 </html>
