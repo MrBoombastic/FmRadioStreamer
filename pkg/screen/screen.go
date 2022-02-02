@@ -19,6 +19,7 @@ import (
 
 var MiniMessage string
 var screenConnection i2c.BusCloser
+var ScreenInverted = false
 
 func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
 	drawer := font.Drawer{

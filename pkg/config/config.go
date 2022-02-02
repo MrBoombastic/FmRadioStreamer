@@ -37,7 +37,7 @@ func GetMap() map[string]interface{} {
 	return data
 }
 
-func save(newConfig Config) {
+func Save(newConfig Config) {
 	currentConfig = newConfig
 	file, _ := json.MarshalIndent(currentConfig, "", "  ")
 	_ = ioutil.WriteFile("config.json", file, 0644)
@@ -48,7 +48,7 @@ var currentConfig Config
 func UpdateFrequency(value float64) {
 	newConfig := Get()
 	newConfig.Frequency = value
-	save(newConfig)
+	Save(newConfig)
 }
 
 func GetFrequency() float64 {
@@ -57,7 +57,7 @@ func GetFrequency() float64 {
 func UpdateMultiplier(value float64) {
 	newConfig := Get()
 	newConfig.Multiplier = value
-	save(newConfig)
+	Save(newConfig)
 }
 
 func GetMultiplier() float64 {

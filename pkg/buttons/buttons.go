@@ -14,11 +14,11 @@ var (
 	buttonUp         = rpio.Pin(20)
 	buttonDown       = rpio.Pin(21)
 	buttonMultiplier = rpio.Pin(16)
-	buttonSet        = rpio.Pin(12)
+	buttonInvert     = rpio.Pin(12)
 )
 
 func Init() {
-	buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonMultiplier, buttonMultiplier}
+	buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonMultiplier, buttonInvert}
 	for _, item := range buttons {
 		item.Input()
 		item.PullUp()
@@ -28,7 +28,7 @@ func Init() {
 
 func Listen(screen *ssd1306.Dev) {
 	for true {
-		buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonMultiplier, buttonSet}
+		buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonMultiplier, buttonInvert}
 		for i, item := range buttons {
 			if item.EdgeDetected() {
 				if i == 0 {
@@ -65,7 +65,14 @@ func Listen(screen *ssd1306.Dev) {
 						config.UpdateMultiplier(0.1)
 					}
 				}
-				oled.RefreshScreen(screen)
+				if i == 3 {
+					oled.ScreenInverted = !oled.ScreenInverted
+					screen.Invert(oled.ScreenInverted)
+				}
+				// Do not refresh screen, when only inverting colors
+				if i < 3 {
+					oled.RefreshScreen(screen)
+				}
 			}
 		}
 		time.Sleep(time.Millisecond * 1000)

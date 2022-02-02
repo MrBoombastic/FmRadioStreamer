@@ -17,46 +17,41 @@ var sites embed.FS
 //go:embed public/*
 var public embed.FS
 
-func index(w http.ResponseWriter, req *http.Request) {
+func index(w http.ResponseWriter, _ *http.Request) {
 	t, err := template.ParseFS(sites, "sites/index.gohtml")
 	if err != nil {
 		fmt.Println(err)
 	}
-	templateData := struct {
-		Config map[string]interface{}
-		Music  []string
-	}{
-		Config: config.GetMap(),
-		Music:  musicList(),
-	}
-	t.Execute(w, templateData)
+
+	t.Execute(w, "")
 }
 
-func music(w http.ResponseWriter, req *http.Request) {
+func music(w http.ResponseWriter, _ *http.Request) {
 	filesSlice := musicList()
 	filesJson, err := json.Marshal(filesSlice)
 	if err != nil {
 		log.Fatal(err)
 	}
+	w.WriteHeader(http.StatusOK)
 	w.Write(filesJson)
 }
 
-func loudstop(w http.ResponseWriter, req *http.Request) {
+func loudstop(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Println("loudstop")
 	w.Write([]byte("OK"))
 }
-func superstop(w http.ResponseWriter, req *http.Request) {
+func superstop(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Println("superstop")
 	w.Write([]byte("OK"))
 }
-func yt(w http.ResponseWriter, req *http.Request) {
+func yt(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Println("yt")
 	w.Write([]byte("OK"))
 }
-func play(w http.ResponseWriter, req *http.Request) {
+func play(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Println("play")
 	w.Write([]byte("OK"))
@@ -65,10 +60,20 @@ func save(w http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		panic(err)
-	} //????????????????????????????????????????????
-	log.Println(string(body), body)
+	}
+	var newConfig config.Config
+	json.Unmarshal(body, &newConfig)
+	config.Save(newConfig)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
+}
+func configuration(w http.ResponseWriter, _ *http.Request) {
+	configMap := config.GetMap()
+	configJson, err := json.Marshal(configMap)
+	if err != nil {
+		log.Fatal(err)
+	}
+	w.Write(configJson)
 }
 func musicList() []string {
 	files, err := ioutil.ReadDir("music/")
@@ -88,12 +93,13 @@ func Init() {
 	fs := http.FileServer(publicFS)
 	http.Handle("/public/", fs)
 	// Handle else
-	http.HandleFunc("/music/", music)
-	http.HandleFunc("/loudstop/", loudstop)
-	http.HandleFunc("/superstop/", superstop)
-	http.HandleFunc("/yt/", yt)
-	http.HandleFunc("/play/", play)
-	http.HandleFunc("/save/", save)
+	http.HandleFunc("/music", music)
+	http.HandleFunc("/loudstop", loudstop)
+	http.HandleFunc("/superstop", superstop)
+	http.HandleFunc("/yt", yt)
+	http.HandleFunc("/config", configuration)
+	http.HandleFunc("/play", play)
+	http.HandleFunc("/save", save)
 	http.HandleFunc("/", index)
 	// Start!
 	port := config.GetPort()
