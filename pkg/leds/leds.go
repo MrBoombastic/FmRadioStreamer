@@ -10,6 +10,7 @@ func Blink(led rpio.Pin, duration time.Duration) {
 	time.Sleep(duration)
 	led.Low()
 }
+
 func Init() {
 	greenLed1.Output()
 	greenLed2.Output()

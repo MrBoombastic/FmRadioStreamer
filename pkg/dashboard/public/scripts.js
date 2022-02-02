@@ -23,6 +23,7 @@ const refreshMusic = async () => {
         musicPicker.appendChild(option);
     });
 };
+refreshMusic()
 const getSelectedMusic = () => {
     return document.getElementById("musicpicker").value;
 };

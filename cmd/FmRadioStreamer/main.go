@@ -44,7 +44,7 @@ func main() {
 	go buttons.Listen(screen)
 	fmt.Println("Done starting peripherals!")
 	go dashboard.Init()
-	time.Sleep(90 * time.Second)
+	time.Sleep(1 * time.Hour)
 	StopPeriphs(screen)
 	os.Exit(0)
 }

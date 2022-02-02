@@ -5,17 +5,19 @@ import (
 	"time"
 )
 
-var blueLedEnabled = true
+var blueLedEnabled = false
 var blueLed = rpio.Pin(7)
 
 func BlueLedLoopStart() {
 	blueLedEnabled = true
 	for true {
+		blueLed.High()
+		time.Sleep(500 * time.Millisecond)
+		blueLed.Low()
 		if blueLedEnabled == false {
 			break
-		} else {
-			Blink(blueLed, 500*time.Millisecond)
 		}
+		time.Sleep(500 * time.Millisecond)
 	}
 }
 

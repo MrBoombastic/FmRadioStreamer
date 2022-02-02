@@ -1,3 +1,7 @@
+github.com/BrianAllred/goydl v0.0.0-20200922193158-6eeb623d0fe8 h1:jSnpkKA8r7Ow7YuLiHsXc0fPQzdHktFGnLUmGAl+owM=
+github.com/BrianAllred/goydl v0.0.0-20200922193158-6eeb623d0fe8/go.mod h1:hpSBK67Uduw/SGy6bObP8YrAZjcw0WR+gV/KTl9o2Lc=
+github.com/TheKinrar/goydl v0.0.0-20210916211739-e36980173c4c h1:s3HHnf6ApzBy4i1U4oAcmxfzhmG4bh8bFZkpwsm4dkc=
+github.com/TheKinrar/goydl v0.0.0-20210916211739-e36980173c4c/go.mod h1:k11RIIJu+RUSYGKq/ZmKAlDSiFpPGU6UB+5u3YxgE+o=
 github.com/stianeikeland/go-rpio/v4 v4.6.0 h1:eAJgtw3jTtvn/CqwbC82ntcS+dtzUTgo5qlZKe677EY=
 github.com/stianeikeland/go-rpio/v4 v4.6.0/go.mod h1:A3GvHxC1Om5zaId+HqB3HKqx4K/AqeckxB7qRjxMK7o=
 golang.org/x/image v0.0.0-20211028202545-6944b10bf410 h1:hTftEOvwiOq2+O8k2D5/Q7COC7k5Qcrgc2TFURJYnvQ=

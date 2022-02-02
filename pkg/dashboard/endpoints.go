@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/condlers"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"html/template"
 	"io/ioutil"
@@ -52,7 +53,13 @@ func yt(w http.ResponseWriter, req *http.Request) {
 	if onlySearch == "true" {
 		w.Write(searchJson)
 	} else {
-		condlers.DownloadAudioFromYoutube(result.Items[0].ID.VideoID, result.Items[0].Snippet.Title)
+		go leds.BlueLedLoopStart()
+		err := condlers.DownloadAudioFromYoutube(result.Items[0].ID.VideoID, result.Items[0].Snippet.Title)
+		leds.BlueLedLoopStop()
+		if err != nil {
+			fmt.Println(err)
+		}
+		w.Write([]byte("OK"))
 	}
 }
 func play(w http.ResponseWriter, _ *http.Request) {
