@@ -67,3 +67,7 @@ func GetMultiplier() float64 {
 func GetPort() uint16 {
 	return Get().Port
 }
+
+func GetYouTubeAPIKey() string {
+	return Get().YouTubeAPIKey
+}

@@ -1,0 +1,66 @@
+const configs = document.getElementById("config-row");
+const logs = document.getElementById("logs");
+
+const errorHandler = async (data, endpoint, errored = false) => {
+    const status = data.status;
+    if (!errored) data = await data.json().catch(() => data);
+    logs.innerText += (endpoint + "  " + status + "  " + JSON.stringify(data) + "\n");
+    logs.scrollTop = logs.scrollHeight - logs.clientHeight;
+    return data;
+};
+const niceFetch = (value, method = "GET", body, headers) => {
+    return fetch(value, {method, body, headers})
+        .then(async r => await errorHandler(r, value))
+        .catch(async e => await errorHandler(e, value, true));
+};
+const refreshMusic = async () => {
+    const musicList = await niceFetch("./music");
+    const musicPicker = document.getElementById("musicpickerlist");
+    musicPicker.innerHTML = '';
+    musicList.forEach(elem => {
+        const option = document.createElement('option');
+        option.value = elem;
+        musicPicker.appendChild(option);
+    });
+};
+const getSelectedMusic = () => {
+    return document.getElementById("musicpicker").value;
+};
+const getConfig = async () => {
+    const config = await niceFetch("./config");
+    for (let key in config) {
+        configs.innerHTML += `<div class="col-md-6">
+            <label for="${key}" class="text-white">${key}:</label>
+            <input type="${typeof config[key]}" class="form-control setting"
+                   id="${key}"
+                   value="${config[key]}">
+            </div>`;
+    }
+};
+getConfig();
+const saveConfig = () => {
+    const inputs = document.getElementsByClassName("setting");
+    const settings = {};
+    for (let data of inputs) {
+        let value = data.value;
+        if (["true", "false"].includes(value)) value = (value === 'true');
+        if (data.attributes.type.value === "number") value = Number(value);
+        settings[data.id] = value;
+    }
+    niceFetch("./save", "POST", JSON.stringify(settings), {'Content-Type': 'application/json'});
+};
+
+function htmlDecode(input) {
+    const doc = new DOMParser().parseFromString(input, "text/html");
+    return doc.documentElement.textContent;
+}
+
+document.getElementById("youtube-search").addEventListener("click", async () => {
+    const data = await niceFetch(`./yt?q=${encodeURIComponent(document.getElementById("youtube-input").value)}&search=true`);
+    if (data.error) return;
+    ["title", "channelTitle", "description"].forEach(prop => {
+        document.getElementById("youtube-" + prop).textContent = htmlDecode(data[prop]);
+    });
+    document.getElementById("youtube-thumb").src = data.thumbnails.high.url;
+    document.getElementById("youtube-url").href = data.url;
+});
