@@ -6,7 +6,6 @@ import (
 	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
 	"github.com/stianeikeland/go-rpio/v4"
 	"math"
-	"periph.io/x/periph/devices/ssd1306"
 	"time"
 )
 
@@ -26,7 +25,7 @@ func Init() {
 	}
 }
 
-func Listen(screen *ssd1306.Dev) {
+func Listen() {
 	for true {
 		buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonMultiplier, buttonInvert}
 		for i, item := range buttons {
@@ -67,11 +66,11 @@ func Listen(screen *ssd1306.Dev) {
 				}
 				if i == 3 {
 					oled.ScreenInverted = !oled.ScreenInverted
-					screen.Invert(oled.ScreenInverted)
+					oled.Screen.Invert(oled.ScreenInverted)
 				}
 				// Do not refresh screen, when only inverting colors
 				if i < 3 {
-					oled.RefreshScreen(screen)
+					oled.RefreshScreen()
 				}
 			}
 		}

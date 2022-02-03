@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/buttons"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/dashboard"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
@@ -34,17 +35,20 @@ func main() {
 	go leds.QuadGreensLoopStart()
 	// Init screen
 	var err error
-	screen, err = oled.Create()
+	err = oled.Create()
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	core.Play("")
+
 	// Listen for process killing/exiting
 	go StopApplicationHandler(screen)
-	oled.RefreshScreen(screen)
-	go buttons.Listen(screen)
+	oled.RefreshScreen()
+	go buttons.Listen()
 	fmt.Println("Done starting peripherals!")
 	go dashboard.Init()
 	time.Sleep(1 * time.Hour)
-	StopPeriphs(screen)
+	StopPeriphs()
 	os.Exit(0)
 }

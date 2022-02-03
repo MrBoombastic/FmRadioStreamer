@@ -19,6 +19,7 @@ import (
 
 var MiniMessage string
 var screenConnection i2c.BusCloser
+var Screen *ssd1306.Dev
 var ScreenInverted = false
 
 func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
@@ -31,33 +32,34 @@ func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
 	drawer.DrawString(s)
 }
 
-func Create() (*ssd1306.Dev, error) {
+func Create() error {
 	_, err := host.Init()
 	if err != nil {
-		return nil, err
+		return err
 	}
-
 	screenConnection, err = i2creg.Open("1")
 	if err != nil {
+		return err
+	}
+	scr, err := ssd1306.NewI2C(screenConnection, &ssd1306.DefaultOpts)
+	Screen = scr
+	return nil
+}
+
+func createImg() *image1bit.VerticalLSB {
+	return image1bit.NewVerticalLSB(Screen.Bounds())
+}
+
+func draw(img *image1bit.VerticalLSB) {
+	if err := Screen.Draw(Screen.Bounds(), img, image.Point{}); err != nil {
 		log.Fatal(err)
 	}
-	return ssd1306.NewI2C(screenConnection, &ssd1306.DefaultOpts)
 }
 
-func createImg(screen *ssd1306.Dev) *image1bit.VerticalLSB {
-	return image1bit.NewVerticalLSB(screen.Bounds())
-}
-
-func draw(screen *ssd1306.Dev, img *image1bit.VerticalLSB) {
-	if err := screen.Draw(screen.Bounds(), img, image.Point{}); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func RefreshScreen(screen *ssd1306.Dev) {
+func RefreshScreen() {
 	cfg := config.Get()
-	screen.StopScroll()
-	img := createImg(screen)
+	Screen.StopScroll()
+	img := createImg()
 	writer(img, 2, 11, cfg.PS)
 	writer(img, 71, 11, fmt.Sprintf("%.1f FM", cfg.Frequency))
 	maxRT := 15
@@ -80,17 +82,17 @@ func RefreshScreen(screen *ssd1306.Dev) {
 		ip := strings.Split(tools.GetLocalIP().String(), ".")[2:4]
 		writer(img, 2, 62, fmt.Sprintf(".%v:%d", strings.Join(ip, "."), cfg.Port))
 	}
-	draw(screen, img)
+	draw(img)
 
-	err := screen.Scroll(ssd1306.Left, ssd1306.FrameRate5, 16, 48)
+	err := Screen.Scroll(ssd1306.Left, ssd1306.FrameRate5, 16, 48)
 	if err != nil {
 		return
 	}
 	//screen.Invert(true)
 }
 
-func StopScreen(screen *ssd1306.Dev) {
-	screen.StopScroll()
-	draw(screen, createImg(screen))
+func StopScreen() {
+	Screen.StopScroll()
+	draw(createImg())
 	screenConnection.Close()
 }

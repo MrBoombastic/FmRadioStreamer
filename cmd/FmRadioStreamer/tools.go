@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
@@ -22,13 +23,14 @@ func StopApplicationHandler(screen *ssd1306.Dev) {
 	<-done
 	fmt.Println()
 	fmt.Println("Exiting...")
-	oled.StopScreen(screen)
-	StopPeriphs(screen)
+	oled.StopScreen()
+	StopPeriphs()
 	os.Exit(0)
 }
 
-func StopPeriphs(screen *ssd1306.Dev) {
+func StopPeriphs() {
 	leds.Clear()
-	oled.StopScreen(screen)
+	oled.StopScreen()
 	tools.StopGPIO()
+	core.Kill()
 }

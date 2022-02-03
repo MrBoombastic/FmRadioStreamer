@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/condlers"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"html/template"
 	"io/ioutil"
@@ -34,11 +36,13 @@ func music(w http.ResponseWriter, _ *http.Request) {
 
 func loudstop(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
+	core.Kill()
 	fmt.Println("loudstop")
 	w.Write([]byte("OK"))
 }
 func superstop(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
+	core.Play("")
 	fmt.Println("superstop")
 	w.Write([]byte("OK"))
 }
@@ -62,10 +66,12 @@ func yt(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("OK"))
 	}
 }
-func play(w http.ResponseWriter, _ *http.Request) {
+func play(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Println("play")
+	query := req.FormValue("q")
 	w.Write([]byte("OK"))
+	core.Play(query)
 }
 func save(w http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
@@ -75,6 +81,7 @@ func save(w http.ResponseWriter, req *http.Request) {
 	var newConfig config.Config
 	json.Unmarshal(body, &newConfig)
 	config.Save(newConfig)
+	screen.RefreshScreen()
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
 }
