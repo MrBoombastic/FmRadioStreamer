@@ -8,11 +8,10 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"os"
 	"os/signal"
-	"periph.io/x/periph/devices/ssd1306"
 	"syscall"
 )
 
-func StopApplicationHandler(screen *ssd1306.Dev) {
+func StopApplicationHandler() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	done := make(chan bool, 1)
@@ -28,8 +27,11 @@ func StopApplicationHandler(screen *ssd1306.Dev) {
 }
 
 func StopPeriphs() {
+	core.SuperKill()
 	leds.Clear()
 	oled.StopScreen()
-	tools.StopGPIO()
-	core.Kill()
+	err := tools.StopGPIO()
+	if err != nil {
+		fmt.Println(err)
+	}
 }

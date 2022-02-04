@@ -43,7 +43,7 @@ func main() {
 	core.Play("")
 
 	// Listen for process killing/exiting
-	go StopApplicationHandler(screen)
+	go StopApplicationHandler()
 	oled.RefreshScreen()
 	go buttons.Listen()
 	fmt.Println("Done starting peripherals!")

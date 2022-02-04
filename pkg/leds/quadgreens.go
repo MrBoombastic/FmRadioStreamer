@@ -12,26 +12,32 @@ var (
 	greenLed4 = rpio.Pin(26)
 )
 
-var greenSleepInterval = 500 * time.Millisecond
+var greensSleepInterval = 500 * time.Millisecond
+var greensLoopEnabled = true
 
 func QuadGreensLoopStart() {
+	greensLoopEnabled = true
 	greenLed4.High()
 	for true {
 		greenLed4.Toggle()
 		greenLed1.Toggle()
-		time.Sleep(greenSleepInterval)
+		time.Sleep(greensSleepInterval)
 		greenLed1.Toggle()
 		greenLed2.Toggle()
-		time.Sleep(greenSleepInterval)
+		time.Sleep(greensSleepInterval)
 		greenLed2.Toggle()
 		greenLed3.Toggle()
-		time.Sleep(greenSleepInterval)
+		time.Sleep(greensSleepInterval)
 		greenLed3.Toggle()
 		greenLed4.Toggle()
-		time.Sleep(greenSleepInterval)
+		time.Sleep(greensSleepInterval)
+		if greensLoopEnabled == false {
+			break
+		}
 	}
 }
 func QuadGreensLoopStop() {
+	greensLoopEnabled = false
 	greenLed1.Low()
 	greenLed2.Low()
 	greenLed3.Low()

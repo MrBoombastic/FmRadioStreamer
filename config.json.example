@@ -3,8 +3,12 @@
   "multiplier": 0.1,
   "PS": "FmRadStr",
   "RT": "RPi based radio streamer. It is working!",
+  "PI": "FFFF",
+  "PTY": 0,
   "apikey": "",
   "port": 80,
   "power": 5,
+  "mpx": 30,
+  "preemph": "eu",
   "screen": false
 }

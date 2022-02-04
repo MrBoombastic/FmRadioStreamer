@@ -33,7 +33,7 @@ func Listen() {
 				if i == 0 {
 					currentFrequency := config.GetFrequency()
 					currentMultiplier := config.GetMultiplier()
-					if currentFrequency-currentMultiplier <= 76.0 {
+					if currentFrequency-currentMultiplier < 76.0 {
 						oled.MiniMessage = "MIN"
 						leds.YellowBlink()
 					} else {
@@ -43,7 +43,7 @@ func Listen() {
 				if i == 1 {
 					currentFrequency := config.GetFrequency()
 					currentMultiplier := config.GetMultiplier()
-					if currentFrequency+currentMultiplier >= 109.0 { //Theoretically 108, but who cares
+					if currentFrequency+currentMultiplier > 108.0 {
 						oled.MiniMessage = "MAX"
 						go leds.YellowBlink()
 					} else {

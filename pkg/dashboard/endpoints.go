@@ -20,6 +20,7 @@ func index(w http.ResponseWriter, _ *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("index")
 
 	t.Execute(w, "")
 }
@@ -71,7 +72,6 @@ func play(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("play")
 	query := req.FormValue("q")
 	w.Write([]byte("OK"))
-	//core.Kill()
 	core.Play(query)
 }
 func save(w http.ResponseWriter, req *http.Request) {
