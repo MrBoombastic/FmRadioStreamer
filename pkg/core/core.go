@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os/exec"
+	"syscall"
 )
 
 var PiFmAdv *exec.Cmd
@@ -20,6 +21,9 @@ func GenerateOptions(audio string) []string {
 }
 func run(name string, args []string) error {
 	PiFmAdv = exec.Command(name, args...)
+	PiFmAdv.SysProcAttr = &syscall.SysProcAttr{
+		Pdeathsig: syscall.SIGINT,
+	}
 	stderr, err := PiFmAdv.StderrPipe()
 	if err != nil {
 		log.Fatal(err)
@@ -30,11 +34,11 @@ func run(name string, args []string) error {
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		err = PiFmAdv.Start()
-		if err != nil {
-			return err
-		}*/
+	*/
+	err = PiFmAdv.Start()
+	if err != nil {
+		return err
+	}
 	cmderr, _ := io.ReadAll(stderr)
 	fmt.Printf("%s\n", cmderr)
 	/*
@@ -44,12 +48,14 @@ func run(name string, args []string) error {
 	return nil
 }
 func Kill() {
-	cmd := exec.Command("pkill", "-2", "pi_fm_adv")
-	cmd.Start()
+	if PiFmAdv != nil {
+		PiFmAdv.Process.Kill()
+		PiFmAdv = nil
+	}
 }
 func Play(audio string) {
 	// Make sure that previous playback is stopped
-	// Kill()
+	Kill()
 	go func() {
 		options := GenerateOptions(audio)
 		err := run("core/pi_fm_adv", options)

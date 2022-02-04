@@ -36,13 +36,13 @@ func music(w http.ResponseWriter, _ *http.Request) {
 
 func loudstop(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	core.Kill()
+	core.Play("")
 	fmt.Println("loudstop")
 	w.Write([]byte("OK"))
 }
 func superstop(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	core.Play("")
+	core.Kill()
 	fmt.Println("superstop")
 	w.Write([]byte("OK"))
 }
@@ -71,6 +71,7 @@ func play(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("play")
 	query := req.FormValue("q")
 	w.Write([]byte("OK"))
+	//core.Kill()
 	core.Play(query)
 }
 func save(w http.ResponseWriter, req *http.Request) {

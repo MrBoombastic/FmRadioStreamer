@@ -23,7 +23,6 @@ func StopApplicationHandler(screen *ssd1306.Dev) {
 	<-done
 	fmt.Println()
 	fmt.Println("Exiting...")
-	oled.StopScreen()
 	StopPeriphs()
 	os.Exit(0)
 }
