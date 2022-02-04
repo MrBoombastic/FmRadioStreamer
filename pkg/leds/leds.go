@@ -22,7 +22,12 @@ func Init() {
 }
 
 func Clear() {
-	QuadGreensLoopStop()
-	BlueLedLoopStop()
+	GreensLoopEnabled = false
+	BlueLedEnabled = false
+	blueLed.Low()
 	yellowLed.Low()
+	greenLed1.Low()
+	greenLed2.Low()
+	greenLed3.Low()
+	greenLed4.Low()
 }

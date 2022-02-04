@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func StopApplicationHandler() {
@@ -27,11 +28,16 @@ func StopApplicationHandler() {
 }
 
 func StopPeriphs() {
-	core.SuperKill()
 	leds.Clear()
+	tools.StopGPIO()
+	time.Sleep(300 * time.Millisecond)
+	core.SuperKill()
+	time.Sleep(300 * time.Millisecond)
 	oled.StopScreen()
-	err := tools.StopGPIO()
+	//time.Sleep(300 * time.Millisecond)
+	//time.Sleep(300 * time.Millisecond)
+	/*err := tools.StopGPIO()
 	if err != nil {
 		fmt.Println(err)
-	}
+	}*/
 }

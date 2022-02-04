@@ -13,12 +13,12 @@ var (
 )
 
 var greensSleepInterval = 500 * time.Millisecond
-var greensLoopEnabled = true
+var GreensLoopEnabled = true
 
 func QuadGreensLoopStart() {
-	greensLoopEnabled = true
+	GreensLoopEnabled = true
 	greenLed4.High()
-	for true {
+	for GreensLoopEnabled {
 		greenLed4.Toggle()
 		greenLed1.Toggle()
 		time.Sleep(greensSleepInterval)
@@ -31,15 +31,5 @@ func QuadGreensLoopStart() {
 		greenLed3.Toggle()
 		greenLed4.Toggle()
 		time.Sleep(greensSleepInterval)
-		if greensLoopEnabled == false {
-			break
-		}
 	}
-}
-func QuadGreensLoopStop() {
-	greensLoopEnabled = false
-	greenLed1.Low()
-	greenLed2.Low()
-	greenLed3.Low()
-	greenLed4.Low()
 }

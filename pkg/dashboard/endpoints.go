@@ -60,7 +60,7 @@ func yt(w http.ResponseWriter, req *http.Request) {
 	} else {
 		go leds.BlueLedLoopStart()
 		err := condlers.DownloadAudioFromYoutube(result.Items[0].ID.VideoID, result.Items[0].Snippet.Title)
-		leds.BlueLedLoopStop()
+		leds.BlueLedEnabled = false
 		if err != nil {
 			fmt.Println(err)
 		}
