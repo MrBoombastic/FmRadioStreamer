@@ -27,6 +27,10 @@ func musicList() []string {
 	return filesSlice
 }
 
+var httpServer = &http.Server{
+	Addr: fmt.Sprintf(":%v", config.GetPort()),
+}
+
 func Init() {
 	// Handle static files
 	var publicFS = http.FS(public)
@@ -42,7 +46,8 @@ func Init() {
 	http.HandleFunc("/save", save)
 	http.HandleFunc("/", index)
 	// Start!
-	port := config.GetPort()
-	go http.ListenAndServe(fmt.Sprintf(":%v", port), nil)
-	fmt.Println(fmt.Sprintf("Dashboard listening at port %v!", port))
+
+	go httpServer.ListenAndServe()
+
+	fmt.Println(fmt.Sprintf("Dashboard listening at port %v!", httpServer.Addr))
 }

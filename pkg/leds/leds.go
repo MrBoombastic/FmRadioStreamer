@@ -18,16 +18,4 @@ func Init() {
 	greenLed4.Output()
 	blueLed.Output()
 	yellowLed.Output()
-	Clear()
-}
-
-func Clear() {
-	GreensLoopEnabled = false
-	BlueLedEnabled = false
-	blueLed.Low()
-	yellowLed.Low()
-	greenLed1.Low()
-	greenLed2.Low()
-	greenLed3.Low()
-	greenLed4.Low()
 }

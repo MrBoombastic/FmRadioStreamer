@@ -43,7 +43,7 @@ func loudstop(w http.ResponseWriter, _ *http.Request) {
 }
 func superstop(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	core.Kill()
+	core.SuperKill()
 	fmt.Println("superstop")
 	w.Write([]byte("OK"))
 }
@@ -58,7 +58,7 @@ func yt(w http.ResponseWriter, req *http.Request) {
 	if onlySearch == "true" {
 		w.Write(searchJson)
 	} else {
-		go leds.BlueLedLoopStart()
+		leds.BlueLedEnabled = true
 		err := condlers.DownloadAudioFromYoutube(result.Items[0].ID.VideoID, result.Items[0].Snippet.Title)
 		leds.BlueLedEnabled = false
 		if err != nil {

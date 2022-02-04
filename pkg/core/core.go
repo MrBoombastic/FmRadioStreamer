@@ -48,35 +48,24 @@ func run(name string, args []string) error {
 		return err
 	}
 	cmderr, _ := io.ReadAll(stderr)
-	fmt.Printf("%s\n", cmderr)
+	if fmt.Sprintf("%s", cmderr) != "" {
+		fmt.Printf("Pi_Fm_Adv error:\n%s", cmderr)
+	}
 	/*
 		cmdout, _ := io.ReadAll(stdout)
 		fmt.Printf("%s\n", cmdout)
 	*/
 	return nil
 }
-func Kill() {
-	if PiFmAdv != nil {
-		PiFmAdv.Process.Kill()
-		PiFmAdv = nil
-	}
-}
+
 func SuperKill() {
 	cmd := exec.Command("pkill", "-2", "pi_fm_adv")
 	cmd.Start()
-
-	/*	stdout, err := cmd.StdoutPipe()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		cmdout, _ := io.ReadAll(stdout)
-		fmt.Printf("%s\n", cmdout)*/
-
+	cmd.Wait()
 }
 func Play(audio string) {
 	// Make sure that previous playback is stopped
-	Kill()
+	SuperKill()
 	go func() {
 		options := GenerateOptions(audio)
 		err := run("core/pi_fm_adv", options)

@@ -1,7 +1,9 @@
 package leds
 
 import (
+	"context"
 	"github.com/stianeikeland/go-rpio/v4"
+	"sync"
 	"time"
 )
 
@@ -13,23 +15,31 @@ var (
 )
 
 var greensSleepInterval = 500 * time.Millisecond
-var GreensLoopEnabled = true
 
-func QuadGreensLoopStart() {
-	GreensLoopEnabled = true
+func QuadGreensLoopStart(wg *sync.WaitGroup, ctx context.Context) {
+	defer wg.Done()
 	greenLed4.High()
-	for GreensLoopEnabled {
-		greenLed4.Toggle()
-		greenLed1.Toggle()
-		time.Sleep(greensSleepInterval)
-		greenLed1.Toggle()
-		greenLed2.Toggle()
-		time.Sleep(greensSleepInterval)
-		greenLed2.Toggle()
-		greenLed3.Toggle()
-		time.Sleep(greensSleepInterval)
-		greenLed3.Toggle()
-		greenLed4.Toggle()
-		time.Sleep(greensSleepInterval)
+	for {
+		select {
+		case <-ctx.Done():
+			greenLed1.Low()
+			greenLed2.Low()
+			greenLed3.Low()
+			greenLed4.Low()
+			return
+		case <-time.After(greensSleepInterval / 2):
+			greenLed4.Toggle()
+			greenLed1.Toggle()
+			time.Sleep(greensSleepInterval)
+			greenLed1.Toggle()
+			greenLed2.Toggle()
+			time.Sleep(greensSleepInterval)
+			greenLed2.Toggle()
+			greenLed3.Toggle()
+			time.Sleep(greensSleepInterval)
+			greenLed3.Toggle()
+			greenLed4.Toggle()
+			time.Sleep(greensSleepInterval / 2)
+		}
 	}
 }

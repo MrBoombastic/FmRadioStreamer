@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/buttons"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
@@ -9,46 +10,51 @@ import (
 	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"os"
+	"os/signal"
 	"periph.io/x/periph/devices/ssd1306"
-	"time"
+	"sync"
+	"syscall"
 )
 
 var screen *ssd1306.Dev
 
 func main() {
-
 	if os.Geteuid() != 0 {
 		fmt.Println("Not running as sudo! Preventing system crash! Exiting...")
 		os.Exit(0)
 		return
 	}
-	// Init and start leds
-	fmt.Println("Preparing peripherals...")
-	tools.InitGPIO()
-	leds.Init()
-	buttons.Init()
-	fmt.Println("Done preparing peripherals!")
-
-	time.Sleep(time.Second * 2)
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	var wg sync.WaitGroup
 
 	fmt.Println("Starting peripherals...")
-	go leds.QuadGreensLoopStart()
+	tools.InitGPIO()
+
+	leds.Init()
+	wg.Add(1)
+	go leds.QuadGreensLoopStart(&wg, ctx)
+	wg.Add(1)
+	go leds.BlueLedLoopStart(&wg, ctx)
+
 	// Init screen
-	var err error
-	err = oled.Create()
-	if err != nil {
-		fmt.Println(err)
-	}
+	wg.Add(1)
+	go oled.Create(&wg, ctx)
+
+	// Init buttons
+	buttons.Init()
+	wg.Add(1)
+	go buttons.Listen(&wg, ctx)
+
+	dashboard.Init()
 
 	core.Play("")
 
-	// Listen for process killing/exiting
-	go StopApplicationHandler()
-	oled.RefreshScreen()
-	go buttons.Listen()
-	fmt.Println("Done starting peripherals!")
-	go dashboard.Init()
-	time.Sleep(1 * time.Hour)
-	StopPeriphs()
-	os.Exit(0)
+	wg.Wait()
+	fmt.Println("Exiting...")
+	fmt.Println("gpio")
+	//tools.StopGPIO()
+	fmt.Println("core")
+	core.SuperKill()
+	fmt.Println("Exited")
 }

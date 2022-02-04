@@ -1,6 +1,7 @@
 package screen
 
 import (
+	"context"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
@@ -15,6 +16,8 @@ import (
 	"periph.io/x/periph/devices/ssd1306/image1bit"
 	"periph.io/x/periph/host"
 	"strings"
+	"sync"
+	"time"
 )
 
 var MiniMessage string
@@ -32,18 +35,32 @@ func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
 	drawer.DrawString(s)
 }
 
-func Create() error {
-	_, err := host.Init()
-	if err != nil {
-		return err
+func Create(wg *sync.WaitGroup, ctx context.Context) error {
+	defer wg.Done()
+	for {
+		select {
+		case <-ctx.Done():
+			Screen.StopScroll()
+			draw(createImg())
+			screenConnection.Close()
+			return nil
+
+		case <-time.After(time.Second):
+			if Screen == nil {
+				_, err := host.Init()
+				if err != nil {
+					return err
+				}
+				screenConnection, err = i2creg.Open("1")
+				if err != nil {
+					return err
+				}
+				scr, err := ssd1306.NewI2C(screenConnection, &ssd1306.DefaultOpts)
+				Screen = scr
+				RefreshScreen()
+			}
+		}
 	}
-	screenConnection, err = i2creg.Open("1")
-	if err != nil {
-		return err
-	}
-	scr, err := ssd1306.NewI2C(screenConnection, &ssd1306.DefaultOpts)
-	Screen = scr
-	return nil
 }
 
 func createImg() *image1bit.VerticalLSB {
@@ -57,6 +74,9 @@ func draw(img *image1bit.VerticalLSB) {
 }
 
 func RefreshScreen() {
+	if Screen == nil {
+		return
+	}
 	cfg := config.Get()
 	Screen.StopScroll()
 	img := createImg()
@@ -89,10 +109,4 @@ func RefreshScreen() {
 		return
 	}
 	//screen.Invert(true)
-}
-
-func StopScreen() {
-	Screen.StopScroll()
-	draw(createImg())
-	screenConnection.Close()
 }
