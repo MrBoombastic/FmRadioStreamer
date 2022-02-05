@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/condlers"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
@@ -9,88 +8,87 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
-	"html/template"
-	"io/ioutil"
 	"log"
-	"net/http"
 )
 
-func index(w http.ResponseWriter, _ *http.Request) {
-	t, err := template.ParseFS(sites, "sites/index.gohtml")
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("index")
-
-	t.Execute(w, "")
+var musicEndpoint = EndpointData{
+	Endpoint: music,
 }
 
-func music(w http.ResponseWriter, _ *http.Request) {
+func music(ctx Context) {
 	filesSlice := musicList()
-	filesJson, err := json.Marshal(filesSlice)
-	if err != nil {
-		log.Fatal(err)
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(filesJson)
+	ctx.Server.JSON(filesSlice)
 }
 
-func loudstop(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(http.StatusOK)
+var loudstopEndpoint = EndpointData{
+	Endpoint: loudstop,
+}
+
+func loudstop(ctx Context) {
 	core.Play("")
-	fmt.Println("loudstop")
-	w.Write([]byte("OK"))
+	ctx.Server.SendStatus(200)
 }
-func superstop(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(http.StatusOK)
+
+var superstopEndpoint = EndpointData{
+	Endpoint: superstop,
+}
+
+func superstop(ctx Context) {
 	core.SuperKill()
-	fmt.Println("superstop")
-	w.Write([]byte("OK"))
+	ctx.Server.SendStatus(200)
 }
-func yt(w http.ResponseWriter, req *http.Request) {
-	onlySearch := req.FormValue("search")
-	query := req.FormValue("q")
+
+var ytEndpoint = EndpointData{
+	Endpoint: yt,
+}
+
+func yt(ctx Context) {
+	search := ctx.Server.Query("search")
+	query := ctx.Server.Query("q")
 	result := tools.SearchYouTube(query)
-	searchJson, err := json.Marshal(result.Items[0].Snippet)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if onlySearch == "true" {
-		w.Write(searchJson)
+	if search == "true" {
+		ctx.Server.JSON(result.Items[0].Snippet)
 	} else {
+		ctx.Server.SendStatus(200)
 		leds.BlueLedEnabled = true
 		err := condlers.DownloadAudioFromYoutube(result.Items[0].ID.VideoID, result.Items[0].Snippet.Title)
 		leds.BlueLedEnabled = false
 		if err != nil {
 			fmt.Println(err)
 		}
-		w.Write([]byte("OK"))
 	}
 }
-func play(w http.ResponseWriter, req *http.Request) {
-	w.WriteHeader(http.StatusOK)
+
+var playEndpoint = EndpointData{
+	Endpoint: play,
+}
+
+func play(ctx Context) {
 	fmt.Println("play")
-	query := req.FormValue("q")
-	w.Write([]byte("OK"))
+	query := ctx.Server.Query("q")
 	core.Play(query)
+	ctx.Server.SendStatus(200)
 }
-func save(w http.ResponseWriter, req *http.Request) {
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		panic(err)
+
+var saveEndpoint = EndpointData{
+	Endpoint: save,
+}
+
+func save(ctx Context) {
+	newConfig := new(config.Config)
+	if err := ctx.Server.BodyParser(newConfig); err != nil {
+		log.Fatalln("ERROR: Failed to parse new config!")
 	}
-	var newConfig config.Config
-	json.Unmarshal(body, &newConfig)
-	config.Save(newConfig)
+	config.Save(*newConfig)
 	screen.RefreshScreen()
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	ctx.Server.SendStatus(200)
 }
-func configuration(w http.ResponseWriter, _ *http.Request) {
+
+var configEndpoint = EndpointData{
+	Endpoint: configuration,
+}
+
+func configuration(ctx Context) {
 	configMap := config.GetMap()
-	configJson, err := json.Marshal(configMap)
-	if err != nil {
-		log.Fatal(err)
-	}
-	w.Write(configJson)
+	ctx.Server.JSON(configMap)
 }

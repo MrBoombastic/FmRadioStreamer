@@ -18,10 +18,12 @@ import (
 
 func main() {
 	tools.CheckRoot()
+	// Exit handler
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	var wg sync.WaitGroup
 
+	// Get local IP
 	tools.RefreshLocalIP()
 	log.Println("Your local IP is:", tools.LocalIP)
 	log.Println("Starting peripherals")
@@ -46,7 +48,7 @@ func main() {
 
 	// Starting dashboard and core with no music
 	log.Println("Starting dashboard")
-	dashboard.Init()
+	go dashboard.Init()
 	log.Println("Starting core")
 	core.Play("")
 	log.Println("Core started")

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<link rel="stylesheet" href="public/bootstrap.min.css">
-<script src="public/bootstrap.min.js"></script>
-<script defer src="public/scripts.js"></script>
+<link rel="stylesheet" href="./static/bootstrap.min.css">
+<script src="static/bootstrap.min.js"></script>
+<script defer src="static/scripts.js"></script>
 
 <head>
     <meta charset="utf-8">
@@ -38,7 +38,7 @@
         <div class="col-md-3 col-sm-12" style="padding-bottom: 1rem">
             <div class="card bg-dark">
                 <div class="card-body">
-                    <button type="button" class="btn btn-danger" onclick="niceFetch('./superstop')"
+                    <button type="button" class="btn btn-danger" onclick="niceFetch('./api/superstop')"
                             style="width: 100%">Radio DOWN (a.k.a. Super Stop)
                     </button>
                 </div>
@@ -53,10 +53,10 @@
                     </datalist>
                 </div>
                 <button type="button" class="btn btn-success"
-                        onclick="niceFetch('./play?q=' + document.getElementById('musicpicker').value)">Play
+                        onclick="niceFetch('./api/play?q=' + document.getElementById('musicpicker').value)">Play
                 </button>
                 <button type="button" class="btn btn-info" onclick="refreshMusic()">Refresh</button>
-                <button type="button" class="btn btn-warning" onclick="niceFetch('./loudstop')">Stop</button>
+                <button type="button" class="btn btn-warning" onclick="niceFetch('./api/loudstop')">Stop</button>
             </div>
         </div>
         <p class="text-white">YouTube:</p>
@@ -71,7 +71,7 @@
                                 <div class="input-group-append">
                                     <button id="youtube-search" type="button" class="btn btn-primary">Search</button>
                                     <button id="youtube-download" type="button" class="btn btn-success"
-                                            onclick="niceFetch(`./yt?q=${encodeURIComponent(document.getElementById('youtube-input').value)}`)">
+                                            onclick="niceFetch(`./api/yt?q=${encodeURIComponent(document.getElementById('youtube-input').value)}`)">
                                         Download
                                     </button>
                                 </div>

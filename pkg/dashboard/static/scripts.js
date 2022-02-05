@@ -14,7 +14,7 @@ const niceFetch = (value, method = "GET", body, headers) => {
         .catch(async e => await errorHandler(e, value, true));
 };
 const refreshMusic = async () => {
-    const musicList = await niceFetch("./music");
+    const musicList = await niceFetch("./api/music");
     const musicPicker = document.getElementById("musicpickerlist");
     musicPicker.innerHTML = '';
     musicList.forEach(elem => {
@@ -28,7 +28,7 @@ const getSelectedMusic = () => {
     return document.getElementById("musicpicker").value;
 };
 const getConfig = async () => {
-    const config = await niceFetch("./config");
+    const config = await niceFetch("./api/config");
     for (let key in config) {
         configs.innerHTML += `<div class="col-md-6">
             <label for="${key}" class="text-white">${key}:</label>
@@ -48,7 +48,7 @@ const saveConfig = () => {
         if (data.attributes.type.value === "number") value = Number(value);
         settings[data.id] = value;
     }
-    niceFetch("./save", "POST", JSON.stringify(settings), {'Content-Type': 'application/json'});
+    niceFetch("./api/save", "POST", JSON.stringify(settings), {'Content-Type': 'application/json'});
 };
 
 function htmlDecode(input) {
@@ -57,7 +57,7 @@ function htmlDecode(input) {
 }
 
 document.getElementById("youtube-search").addEventListener("click", async () => {
-    const data = await niceFetch(`./yt?q=${encodeURIComponent(document.getElementById("youtube-input").value)}&search=true`);
+    const data = await niceFetch(`./api/yt?q=${encodeURIComponent(document.getElementById("youtube-input").value)}&search=true`);
     if (data.error) return;
     ["title", "channelTitle", "description"].forEach(prop => {
         document.getElementById("youtube-" + prop).textContent = htmlDecode(data[prop]);

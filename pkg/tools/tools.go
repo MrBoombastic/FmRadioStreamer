@@ -19,7 +19,7 @@ var LocalIP net.IP
 func RefreshLocalIP() {
 	conn, err := net.Dial("udp", "8.8.8.8:80") // It will not actually connect
 	if err != nil {
-		log.Println("Failed to get local IP address! Falling back to localhost...")
+		log.Println("WARNING: Failed to get local IP address! Falling back to localhost...")
 		LocalIP = net.ParseIP("127.0.0.1")
 	}
 	defer conn.Close()

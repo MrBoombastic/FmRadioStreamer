@@ -4,16 +4,18 @@ import (
 	"embed"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-//go:embed sites/*
-var sites embed.FS
+//go:embed sites/index.html
+var index embed.FS
 
-//go:embed public/*
-var public embed.FS
+//go:embed static/*
+var static embed.FS
 
 func musicList() []string {
 	files, err := ioutil.ReadDir("music/")
@@ -27,27 +29,34 @@ func musicList() []string {
 	return filesSlice
 }
 
-var httpServer = &http.Server{
-	Addr: fmt.Sprintf(":%v", config.GetPort()),
-}
+var app = fiber.New()
 
 func Init() {
 	// Handle static files
-	var publicFS = http.FS(public)
-	fs := http.FileServer(publicFS)
-	http.Handle("/public/", fs)
-	// Handle else
-	http.HandleFunc("/music", music)
-	http.HandleFunc("/loudstop", loudstop)
-	http.HandleFunc("/superstop", superstop)
-	http.HandleFunc("/yt", yt)
-	http.HandleFunc("/config", configuration)
-	http.HandleFunc("/play", play)
-	http.HandleFunc("/save", save)
-	http.HandleFunc("/", index)
+	app.Use("/static/", filesystem.New(filesystem.Config{
+		Root:       http.FS(static),
+		PathPrefix: "static",
+	}))
+	// Handle API endpoints
+	app.Use("/api/*", func(c *fiber.Ctx) error {
+		endpoint := fmt.Sprintf("%s", c.Params("*"))
+		fmt.Println(endpoint)
+		foundEndpoint, err := findEndpoint(endpoint)
+		if err != nil {
+			return c.SendStatus(404)
+		}
+		handler := foundEndpoint.Endpoint
+		if handler != nil {
+			handler(NewContext(c))
+		}
+		return nil
+	})
+	// Handle index file
+	app.Use("/", filesystem.New(filesystem.Config{
+		Root:       http.FS(index),
+		PathPrefix: "sites",
+	}))
+
 	// Start!
-
-	go httpServer.ListenAndServe()
-
-	log.Println(fmt.Sprintf("Dashboard listening at port %v!", httpServer.Addr))
+	app.Listen(fmt.Sprintf(":%v", config.GetPort()))
 }
