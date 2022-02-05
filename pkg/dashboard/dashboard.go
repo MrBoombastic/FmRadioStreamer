@@ -49,5 +49,5 @@ func Init() {
 
 	go httpServer.ListenAndServe()
 
-	fmt.Println(fmt.Sprintf("Dashboard listening at port %v!", httpServer.Addr))
+	log.Println(fmt.Sprintf("Dashboard listening at port %v!", httpServer.Addr))
 }

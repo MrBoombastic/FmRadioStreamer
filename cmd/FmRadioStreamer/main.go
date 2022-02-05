@@ -9,28 +9,25 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
+	"log"
 	"os"
 	"os/signal"
-	"periph.io/x/periph/devices/ssd1306"
 	"sync"
 	"syscall"
 )
 
-var screen *ssd1306.Dev
-
 func main() {
-	if os.Geteuid() != 0 {
-		fmt.Println("Not running as sudo! Preventing system crash! Exiting...")
-		os.Exit(0)
-		return
-	}
+	tools.CheckRoot()
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	var wg sync.WaitGroup
 
-	fmt.Println("Starting peripherals...")
-	tools.InitGPIO()
+	tools.RefreshLocalIP()
+	log.Println("Your local IP is:", tools.LocalIP)
+	log.Println("Starting peripherals")
 
+	// Init GPIO pins and leds
+	tools.InitGPIO()
 	leds.Init()
 	wg.Add(1)
 	go leds.QuadGreensLoopStart(&wg, ctx)
@@ -45,16 +42,25 @@ func main() {
 	buttons.Init()
 	wg.Add(1)
 	go buttons.Listen(&wg, ctx)
+	log.Println("Peripherals started")
 
+	// Starting dashboard and core with no music
+	log.Println("Starting dashboard")
 	dashboard.Init()
-
+	log.Println("Starting core")
 	core.Play("")
+	log.Println("Core started")
+	log.Println("Starting procedure done!")
 
 	wg.Wait()
-	fmt.Println("Exiting...")
-	fmt.Println("gpio")
-	//tools.StopGPIO()
-	fmt.Println("core")
+
+	// Code below is initated AFTER Ctrl-C or other terminating signal is sent
+
+	// This should be executed, but it works fine whithout it and invoking it crashes my RPi :(
+	// tools.StopGPIO()
+	fmt.Println() // Usually "^C" is printed in the console, so it will be more pretty to go to next line
+	log.Println("Gracefully exiting")
+	log.Println("Killing core")
 	core.SuperKill()
-	fmt.Println("Exited")
+	log.Println("Gracefully exited")
 }

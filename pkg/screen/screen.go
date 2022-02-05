@@ -20,12 +20,12 @@ import (
 	"time"
 )
 
-var MiniMessage string
 var screenConnection i2c.BusCloser
 var Screen *ssd1306.Dev
 var ScreenInverted = false
+var img *image1bit.VerticalLSB
 
-func writer(img *image1bit.VerticalLSB, x int, y int, s string) {
+func writer(x int, y int, s string) {
 	drawer := font.Drawer{
 		Dst:  img,
 		Src:  &image.Uniform{C: image1bit.On},
@@ -41,7 +41,9 @@ func Create(wg *sync.WaitGroup, ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			Screen.StopScroll()
-			draw(createImg())
+			createImg()
+			draw()
+			Screen.Invert(false)
 			screenConnection.Close()
 			return nil
 
@@ -63,14 +65,30 @@ func Create(wg *sync.WaitGroup, ctx context.Context) error {
 	}
 }
 
-func createImg() *image1bit.VerticalLSB {
-	return image1bit.NewVerticalLSB(Screen.Bounds())
+func createImg() {
+	img = image1bit.NewVerticalLSB(Screen.Bounds())
 }
 
-func draw(img *image1bit.VerticalLSB) {
+func draw() {
+	if img == nil {
+		createImg()
+	}
 	if err := Screen.Draw(Screen.Bounds(), img, image.Point{}); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func MiniMessage(message string) {
+	Screen.StopScroll()
+	for x := 2; x <= 90; x++ {
+		for y := 49; y <= 63; y++ {
+			img.Set(x, y, image1bit.Off)
+		}
+	}
+	writer(2, 62, message)
+	draw()
+	time.Sleep(2 * time.Second)
+	RefreshScreen()
 }
 
 func RefreshScreen() {
@@ -79,34 +97,28 @@ func RefreshScreen() {
 	}
 	cfg := config.Get()
 	Screen.StopScroll()
-	img := createImg()
-	writer(img, 2, 11, cfg.PS)
-	writer(img, 71, 11, fmt.Sprintf("%.1f FM", cfg.Frequency))
+	createImg()
+	writer(2, 11, cfg.PS)
+	writer(71, 11, fmt.Sprintf("%.1f FM", cfg.Frequency))
 	maxRT := 15
 	if len(cfg.RT) < 16 {
 		maxRT = len(cfg.RT)
 	}
-	writer(img, 1, 32, cfg.RT[0:maxRT])
+	writer(0, 32, cfg.RT[0:maxRT])
 	maxRT = 31
 	if len(cfg.RT) < 32 {
 		maxRT = len(cfg.RT)
 	}
-	writer(img, 1, 42, cfg.RT[16:maxRT])
-	writer(img, 99, 62, fmt.Sprintf("%.1fx", cfg.Multiplier))
-	if MiniMessage == "100" { //assuming this message is from FFmpeg
-		MiniMessage = ""
-	}
-	if MiniMessage != "" {
-		writer(img, 2, 62, MiniMessage)
-	} else {
-		ip := strings.Split(tools.GetLocalIP().String(), ".")[2:4]
-		writer(img, 2, 62, fmt.Sprintf(".%v:%d", strings.Join(ip, "."), cfg.Port))
-	}
-	draw(img)
+	writer(0, 42, cfg.RT[16:maxRT])
+	writer(99, 62, fmt.Sprintf("%.1fx", cfg.Multiplier))
 
-	err := Screen.Scroll(ssd1306.Left, ssd1306.FrameRate5, 16, 48)
+	ip := strings.Split(tools.LocalIP.String(), ".")[2:4]
+	writer(0, 62, fmt.Sprintf(".%v:%d", strings.Join(ip, "."), cfg.Port))
+
+	draw()
+
+	err := Screen.Scroll(ssd1306.Left, ssd1306.FrameRate25, 16, 48)
 	if err != nil {
 		return
 	}
-	//screen.Invert(true)
 }

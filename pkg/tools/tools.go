@@ -10,18 +10,20 @@ import (
 	"net"
 	"net/http"
 	url2 "net/url"
+	"os"
 	"time"
 )
 
-func GetLocalIP() net.IP {
-	conn, err := net.Dial("udp", "8.8.8.8:80") // Will not actually connect
+var LocalIP net.IP
+
+func RefreshLocalIP() {
+	conn, err := net.Dial("udp", "8.8.8.8:80") // It will not actually connect
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Failed to get local IP address! Falling back to localhost...")
+		LocalIP = net.ParseIP("127.0.0.1")
 	}
 	defer conn.Close()
-
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	return localAddr.IP
+	LocalIP = conn.LocalAddr().(*net.UDPAddr).IP
 }
 
 func InitGPIO() error {
@@ -68,4 +70,11 @@ func SearchYouTube(query string) YouTubeAPIResult {
 	}
 
 	return result
+}
+
+func CheckRoot() {
+	if os.Geteuid() != 0 {
+		log.Println("WARNING: Not running as root! Exiting...")
+		os.Exit(0)
+	}
 }

@@ -2,6 +2,7 @@ package buttons
 
 import (
 	"context"
+	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
@@ -41,20 +42,22 @@ func Listen(wg *sync.WaitGroup, ctx context.Context) {
 						currentFrequency := config.GetFrequency()
 						currentMultiplier := config.GetMultiplier()
 						if currentFrequency-currentMultiplier < 76.0 {
-							oled.MiniMessage = "MIN"
-							leds.YellowBlink()
+							go leds.YellowBlink()
+							oled.MiniMessage("MIN FREQ!")
 						} else {
 							config.UpdateFrequency(math.Floor((config.GetFrequency()-config.GetMultiplier())*10) / 10)
+							oled.RefreshScreen()
 						}
 					}
 					if i == 1 {
 						currentFrequency := config.GetFrequency()
 						currentMultiplier := config.GetMultiplier()
 						if currentFrequency+currentMultiplier > 108.0 {
-							oled.MiniMessage = "MAX"
 							go leds.YellowBlink()
+							oled.MiniMessage("MAX FREQ!")
 						} else {
 							config.UpdateFrequency(math.Floor((config.GetFrequency()+config.GetMultiplier())*10) / 10)
+							oled.RefreshScreen()
 						}
 					}
 					if i == 2 {
@@ -70,15 +73,13 @@ func Listen(wg *sync.WaitGroup, ctx context.Context) {
 						default:
 							config.UpdateMultiplier(0.1)
 						}
+						oled.RefreshScreen()
 					}
 					if i == 3 {
 						oled.ScreenInverted = !oled.ScreenInverted
 						oled.Screen.Invert(oled.ScreenInverted)
 					}
-					// Do not refresh screen, when only inverting colors
-					if i < 3 {
-						oled.RefreshScreen()
-					}
+					fmt.Println(i)
 				}
 			}
 		}
