@@ -6,50 +6,35 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
-	"github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
+	"github.com/gofiber/fiber/v2"
 	"log"
 )
 
-var musicEndpoint = EndpointData{
-	Endpoint: music,
-}
-
-func music(ctx Context) {
+func music(ctx *fiber.Ctx) {
 	filesSlice := musicList()
-	ctx.Server.JSON(filesSlice)
+	ctx.JSON(filesSlice)
 }
 
-var loudstopEndpoint = EndpointData{
-	Endpoint: loudstop,
-}
-
-func loudstop(ctx Context) {
+func loudstop(ctx *fiber.Ctx) {
 	core.Play("")
-	ctx.Server.SendStatus(200)
+	ctx.SendStatus(200)
 }
 
-var superstopEndpoint = EndpointData{
-	Endpoint: superstop,
+func superstop(ctx *fiber.Ctx) {
+	core.Kill()
+	ctx.SendStatus(200)
 }
 
-func superstop(ctx Context) {
-	core.SuperKill()
-	ctx.Server.SendStatus(200)
-}
-
-var ytEndpoint = EndpointData{
-	Endpoint: yt,
-}
-
-func yt(ctx Context) {
-	search := ctx.Server.Query("search")
-	query := ctx.Server.Query("q")
+func yt(ctx *fiber.Ctx) {
+	search := ctx.Query("search")
+	query := ctx.Query("q")
 	result := tools.SearchYouTube(query)
 	if search == "true" {
-		ctx.Server.JSON(result.Items[0].Snippet)
+		ctx.JSON(result.Items[0].Snippet)
 	} else {
-		ctx.Server.SendStatus(200)
+		ctx.SendStatus(200)
 		leds.BlueLedEnabled = true
 		err := condlers.DownloadAudioFromYoutube(result.Items[0].ID.VideoID, result.Items[0].Snippet.Title)
 		leds.BlueLedEnabled = false
@@ -59,36 +44,26 @@ func yt(ctx Context) {
 	}
 }
 
-var playEndpoint = EndpointData{
-	Endpoint: play,
-}
-
-func play(ctx Context) {
+func play(ctx *fiber.Ctx) {
 	fmt.Println("play")
-	query := ctx.Server.Query("q")
+	query := ctx.Query("q")
 	core.Play(query)
-	ctx.Server.SendStatus(200)
+	ctx.SendStatus(200)
 }
 
-var saveEndpoint = EndpointData{
-	Endpoint: save,
-}
-
-func save(ctx Context) {
+func save(ctx *fiber.Ctx) {
 	newConfig := new(config.Config)
-	if err := ctx.Server.BodyParser(newConfig); err != nil {
+	if err := ctx.BodyParser(newConfig); err != nil {
 		log.Fatalln("ERROR: Failed to parse new config!")
 	}
 	config.Save(*newConfig)
-	screen.RefreshScreen()
-	ctx.Server.SendStatus(200)
+	if config.GetSSD1306() {
+		ssd1306.Refresh()
+	}
+	ctx.SendStatus(200)
 }
 
-var configEndpoint = EndpointData{
-	Endpoint: configuration,
-}
-
-func configuration(ctx Context) {
+func configuration(ctx *fiber.Ctx) {
 	configMap := config.GetMap()
-	ctx.Server.JSON(configMap)
+	ctx.JSON(configMap)
 }

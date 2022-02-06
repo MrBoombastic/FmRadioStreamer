@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/buttons"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/dashboard"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
-	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"log"
 	"os"
@@ -36,9 +37,11 @@ func main() {
 	wg.Add(1)
 	go leds.BlueLedLoopStart(&wg, ctx)
 
-	// Init screen
-	wg.Add(1)
-	go oled.Create(&wg, ctx)
+	if config.GetSSD1306() {
+		// Init screen
+		wg.Add(1)
+		go ssd1306.Create(&wg, ctx)
+	}
 
 	// Init buttons
 	buttons.Init()
@@ -63,6 +66,6 @@ func main() {
 	fmt.Println() // Usually "^C" is printed in the console, so it will be more pretty to go to next line
 	log.Println("Gracefully exiting")
 	log.Println("Killing core")
-	core.SuperKill()
+	core.Kill()
 	log.Println("Gracefully exited")
 }

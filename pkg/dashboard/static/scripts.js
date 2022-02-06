@@ -2,10 +2,12 @@ const configs = document.getElementById("config-row");
 const logs = document.getElementById("logs");
 
 const errorHandler = async (data, endpoint, errored = false) => {
+    endpoint = endpoint.replace("./api", "").split('?')[0]
     const status = data.status;
     if (!errored) data = await data.json().catch(() => data);
     logs.innerText += (endpoint + "  " + status + "  " + JSON.stringify(data) + "\n");
     logs.scrollTop = logs.scrollHeight - logs.clientHeight;
+    notify(`HTTP ${status} - ${endpoint}`);
     return data;
 };
 const niceFetch = (value, method = "GET", body, headers) => {
@@ -23,7 +25,7 @@ const refreshMusic = async () => {
         musicPicker.appendChild(option);
     });
 };
-refreshMusic()
+refreshMusic();
 const getSelectedMusic = () => {
     return document.getElementById("musicpicker").value;
 };
@@ -54,6 +56,15 @@ const saveConfig = () => {
 function htmlDecode(input) {
     const doc = new DOMParser().parseFromString(input, "text/html");
     return doc.documentElement.textContent;
+}
+
+function notify(message) {
+    const snackbar = document.getElementById("snackbar");
+    snackbar.className = "show";
+    snackbar.textContent = message;
+    setTimeout(function () {
+        snackbar.className = snackbar.className.replace("show", "");
+    }, 1500);
 }
 
 document.getElementById("youtube-search").addEventListener("click", async () => {

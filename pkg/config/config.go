@@ -71,3 +71,7 @@ func GetPort() uint16 {
 func GetYouTubeAPIKey() string {
 	return Get().YouTubeAPIKey
 }
+
+func GetSSD1306() bool {
+	return Get().SSD1306
+}

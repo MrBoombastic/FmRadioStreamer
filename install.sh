@@ -11,5 +11,4 @@ sudo rm -r temp/
 cd core && make clean && echo "Core cleaned." || echo "Failed to clean core."
 make && echo "Successfully compiled!" || echo "Failed to compile!"
 cd ../
-yarn && echo "Successfully installed npm modules!" || echo "Failed to install npm modules!"
-echo "Now it's time to configure RDS and type YouTube v3 key into config.json. Please do it manually."
+echo "Done. Set YT API key in config.json and do not forget to add 'gpu_freq=250' in /boot/config.txt. Enjoy!"

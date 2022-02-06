@@ -45,9 +45,9 @@ func Init() {
 		if err != nil {
 			return c.SendStatus(404)
 		}
-		handler := foundEndpoint.Endpoint
+		handler := foundEndpoint
 		if handler != nil {
-			handler(NewContext(c))
+			handler(c)
 		}
 		return nil
 	})

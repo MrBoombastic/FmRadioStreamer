@@ -6,11 +6,13 @@ type Config struct {
 	PS            string  `json:"PS"`
 	RT            string  `json:"RT"`
 	PI            string  `json:"PI"`
+	TP            string  `json:"TP"`
 	PTY           uint    `json:"PTY"`
 	YouTubeAPIKey string  `json:"apikey"`
 	Port          uint16  `json:"port"`
 	Power         uint8   `json:"power"`
 	Mpx           uint    `json:"mpx"`
 	Preemph       string  `json:"preemph"`
-	Screen        bool    `json:"screen"`
+	AntennaGPIO   uint8   `json:"antennaGPIO"`
+	SSD1306       bool    `json:"ssd1306"`
 }

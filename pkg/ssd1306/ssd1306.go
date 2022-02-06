@@ -1,4 +1,4 @@
-package screen
+package ssd1306
 
 import (
 	"context"
@@ -22,7 +22,7 @@ import (
 
 var screenConnection i2c.BusCloser
 var Screen *ssd1306.Dev
-var ScreenInverted = false
+var Inverted = false
 var img *image1bit.VerticalLSB
 
 func writer(x int, y int, s string) {
@@ -59,7 +59,7 @@ func Create(wg *sync.WaitGroup, ctx context.Context) error {
 				}
 				scr, err := ssd1306.NewI2C(screenConnection, &ssd1306.DefaultOpts)
 				Screen = scr
-				RefreshScreen()
+				Refresh()
 			}
 		}
 	}
@@ -88,10 +88,10 @@ func MiniMessage(message string) {
 	writer(2, 62, message)
 	draw()
 	time.Sleep(2 * time.Second)
-	RefreshScreen()
+	Refresh()
 }
 
-func RefreshScreen() {
+func Refresh() {
 	if Screen == nil {
 		return
 	}

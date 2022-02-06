@@ -4,11 +4,13 @@
   "PS": "FmRadStr",
   "RT": "RPi based radio streamer. It is working!",
   "PI": "FFFF",
+  "TP": "",
   "PTY": 0,
   "apikey": "",
   "port": 80,
   "power": 5,
   "mpx": 30,
   "preemph": "eu",
-  "screen": false
+  "antennaGPIO": 4,
+  "ssd1306": true
 }

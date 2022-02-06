@@ -6,10 +6,7 @@ import (
 	"io"
 	"log"
 	"os/exec"
-	"syscall"
 )
-
-var PiFmAdv *exec.Cmd
 
 func GenerateOptions(audio string) []string {
 	cfg := config.Get()
@@ -19,7 +16,10 @@ func GenerateOptions(audio string) []string {
 		"--freq", fmt.Sprintf("%f", cfg.Frequency),
 		"--power", fmt.Sprintf("%v", cfg.Power),
 		"--pi", cfg.PI,
+		"--tp", cfg.TP,
 		"--pty", fmt.Sprintf("%v", cfg.PTY),
+		"--preemph", cfg.Preemph,
+		"--gpio", fmt.Sprintf("%v", cfg.AntennaGPIO),
 		"--mpx", fmt.Sprintf("%v", cfg.Mpx),
 	}
 	if audio != "" {
@@ -28,10 +28,7 @@ func GenerateOptions(audio string) []string {
 	return options
 }
 func run(name string, args []string) error {
-	PiFmAdv = exec.Command(name, args...)
-	PiFmAdv.SysProcAttr = &syscall.SysProcAttr{
-		Pdeathsig: syscall.SIGINT,
-	}
+	PiFmAdv := exec.Command(name, args...)
 	stderr, err := PiFmAdv.StderrPipe()
 	if err != nil {
 		log.Fatal(err)
@@ -58,14 +55,14 @@ func run(name string, args []string) error {
 	return nil
 }
 
-func SuperKill() {
+func Kill() {
 	cmd := exec.Command("pkill", "-2", "pi_fm_adv")
 	cmd.Start()
 	cmd.Wait()
 }
 func Play(audio string) {
 	// Make sure that previous playback is stopped
-	SuperKill()
+	Kill()
 	go func() {
 		options := GenerateOptions(audio)
 		err := run("core/pi_fm_adv", options)

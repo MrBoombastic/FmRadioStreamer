@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
-	oled "github.com/MrBoombastic/FmRadioStreamer/pkg/screen"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
 	"github.com/stianeikeland/go-rpio/v4"
 	"math"
 	"sync"
@@ -43,10 +43,14 @@ func Listen(wg *sync.WaitGroup, ctx context.Context) {
 						currentMultiplier := config.GetMultiplier()
 						if currentFrequency-currentMultiplier < 76.0 {
 							go leds.YellowBlink()
-							oled.MiniMessage("MIN FREQ!")
+							if config.GetSSD1306() {
+								ssd1306.MiniMessage("MIN FREQ!")
+							}
 						} else {
 							config.UpdateFrequency(math.Floor((config.GetFrequency()-config.GetMultiplier())*10) / 10)
-							oled.RefreshScreen()
+							if config.GetSSD1306() {
+								ssd1306.Refresh()
+							}
 						}
 					}
 					if i == 1 {
@@ -54,10 +58,14 @@ func Listen(wg *sync.WaitGroup, ctx context.Context) {
 						currentMultiplier := config.GetMultiplier()
 						if currentFrequency+currentMultiplier > 108.0 {
 							go leds.YellowBlink()
-							oled.MiniMessage("MAX FREQ!")
+							if config.GetSSD1306() {
+								ssd1306.MiniMessage("MAX FREQ!")
+							}
 						} else {
 							config.UpdateFrequency(math.Floor((config.GetFrequency()+config.GetMultiplier())*10) / 10)
-							oled.RefreshScreen()
+							if config.GetSSD1306() {
+								ssd1306.Refresh()
+							}
 						}
 					}
 					if i == 2 {
@@ -73,11 +81,15 @@ func Listen(wg *sync.WaitGroup, ctx context.Context) {
 						default:
 							config.UpdateMultiplier(0.1)
 						}
-						oled.RefreshScreen()
+						if config.GetSSD1306() {
+							ssd1306.Refresh()
+						}
 					}
 					if i == 3 {
-						oled.ScreenInverted = !oled.ScreenInverted
-						oled.Screen.Invert(oled.ScreenInverted)
+						if config.GetSSD1306() {
+							ssd1306.Inverted = !ssd1306.Inverted
+							ssd1306.Screen.Invert(ssd1306.Inverted)
+						}
 					}
 					fmt.Println(i)
 				}
