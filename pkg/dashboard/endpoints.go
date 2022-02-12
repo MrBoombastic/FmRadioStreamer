@@ -13,7 +13,10 @@ import (
 )
 
 func music(ctx *fiber.Ctx) {
-	filesSlice := musicList()
+	filesSlice, err := musicList()
+	if err != nil {
+		ctx.SendStatus(500)
+	}
 	ctx.JSON(filesSlice)
 }
 
@@ -30,7 +33,12 @@ func superstop(ctx *fiber.Ctx) {
 func yt(ctx *fiber.Ctx) {
 	search := ctx.Query("search")
 	query := ctx.Query("q")
-	result := tools.SearchYouTube(query)
+	result, err := tools.SearchYouTube(query)
+	if err != nil {
+		log.Println(err)
+		ctx.SendStatus(500)
+		return
+	}
 	if search == "true" {
 		ctx.JSON(result.Items[0].Snippet)
 	} else {
@@ -39,7 +47,7 @@ func yt(ctx *fiber.Ctx) {
 		err := condlers.DownloadAudioFromYoutube(result.Items[0].ID.VideoID, result.Items[0].Snippet.Title)
 		leds.BlueLedEnabled = false
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 }

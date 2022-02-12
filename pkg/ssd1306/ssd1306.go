@@ -79,6 +79,9 @@ func draw() {
 }
 
 func MiniMessage(message string) {
+	if Screen == nil {
+		return
+	}
 	Screen.StopScroll()
 	for x := 2; x <= 90; x++ {
 		for y := 49; y <= 63; y++ {
@@ -119,6 +122,6 @@ func Refresh() {
 
 	err := Screen.Scroll(ssd1306.Left, ssd1306.FrameRate25, 16, 48)
 	if err != nil {
-		return
+		log.Println(err)
 	}
 }

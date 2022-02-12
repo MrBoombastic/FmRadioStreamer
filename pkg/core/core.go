@@ -46,7 +46,7 @@ func run(name string, args []string) error {
 	}
 	cmderr, _ := io.ReadAll(stderr)
 	if fmt.Sprintf("%s", cmderr) != "" {
-		fmt.Printf("Pi_Fm_Adv error:\n%s", cmderr)
+		log.Printf("PiFmAdv %s", cmderr)
 	}
 	/*
 		cmdout, _ := io.ReadAll(stdout)
@@ -67,7 +67,7 @@ func Play(audio string) {
 		options := GenerateOptions(audio)
 		err := run("core/pi_fm_adv", options)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 	}()
 }

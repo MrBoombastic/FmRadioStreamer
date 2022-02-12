@@ -7,7 +7,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -17,16 +16,16 @@ var index embed.FS
 //go:embed static/*
 var static embed.FS
 
-func musicList() []string {
+func musicList() ([]string, error) {
 	files, err := ioutil.ReadDir("music/")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	var filesSlice []string
 	for _, item := range files {
 		filesSlice = append(filesSlice, item.Name())
 	}
-	return filesSlice
+	return filesSlice, nil
 }
 
 var app = fiber.New()
@@ -40,7 +39,6 @@ func Init() {
 	// Handle API endpoints
 	app.Use("/api/*", func(c *fiber.Ctx) error {
 		endpoint := fmt.Sprintf("%s", c.Params("*"))
-		fmt.Println(endpoint)
 		foundEndpoint, err := findEndpoint(endpoint)
 		if err != nil {
 			return c.SendStatus(404)

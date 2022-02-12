@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,7 +13,7 @@ func Get() Config {
 	}
 	file, err := os.Open("config.json")
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	defer file.Close()
 	configuration := Config{}
@@ -39,8 +38,12 @@ func GetMap() map[string]interface{} {
 
 func Save(newConfig Config) {
 	currentConfig = newConfig
-	file, _ := json.MarshalIndent(currentConfig, "", "  ")
-	_ = ioutil.WriteFile("config.json", file, 0644)
+	file, err := json.MarshalIndent(currentConfig, "", "  ")
+	err = ioutil.WriteFile("config.json", file, 0644)
+	if err != nil {
+		log.Println(err)
+	}
+
 }
 
 var currentConfig Config

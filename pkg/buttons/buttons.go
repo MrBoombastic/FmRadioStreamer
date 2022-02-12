@@ -2,7 +2,6 @@ package buttons
 
 import (
 	"context"
-	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
@@ -91,7 +90,6 @@ func Listen(wg *sync.WaitGroup, ctx context.Context) {
 							ssd1306.Screen.Invert(ssd1306.Inverted)
 						}
 					}
-					fmt.Println(i)
 				}
 			}
 		}

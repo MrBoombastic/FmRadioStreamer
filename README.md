@@ -1,7 +1,3 @@
-# Warning: rewrite in progress!
-
-## Here is the latest "stable" version: [click](https://github.com/MrBoombastic/FmRadioStreamer/tree/bc3cae0455e9352db580cb24f56f9788ea515354)
-
 # FmRadioStreamer
 
 [BETA] Raspberry Pi based FM streamer with OLED, buttons and LEDs support.
@@ -30,42 +26,40 @@ Rename `config.json.example` to `config.json`. Then type `sudo node index.js`. Y
 Removed, but it's easy to reverse-engineer. I hope so.
 
 ## Dependencies note
-This project uses PiFmAdv, FFmpeg, libsndfile1-dev, Start Bootstrap - Bare and other stuff listed in package.json.
+This project uses PiFmAdv, FFmpeg, libsndfile1-dev, youtube-dl and other stuff listed in go.mod.
 
 ## Hardware
-SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, ~20k Ohm resistors, leds, female-male and male-male cables. Tested on Raspberry Pi Zero W with goldpins soldered by me. :D
+
+SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, ~20k Ohm resistors, LEDs, female-male and male-male wires. Tested on
+Raspberry Pi Zero W Rev 1.1.
 
 ## What if I don't have that hardware?
-The minimum requirement is RPi. FmRadioStreamer SHOULD work without them.
+
+The minimum requirement is RPi. FmRadioStreamer SHOULD work without any other peripherals.
 
 ## Gallery
+
 In the `docs` directory there are pictures of first version of this project. Watch on your own risk!
-![Image](docs/hwv2_1.jpg?raw=true "Image")
-![Image](docs/hwv2_2.jpg?raw=true "Image")
-![Image](docs/webserver.png?raw=true "Image")
-
-## What is NOT working a.k.a. bugs
-- ~~Optimisation sucks~~ maybe not
-- ~~Files are in a mess~~ definitly not
-
-## What is in progress?
-- ~~Android app~~ not much time
-- More stuff to change/improve
+![Image](docs/hwv2rev2_1.jpg?raw=true "Image")
+![Image](docs/hwv2rev2_2.jpg?raw=true "Image")
+![Image](docs/dashboard.png?raw=true "Dashboard screenshot")
+![Image](docs/sdrsharp.png?raw=true "SDR# screenshot")
 
 ## GPIO
+
 - 1 - 3V3 Power
 - 3 - GPIO 2 - screen
 - 5 - GPIO 3 - screen
 - 6 - GND - for screen
-- 7 - GPIO 4 -  antenna
-- 26 - GPIO 7 - BLUE WORKING LED
-- 29 - GPIO 5 - YELLOW WARNING LED
-- 31 - GPIO 6 - LED
-- 32 - GPIO 12 - button
-- 33 - GPIO 13 - LED
-- 35 - GPIO 19 - LED
-- 36 - GPIO 16 - button
-- 37 - GPIO 26 - LED
-- 38 - GPIO 20 - button
+- 7 - GPIO 4 - antenna
+- 26 - GPIO 7 - blue LED (audio conversion in progress)
+- 29 - GPIO 5 - yellow LED (frequency out of limits)
+- 31 - GPIO 6 - green LED
+- 32 - GPIO 12 - button (screen color inversion)
+- 33 - GPIO 13 - green LED
+- 35 - GPIO 19 - green LED
+- 36 - GPIO 16 - button (frequency multiplier switch)
+- 37 - GPIO 26 - green LED
+- 38 - GPIO 20 - button (frequency up)
 - 39 - GND - for LEDs
-- 40 - GPIO 21 - button
+- 40 - GPIO 21 - button (frequency down)

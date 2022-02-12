@@ -18,7 +18,6 @@ func DownloadAudioFromYoutube(ID string, filename string) error {
 	// go io.Copy(os.Stderr, youtubeDl.Stderr)
 	cmd, err := youtubeDl.Download("https://youtu.be/" + ID)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 	cmd.Wait()

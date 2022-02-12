@@ -9,7 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
-	url2 "net/url"
+	urltool "net/url"
 	"os"
 	"time"
 )
@@ -42,34 +42,35 @@ func StopGPIO() error {
 	return nil
 }
 
-func SearchYouTube(query string) YouTubeAPIResult {
-	url := fmt.Sprintf("https://youtube.googleapis.com/youtube/v3/search?key=%v&q=%v&part=snippet&maxResults=1&type=video", config.GetYouTubeAPIKey(), url2.QueryEscape(query))
+func SearchYouTube(query string) (YouTubeAPIResult, error) {
+	url := fmt.Sprintf("https://youtube.googleapis.com/youtube/v3/search?key=%v&q=%v&part=snippet&maxResults=1&type=video", config.GetYouTubeAPIKey(), urltool.QueryEscape(query))
 	client := http.Client{
 		Timeout: time.Second * 5,
 	}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		log.Println(err)
+		return YouTubeAPIResult{}, err
 	}
 	res, getErr := client.Do(req)
 	if getErr != nil {
-		log.Println(getErr)
+		return YouTubeAPIResult{}, getErr
 	}
 	if res.Body != nil {
 		defer res.Body.Close()
 	}
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
-		log.Println(readErr)
+		return YouTubeAPIResult{}, readErr
 	}
 
 	result := YouTubeAPIResult{}
+	//fmt.Println(string(body))
 	jsonErr := json.Unmarshal(body, &result)
 	if jsonErr != nil {
-		log.Fatal(jsonErr)
+		return YouTubeAPIResult{}, jsonErr
 	}
 
-	return result
+	return result, nil
 }
 
 func CheckRoot() {
