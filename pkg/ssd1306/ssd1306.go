@@ -21,10 +21,15 @@ import (
 )
 
 var screenConnection i2c.BusCloser
-var Screen *ssd1306.Dev
-var Inverted = false
 var img *image1bit.VerticalLSB
 
+// Screen is an open handle to the display controller
+var Screen *ssd1306.Dev
+
+// Inverted defines wheter screen colours are normal or reverted (blue-on-black or black-on-blue)
+var Inverted = false
+
+// writer writes text on img
 func writer(x int, y int, s string) {
 	drawer := font.Drawer{
 		Dst:  img,
@@ -35,7 +40,8 @@ func writer(x int, y int, s string) {
 	drawer.DrawString(s)
 }
 
-func Create(wg *sync.WaitGroup, ctx context.Context) error {
+// Init sets up screen and handles shutting it down
+func Init(wg *sync.WaitGroup, ctx context.Context) error {
 	defer wg.Done()
 	for {
 		select {
@@ -65,10 +71,12 @@ func Create(wg *sync.WaitGroup, ctx context.Context) error {
 	}
 }
 
+// createImg creates empty img
 func createImg() {
 	img = image1bit.NewVerticalLSB(Screen.Bounds())
 }
 
+// draw draws img on Screen
 func draw() {
 	if img == nil {
 		createImg()
@@ -78,6 +86,7 @@ func draw() {
 	}
 }
 
+// MiniMessage shows custom message in bottom-left corer of screen for 2 seconds
 func MiniMessage(message string) {
 	if Screen == nil {
 		return
@@ -94,6 +103,7 @@ func MiniMessage(message string) {
 	Refresh()
 }
 
+// Refresh draws every possible element on the screen
 func Refresh() {
 	if Screen == nil {
 		return

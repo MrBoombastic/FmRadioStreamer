@@ -18,6 +18,7 @@ var (
 	buttonInvert     = rpio.Pin(12)
 )
 
+// Init sets up four physical buttons.
 func Init() {
 	buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonMultiplier, buttonInvert}
 	for _, item := range buttons {
@@ -27,6 +28,7 @@ func Init() {
 	}
 }
 
+// Listen enables frequency, multipliier and screen invertion controlling with physical buttons
 func Listen(wg *sync.WaitGroup, ctx context.Context) {
 	buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonMultiplier, buttonInvert}
 	defer wg.Done()

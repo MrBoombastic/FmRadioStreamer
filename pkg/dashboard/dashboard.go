@@ -16,6 +16,7 @@ var index embed.FS
 //go:embed static/*
 var static embed.FS
 
+// musicList returns slice of all files in 'music' directory
 func musicList() ([]string, error) {
 	files, err := ioutil.ReadDir("music/")
 	if err != nil {
@@ -30,6 +31,7 @@ func musicList() ([]string, error) {
 
 var app = fiber.New()
 
+// Init starts the dashboard
 func Init() {
 	// Handle static files
 	app.Use("/static/", filesystem.New(filesystem.Config{

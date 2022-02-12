@@ -1,41 +1,48 @@
 # FmRadioStreamer
 
-[BETA] Raspberry Pi based FM streamer with OLED, buttons and LEDs support.
+Raspberry Pi based FM streamer with OLED, buttons and LEDs support.
 
-## Installation:
+## Installation
 
-Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`. **WARNING!!!** Installer will use Yarn to
-install packages INSTEAD of NPM!
+Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`.
 
-Edit `config.json` file and enter [YT API key](https://developers.google.com/youtube/v3/getting-started). Also, you have
-to add `gpu_freq=250` in `/boot/config.txt`.
+**WARNING!** This script will install some unnecessary dependencies like Python for `youtube-dl`. If you already have
+working `youtube-dl` instance, edit the script (comment line #6).
 
-## Running:
-Rename `config.json.example` to `config.json`. Then type `sudo node index.js`. You can change RDS in `config.json` file. Go to API Docs section for more.
+Edit `config.json` file and enter your [YouTube API Key](https://developers.google.com/youtube/v3/getting-started).
+Also, you have to add `gpu_freq=250` in `/boot/config.txt`.
 
-## Functions:
-- Show RDS on screen
-- LEDs blinking when all is OK
-- Yellow LED blinks if frequency is out of limit
-- Blue LED blinks if music is being dowloaded from YouTube or converted
-- API - download music from YT and play
-- Change and save frequency with buttons
+## Running
+
+Rename `config.json.example` to `config.json`. Then type `sudo node index.js`. You can change RDS in `config.json` file.
+Go to API Docs section for more.
+
+## Functions
+
+- RDS and other options rendering on screen
+- LEDs blinking when everything is OK
+- Yellow LED blinking if frequency is out of limits
+- Blue LED blinking if music is being processed (downloading, converting)
+- Downloading music from YouTube
+- Changing frequency with buttons
 - Web dashboard
 
-## API Docs
-Removed, but it's easy to reverse-engineer. I hope so.
+## API docs
+
+None. Please reverse-engineer pkg/dashboard for that. :(
 
 ## Dependencies note
+
 This project uses PiFmAdv, FFmpeg, libsndfile1-dev, youtube-dl and other stuff listed in go.mod.
 
-## Hardware
+## Optional hardware
 
 SSD1306 screen, 4 THT buttons, ~400 Ohm resistors, ~20k Ohm resistors, LEDs, female-male and male-male wires. Tested on
 Raspberry Pi Zero W Rev 1.1.
 
 ## What if I don't have that hardware?
 
-The minimum requirement is RPi. FmRadioStreamer SHOULD work without any other peripherals.
+The minimum requirement is the RaspberryPi. FmRadioStreamer SHOULD work without any other peripherals.
 
 ## Gallery
 
@@ -63,3 +70,20 @@ In the `docs` directory there are pictures of first version of this project. Wat
 - 38 - GPIO 20 - button (frequency up)
 - 39 - GND - for LEDs
 - 40 - GPIO 21 - button (frequency down)
+
+## Settings
+
+- freq: frequency, default 108.0 MHz
+- multiplier: frequency multiplier (when using physical buttons), default 0.1
+- PS: RDS station name, default "FmRadStr"
+- RT: RDS station description, default "RPi based radio streamer. It is working!"
+- PI: RDS station ID in hex, default "FFFF"
+- TP: RDS traffic programme, default "" (empty string)
+- PTY: RDS programme type, default 0
+- apikey: YouTube API V3 Key, default "" (empty string)
+- port: dashboard port, default 80
+- power: RaspberryPi output power, default 5
+- mpx: mpx output power ("volume"), default 30
+- preemph: pre-emphasis, "eu" or "us", default "eu"
+- antennaGPIO: GPIO antenna header, default 4, available: 4, 20, 32, 34
+- ssd1306: OLED screen model SSD1306, default true

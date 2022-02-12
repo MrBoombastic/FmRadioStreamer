@@ -2,6 +2,7 @@ package tools
 
 import "time"
 
+// YouTubeAPIResult is a structure of found videos from YouTube API
 type YouTubeAPIResult struct {
 	Kind          string `json:"kind"`
 	Etag          string `json:"etag"`

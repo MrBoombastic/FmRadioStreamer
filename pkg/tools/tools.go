@@ -14,8 +14,10 @@ import (
 	"time"
 )
 
+// LocalIP stores local IP of the devices
 var LocalIP net.IP
 
+// RefreshLocalIP fetches current local IP and saves it to LocalIP variable
 func RefreshLocalIP() {
 	conn, err := net.Dial("udp", "8.8.8.8:80") // It will not actually connect
 	if err != nil {
@@ -26,6 +28,7 @@ func RefreshLocalIP() {
 	LocalIP = conn.LocalAddr().(*net.UDPAddr).IP
 }
 
+// InitGPIO opens connection for LEDs and buttons
 func InitGPIO() error {
 	err := rpio.Open()
 	if err != nil {
@@ -34,6 +37,7 @@ func InitGPIO() error {
 	return nil
 }
 
+// StopGPIO closes connection for LEDs and buttons. This function crashes RPi, therefore is not used internally.
 func StopGPIO() error {
 	err := rpio.Close()
 	if err != nil {
@@ -42,6 +46,7 @@ func StopGPIO() error {
 	return nil
 }
 
+// SearchYouTube queries YouTube API and returns first found video
 func SearchYouTube(query string) (YouTubeAPIResult, error) {
 	url := fmt.Sprintf("https://youtube.googleapis.com/youtube/v3/search?key=%v&q=%v&part=snippet&maxResults=1&type=video", config.GetYouTubeAPIKey(), urltool.QueryEscape(query))
 	client := http.Client{
@@ -73,6 +78,7 @@ func SearchYouTube(query string) (YouTubeAPIResult, error) {
 	return result, nil
 }
 
+// CheckRoot checks if user has root permissions. If not, exits application.
 func CheckRoot() {
 	if os.Geteuid() != 0 {
 		log.Println("WARNING: Not running as root! Exiting...")

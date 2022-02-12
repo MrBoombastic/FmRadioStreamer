@@ -8,6 +8,7 @@ import (
 	"os/exec"
 )
 
+// GenerateOptions generate options to pass to PiFmAdv
 func GenerateOptions(audio string) []string {
 	cfg := config.Get()
 	options := []string{
@@ -27,6 +28,8 @@ func GenerateOptions(audio string) []string {
 	}
 	return options
 }
+
+// run starts playing music or silence via PiFmAdv
 func run(name string, args []string) error {
 	PiFmAdv := exec.Command(name, args...)
 	stderr, err := PiFmAdv.StderrPipe()
@@ -55,11 +58,14 @@ func run(name string, args []string) error {
 	return nil
 }
 
+// Kill stops PiFmAdv using pkill and SIGINT
 func Kill() {
 	cmd := exec.Command("pkill", "-2", "pi_fm_adv")
 	cmd.Start()
 	cmd.Wait()
 }
+
+//Play generates options with GenerateOptions function and uses them when starting PiFimAdv
 func Play(audio string) {
 	// Make sure that previous playback is stopped
 	Kill()

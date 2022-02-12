@@ -7,11 +7,13 @@ import (
 	"time"
 )
 
+// BlueLedEnabled switches blue LED on or off, if BlueLedLoop is running
 var BlueLedEnabled = false
 var blueLedSleepInterval = 500 * time.Millisecond
 var blueLed = rpio.Pin(7)
 
-func BlueLedLoopStart(wg *sync.WaitGroup, ctx context.Context) {
+// BlueLedLoop handles blue LED activity
+func BlueLedLoop(wg *sync.WaitGroup, ctx context.Context) {
 	defer wg.Done()
 	for {
 		select {

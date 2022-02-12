@@ -16,7 +16,8 @@ var (
 
 var greensSleepInterval = 500 * time.Millisecond
 
-func QuadGreensLoopStart(wg *sync.WaitGroup, ctx context.Context) {
+// QuadGreensLoop handles quad green LEDs activity - just blinking in loop in circle
+func QuadGreensLoop(wg *sync.WaitGroup, ctx context.Context) {
 	defer wg.Done()
 	greenLed4.High()
 	for {

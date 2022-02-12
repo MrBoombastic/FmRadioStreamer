@@ -33,14 +33,14 @@ func main() {
 	tools.InitGPIO()
 	leds.Init()
 	wg.Add(1)
-	go leds.QuadGreensLoopStart(&wg, ctx)
+	go leds.QuadGreensLoop(&wg, ctx)
 	wg.Add(1)
-	go leds.BlueLedLoopStart(&wg, ctx)
+	go leds.BlueLedLoop(&wg, ctx)
 
 	if config.GetSSD1306() {
 		// Init screen
 		wg.Add(1)
-		go ssd1306.Create(&wg, ctx)
+		go ssd1306.Init(&wg, ctx)
 	}
 
 	// Init buttons
