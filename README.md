@@ -6,15 +6,25 @@ Raspberry Pi based FM streamer with OLED, buttons and LEDs support.
 [![CodeFactor](https://www.codefactor.io/repository/github/mrboombastic/fmradiostreamer/badge)](https://www.codefactor.io/repository/github/mrboombastic/fmradiostreamer)
 [![BCH compliance](https://bettercodehub.com/edge/badge/MrBoombastic/FmRadioStreamer?branch=master)](https://bettercodehub.com/)
 
+## Building
+
+Clone this repository, run `go get` and then `go build`. Of course, you have to install `Go` first.
+
+If you want to build for other device (e.g. build on Windows and run on RaspberyPi), use cross-compilation!
+
+Environmental variables for RPi Zero: `GOOS=linux;GOARCH=arm;GOARM=5`. For other RPis, `GOARM` may be unnecessary.
+
 ## Installation
 
-Go to project directory, type `chmod +x install.sh`, then `sudo ./install.sh`.
+Build or copy binary from `releases` tab. Copy `install.sh` to your directory, type `chmod +x install.sh`,
+then `sudo ./install.sh`.
 
 **WARNING!** This script will install some unnecessary dependencies like Python for `youtube-dl`. If you already have
 working `youtube-dl` instance, edit the script (comment line #6).
 
-Edit `config.json` file and enter your [YouTube API Key](https://developers.google.com/youtube/v3/getting-started).
-Also, you have to add `gpu_freq=250` in `/boot/config.txt`.
+Copy `config.json.example`, rename to `config.json` aned edit. Here you can get
+your [YouTube API Key](https://developers.google.com/youtube/v3/getting-started). Also, you have to add `gpu_freq=250`
+in `/boot/config.txt`.
 
 ## Running
 
