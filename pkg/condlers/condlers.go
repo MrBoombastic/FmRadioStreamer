@@ -11,7 +11,7 @@ import (
 // DownloadAudioFromYoutube download specific video from YouTube and converts it to OGG/Vorbis format.
 func DownloadAudioFromYoutube(ID string, filename string) error {
 	youtubeDl := goydl.NewYoutubeDl()
-	youtubeDl.Options.Output.Value = fmt.Sprintf("music/%v.wav", strings.ReplaceAll(filename, " ", "-"))
+	youtubeDl.Options.Output.Value = fmt.Sprintf("music/%v.ogg", strings.ReplaceAll(filename, " ", "-"))
 	youtubeDl.Options.ExtractAudio.Value = true
 	youtubeDl.Options.AudioFormat.Value = "vorbis" //"wav" does not produce good input for PiFmAdv. It is still OGG/Opus after conversion.
 	// As usual, this breaks my Pi, so I commented it out...
@@ -21,6 +21,9 @@ func DownloadAudioFromYoutube(ID string, filename string) error {
 	if err != nil {
 		return err
 	}
-	cmd.Wait()
+	err = cmd.Wait()
+	if err != nil {
+		return err
+	}
 	return nil
 }
