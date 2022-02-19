@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// DownloadAudioFromYoutube download specific video from YouTube and converts it to OGG/Vorbis format.
-func DownloadAudioFromYoutube(ID string, filename string) error {
+// DownloadAudio download specific video using youtube-dl and converts it to OGG/Vorbis format.
+func DownloadAudio(URL string, filename string) error {
 	youtubeDl := goydl.NewYoutubeDl()
 	youtubeDl.Options.Output.Value = fmt.Sprintf("music/%v.ogg", strings.ReplaceAll(filename, " ", "-"))
 	youtubeDl.Options.ExtractAudio.Value = true
@@ -17,7 +17,7 @@ func DownloadAudioFromYoutube(ID string, filename string) error {
 	// As usual, this breaks my Pi, so I commented it out...
 	// go io.Copy(os.Stdout, youtubeDl.Stdout)
 	// go io.Copy(os.Stderr, youtubeDl.Stderr)
-	cmd, err := youtubeDl.Download("https://youtu.be/" + ID)
+	cmd, err := youtubeDl.Download(URL)
 	if err != nil {
 		return err
 	}

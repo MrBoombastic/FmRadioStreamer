@@ -12,6 +12,7 @@ import (
 	"log"
 )
 
+// music endpoint returns contents of `music` directory
 func music(ctx *fiber.Ctx) {
 	filesSlice, err := musicList()
 	if err != nil {
@@ -20,16 +21,19 @@ func music(ctx *fiber.Ctx) {
 	ctx.JSON(filesSlice)
 }
 
-func loudstop(ctx *fiber.Ctx) {
+// stop endpoint plays silence
+func stop(ctx *fiber.Ctx) {
 	core.Play("")
 	ctx.SendStatus(200)
 }
 
-func superstop(ctx *fiber.Ctx) {
+// offair kill PiFmAdv entirely
+func offair(ctx *fiber.Ctx) {
 	core.Kill()
 	ctx.SendStatus(200)
 }
 
+// yt endpoint performs searching or downloading audio from other sites
 func yt(ctx *fiber.Ctx) {
 	search := ctx.Query("search")
 	query := ctx.Query("q")
@@ -44,7 +48,7 @@ func yt(ctx *fiber.Ctx) {
 	} else {
 		ctx.SendStatus(200)
 		leds.BlueLedEnabled = true
-		err := condlers.DownloadAudioFromYoutube(result.Items[0].ID.VideoID, result.Items[0].Snippet.Title)
+		err := condlers.DownloadAudio("https://youtu.be/"+result.Items[0].ID.VideoID, result.Items[0].Snippet.Title)
 		leds.BlueLedEnabled = false
 		if err != nil {
 			log.Println(err)
@@ -52,6 +56,7 @@ func yt(ctx *fiber.Ctx) {
 	}
 }
 
+// play endpoint plays selected file
 func play(ctx *fiber.Ctx) {
 	fmt.Println("play")
 	query := ctx.Query("q")
@@ -59,6 +64,7 @@ func play(ctx *fiber.Ctx) {
 	ctx.SendStatus(200)
 }
 
+// save endpoint updates current config
 func save(ctx *fiber.Ctx) {
 	newConfig := new(config.Config)
 	if err := ctx.BodyParser(newConfig); err != nil {
@@ -71,6 +77,7 @@ func save(ctx *fiber.Ctx) {
 	ctx.SendStatus(200)
 }
 
+// configuration endpoint returns current config
 func configuration(ctx *fiber.Ctx) {
 	configMap := config.GetMap()
 	ctx.JSON(configMap)

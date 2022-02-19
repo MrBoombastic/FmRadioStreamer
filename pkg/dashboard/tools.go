@@ -7,13 +7,13 @@ import (
 
 // endpointsList is a map with all endpoints
 var endpointsList = map[string]func(ctx *fiber.Ctx){
-	"config":    configuration,
-	"music":     music,
-	"loudstop":  loudstop,
-	"superstop": superstop,
-	"yt":        yt,
-	"play":      play,
-	"save":      save,
+	"config": configuration,
+	"music":  music,
+	"stop":   stop,
+	"offair": offair,
+	"yt":     yt,
+	"play":   play,
+	"save":   save,
 }
 
 // findEndpoint finds endpoint by name
