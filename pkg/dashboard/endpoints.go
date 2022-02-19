@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/condlers"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
@@ -31,9 +30,12 @@ func stop(ctx *fiber.Ctx) {
 func offair(ctx *fiber.Ctx) {
 	core.Kill()
 	ctx.SendStatus(200)
+	if config.GetSSD1306() {
+		ssd1306.MiniMessage("OFF-AIR")
+	}
 }
 
-// yt endpoint performs searching or downloading audio from other sites
+// yt endpoint performs searching or downloading audio from YouTube
 func yt(ctx *fiber.Ctx) {
 	search := ctx.Query("search")
 	query := ctx.Query("q")
@@ -56,9 +58,20 @@ func yt(ctx *fiber.Ctx) {
 	}
 }
 
+// download endpoint performs downloading audio from other sites
+func download(ctx *fiber.Ctx) {
+	query := ctx.Query("q")
+	ctx.SendStatus(200)
+	leds.BlueLedEnabled = true
+	err := condlers.DownloadAudio(query, "")
+	leds.BlueLedEnabled = false
+	if err != nil {
+		log.Println(err)
+	}
+}
+
 // play endpoint plays selected file
 func play(ctx *fiber.Ctx) {
-	fmt.Println("play")
 	query := ctx.Query("q")
 	core.Play(query)
 	ctx.SendStatus(200)
