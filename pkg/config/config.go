@@ -89,3 +89,8 @@ func GetYouTubeAPIKey() string {
 func GetSSD1306() bool {
 	return Get().SSD1306
 }
+
+// GetRT returns current RT (Get wrapper)
+func GetRT() string {
+	return Get().RT
+}

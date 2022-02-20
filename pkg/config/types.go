@@ -16,4 +16,5 @@ type Config struct {
 	Preemph       string  `json:"preemph"`
 	AntennaGPIO   uint8   `json:"antennaGPIO"`
 	SSD1306       bool    `json:"ssd1306"`
+	DynamicRT     bool    `json:"dynamicRT"`
 }

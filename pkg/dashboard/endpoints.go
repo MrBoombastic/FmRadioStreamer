@@ -13,7 +13,7 @@ import (
 
 // music endpoint returns contents of `music` directory
 func music(ctx *fiber.Ctx) {
-	filesSlice, err := musicList()
+	filesSlice, err := condlers.MusicList()
 	if err != nil {
 		ctx.SendStatus(500)
 	}
@@ -50,7 +50,7 @@ func yt(ctx *fiber.Ctx) {
 	} else {
 		ctx.SendStatus(200)
 		leds.BlueLedEnabled = true
-		err := condlers.DownloadAudio("https://youtu.be/"+result.Items[0].ID.VideoID, result.Items[0].Snippet.Title)
+		err := condlers.DownloadWav("https://youtu.be/" + result.Items[0].ID.VideoID)
 		leds.BlueLedEnabled = false
 		if err != nil {
 			log.Println(err)
@@ -63,7 +63,7 @@ func download(ctx *fiber.Ctx) {
 	query := ctx.Query("q")
 	ctx.SendStatus(200)
 	leds.BlueLedEnabled = true
-	err := condlers.DownloadAudio(query, "")
+	err := condlers.DownloadWav(query)
 	leds.BlueLedEnabled = false
 	if err != nil {
 		log.Println(err)

@@ -24,6 +24,8 @@ func main() {
 	defer stop()
 	var wg sync.WaitGroup
 
+	// Get current configuration
+	cfg := config.Get()
 	// Get local IP
 	tools.RefreshLocalIP()
 	log.Println("Your local IP is:", tools.LocalIP)
@@ -37,7 +39,7 @@ func main() {
 	wg.Add(1)
 	go leds.BlueLedLoop(&wg, ctx)
 
-	if config.GetSSD1306() {
+	if cfg.SSD1306 {
 		// Init screen
 		wg.Add(1)
 		go ssd1306.Init(&wg, ctx)
@@ -48,6 +50,12 @@ func main() {
 	wg.Add(1)
 	go buttons.Listen(&wg, ctx)
 	log.Println("Peripherals started")
+
+	if cfg.DynamicRT {
+		log.Println("Starting dynamic RDS control")
+		go core.RotateRT()
+		log.Println("Dynamic RDS control started")
+	}
 
 	// Starting dashboard and core with no music
 	log.Println("Starting dashboard")

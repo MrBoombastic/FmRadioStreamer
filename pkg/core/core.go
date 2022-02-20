@@ -3,9 +3,14 @@ package core
 import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
+	"golang.org/x/sys/unix"
 	"io"
 	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
+	"time"
 )
 
 // GenerateOptions generate options to pass to PiFmAdv
@@ -22,6 +27,7 @@ func GenerateOptions(audio string) []string {
 		"--preemph", cfg.Preemph,
 		"--gpio", fmt.Sprintf("%v", cfg.AntennaGPIO),
 		"--mpx", fmt.Sprintf("%v", cfg.Mpx),
+		"--ctl", "rds_ctl",
 	}
 	if audio != "" {
 		options = append(options, "--audio", fmt.Sprintf("./music/%v", audio))
@@ -47,10 +53,21 @@ func run(name string, args []string) error {
 	if err != nil {
 		return err
 	}
+	// Support for "dynamic" RDS - getting current playing file name
+	if args[len(args)-2] == "--audio" {
+		audio := args[len(args)-1]
+		extension := filepath.Ext(audio)
+		audio = strings.TrimSuffix(audio, extension)
+		alternateRT = strings.Replace(audio, "./music/", "", 1)
+		if len(alternateRT) > 64 {
+			alternateRT = alternateRT[0:63]
+		}
+	}
 	cmderr, _ := io.ReadAll(stderr)
 	if fmt.Sprintf("%s", cmderr) != "" {
 		log.Printf("PiFmAdv %s", cmderr)
 	}
+	// Stdout commented out for clearer command output, safe to undo!
 	/*
 		cmdout, _ := io.ReadAll(stdout)
 		fmt.Printf("%s\n", cmdout)
@@ -76,4 +93,47 @@ func Play(audio string) {
 			log.Println(err)
 		}
 	}()
+}
+
+//
+var alternateRT = config.GetRT()
+var currentRTState = 0
+
+// RotateRT enables switching RT (every 20 seconds) between that saved in config and current playing audio filename
+func RotateRT() {
+	err := os.Remove("rds_ctl")
+	if err != nil {
+		log.Println("ERROR: Cannot remove rds_ctl pipe file. Missing?")
+		return
+	}
+	err = unix.Mkfifo("rds_ctl", 0666)
+	if err != nil {
+		log.Println("ERROR: Cannot create pipe file: ", err)
+		return
+	}
+	f, err := os.OpenFile("rds_ctl", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	if err != nil {
+		log.Println("ERROR: Cannot open pipe file: ", err)
+		return
+	}
+	for {
+		if currentRTState == 0 {
+			f.WriteString("AB ON\n")
+			_, err := f.WriteString(fmt.Sprintf("RT %s", config.GetRT()))
+			if err != nil {
+				log.Println("ERROR: Cannot update dynamic RT text")
+				break
+			}
+			currentRTState++
+		} else {
+			f.WriteString("AB OFF\n")
+			_, err := f.WriteString(fmt.Sprintf("RT %s", alternateRT))
+			if err != nil {
+				log.Println("ERROR: Cannot update dynamic RT text")
+				break
+			}
+			currentRTState--
+		}
+		time.Sleep(time.Second * 20) //TODO INTERVAL NA CONFIG
+	}
 }

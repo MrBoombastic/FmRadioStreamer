@@ -12,5 +12,6 @@
   "mpx": 30,
   "preemph": "eu",
   "antennaGPIO": 4,
-  "ssd1306": true
+  "ssd1306": true,
+  "dynamicRT": true
 }
