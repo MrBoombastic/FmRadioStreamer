@@ -6,12 +6,13 @@
   "PI": "FFFF",
   "TP": "",
   "PTY": 0,
-  "apikey": "",
+  "ytApiKey": "",
   "port": 80,
   "power": 5,
   "mpx": 30,
   "preemph": "eu",
   "antennaGPIO": 4,
   "ssd1306": true,
-  "dynamicRT": true
+  "dynamicRT": true,
+  "dynamicRTInterval": 20
 }

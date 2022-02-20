@@ -99,7 +99,7 @@ func Play(audio string) {
 var alternateRT = config.GetRT()
 var currentRTState = 0
 
-// RotateRT enables switching RT (every 20 seconds) between that saved in config and current playing audio filename
+// RotateRT enables switching RT between that saved in config and current playing audio filename
 func RotateRT() {
 	err := os.Remove("rds_ctl")
 	if err != nil {
@@ -134,6 +134,6 @@ func RotateRT() {
 			}
 			currentRTState--
 		}
-		time.Sleep(time.Second * 20) //TODO INTERVAL NA CONFIG
+		time.Sleep(time.Second * time.Duration(config.GetDynamicRTInterval()))
 	}
 }

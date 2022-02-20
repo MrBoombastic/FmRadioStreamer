@@ -94,3 +94,8 @@ func GetSSD1306() bool {
 func GetRT() string {
 	return Get().RT
 }
+
+// GetDynamicRTInterval returns current dynamic RT switching interval (Get wrapper)
+func GetDynamicRTInterval() uint {
+	return Get().DynamicRTInterval
+}

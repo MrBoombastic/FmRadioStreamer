@@ -18,9 +18,10 @@ func DownloadWav(URL string) error {
 	youtubeDl.Options.ExtractAudio.Value = true
 	/*
 		Hopefully, output will be already in opus codec.
-		"Why don't you set wave codec here?" you may ask
+		"Why don't you set wave codec here?" you may ask.
 		Well, it doesn't always work. :)
 		And vorbis option still sometimes gives untouched opus file.
+		Instead of using ffmpeg (used by youtube-dl), we will be using opusdec, which is more reliable, I think, but we still need ffmpeg for audio extraction. :(
 	*/
 	// youtubeDl.Options.AudioFormat.Value = "opus"
 
@@ -42,6 +43,7 @@ func DownloadWav(URL string) error {
 	return nil
 }
 
+// OpusToWav converts first found Opus file in "music" directory with "TEMP_" prefix to Wav.
 func OpusToWav() error {
 	// Getting list of music files in "music/" directory
 	list, err := MusicDir()
