@@ -18,7 +18,12 @@ func Get() Config {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(file)
 	configuration := Config{}
 	if err := json.NewDecoder(file).Decode(&configuration); err != nil {
 		log.Fatal(err)
@@ -32,7 +37,12 @@ func GetMap() map[string]interface{} {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(file)
 	var data map[string]interface{}
 	if err := json.NewDecoder(file).Decode(&data); err != nil {
 		log.Fatal(err)

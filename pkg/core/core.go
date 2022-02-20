@@ -78,8 +78,15 @@ func run(name string, args []string) error {
 // Kill stops PiFmAdv using pkill and SIGINT
 func Kill() {
 	cmd := exec.Command("pkill", "-2", "pi_fm_adv")
-	cmd.Start()
-	cmd.Wait()
+	err := cmd.Start()
+	if err != nil {
+		log.Fatal("ERROR: pkill:", err)
+	}
+	err = cmd.Wait()
+	// Preventing RPi overloading
+	if err != nil {
+		log.Println("INFO: pkill:", err)
+	}
 }
 
 //Play generates options with GenerateOptions function and uses them when starting PiFimAdv
@@ -104,7 +111,6 @@ func RotateRT() {
 	err := os.Remove("rds_ctl")
 	if err != nil {
 		log.Println("ERROR: Cannot remove rds_ctl pipe file. Missing?")
-		return
 	}
 	err = unix.Mkfifo("rds_ctl", 0666)
 	if err != nil {
@@ -118,16 +124,24 @@ func RotateRT() {
 	}
 	for {
 		if currentRTState == 0 {
-			f.WriteString("AB ON\n")
-			_, err := f.WriteString(fmt.Sprintf("RT %s", config.GetRT()))
+			_, err := f.WriteString("AB ON\n")
+			if err != nil {
+				log.Println("ERROR: Cannot update dynamic RT text (A/B flag)")
+				break
+			}
+			_, err = f.WriteString(fmt.Sprintf("RT %s", config.GetRT()))
 			if err != nil {
 				log.Println("ERROR: Cannot update dynamic RT text")
 				break
 			}
 			currentRTState++
 		} else {
-			f.WriteString("AB OFF\n")
-			_, err := f.WriteString(fmt.Sprintf("RT %s", alternateRT))
+			_, err := f.WriteString("AB OFF\n")
+			if err != nil {
+				log.Println("ERROR: Cannot update dynamic RT text (A/B flag)")
+				break
+			}
+			_, err = f.WriteString(fmt.Sprintf("RT %s", alternateRT))
 			if err != nil {
 				log.Println("ERROR: Cannot update dynamic RT text")
 				break

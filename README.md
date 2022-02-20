@@ -87,8 +87,6 @@ In the `docs` directory there are pictures of first version of this project. Wat
 
 ## JSON settings
 
-- dynamicRTInterval: dynamic RT switching interval in seconds, default 20
-
 | Option            | Description                                                                  | Type (additional info) | Default                                  | Notes                                                 |
 |-------------------|------------------------------------------------------------------------------|------------------------|------------------------------------------|-------------------------------------------------------|
 | freq              | Frequency in MHz                                                             | number (float64)       | 108.0                                    |                                                       |
