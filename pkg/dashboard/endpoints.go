@@ -13,7 +13,7 @@ import (
 
 // music endpoint returns contents of `music` directory
 func music(ctx *fiber.Ctx) {
-	filesSlice, err := condlers.MusicList()
+	filesSlice, err := condlers.MusicDir()
 	if err != nil {
 		ctx.SendStatus(500)
 	}
