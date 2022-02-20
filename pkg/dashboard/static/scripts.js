@@ -1,5 +1,12 @@
 const configs = document.getElementById("config-row");
 const logs = document.getElementById("logs");
+const youtubeSearchButton = document.getElementById("youtube-search");
+const youtubeSwitchButton = document.getElementById("youtube-switch");
+const youtubeInput = document.getElementById("youtube-input");
+const youtubeThumbnail = document.getElementById("youtube-thumb");
+const yotubeURL = document.getElementById("youtube-url");
+
+let direct = false;
 
 const errorHandler = async (data, endpoint, errored = false) => {
     endpoint = endpoint.replace("./api", "").split('?')[0];
@@ -8,7 +15,7 @@ const errorHandler = async (data, endpoint, errored = false) => {
     logs.innerText += (endpoint + "  " + status + "  " + JSON.stringify(data) + "\n");
     logs.scrollTop = logs.scrollHeight - logs.clientHeight;
     notify(`HTTP ${status} - ${endpoint}`);
-    return data;
+    if (!errored) return data;
 };
 const niceFetch = (value, method = "GET", body, headers) => {
     return fetch(value, {method, body, headers})
@@ -31,7 +38,6 @@ const getSelectedMusic = () => {
 };
 const getConfig = async () => {
     const config = await niceFetch("./api/config");
-    //if (config.status !== 200) return;
     for (let key in config) {
         configs.innerHTML += `<div class="col-md-6">
             <label for="${key}" class="text-white">${key}:</label>
@@ -68,20 +74,17 @@ function notify(message) {
     }, 1500);
 }
 
-const youtubeSearchButton = document.getElementById("youtube-search");
+
 youtubeSearchButton.addEventListener("click", async () => {
     const data = await niceFetch(`./api/yt?q=${encodeURIComponent(document.getElementById("youtube-input").value)}&search=true`);
-    if (data.error) return;
+    if (data?.error) return;
     ["title", "channelTitle", "description"].forEach(prop => {
-        document.getElementById("youtube-" + prop).textContent = htmlDecode(data[prop]);
+        document.getElementById("youtube-" + prop).textContent = htmlDecode(data?.snippet?.[prop]);
     });
-    document.getElementById("youtube-thumb").src = data.thumbnails.high.url;
-    document.getElementById("youtube-url").href = data.url;
+    youtubeThumbnail.src = data.snippet.thumbnails.high.url;
+    yotubeURL.href = "https://youtu.be/" + data?.id?.videoId;
 });
 
-const youtubeSwitchButton = document.getElementById("youtube-switch");
-const youtubeInput = document.getElementById("youtube-input");
-let direct = false;
 youtubeSwitchButton.addEventListener("click", async () => {
     if (youtubeSwitchButton.checked) {
         youtubeSearchButton.setAttribute("disabled", "disabled");

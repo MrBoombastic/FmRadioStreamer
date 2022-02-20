@@ -61,7 +61,7 @@ func yt(ctx *fiber.Ctx) {
 		return
 	}
 	if search == "true" {
-		err := ctx.JSON(result.Items[0].Snippet)
+		err := ctx.JSON(result.Items[0])
 		if err != nil {
 			log.Println(err)
 		}
