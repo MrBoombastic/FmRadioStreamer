@@ -7,6 +7,8 @@ sudo sudo pip install --upgrade youtube_dl && echo "FMRADSTR: Successfully insta
 echo "FMRADSTR: Creating directories..."
 mkdir "core"
 mkdir "music"
+echo "FMRADSTR: Downloading PiFmAdv..."
+git submodule update --init --recursive
 echo "FMRADSTR: Moving and compiling PiFmAdv..."
 mv PiFmAdv/src/* core/ && echo "FMRADSTR: Moved it to core directory!" || echo "FMRADSTR: Failed to move it to core directory!"
 cd core && make clean && echo "FMRADSTR: Core cleaned!" || echo "FMRADSTR: Failed to clean core!"
