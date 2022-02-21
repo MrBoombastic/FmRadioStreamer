@@ -6,7 +6,6 @@ echo "FMRADSTR: Trying to install/upgrade youtube-dl..."
 sudo sudo pip install --upgrade youtube_dl && echo "FMRADSTR: Successfully installed youtube-dl!" || echo "FMRADSTR: Failed to install youtube-dl!"
 echo "FMRADSTR: Creating directories..."
 mkdir "core"
-mkdir "music"
 echo "FMRADSTR: Downloading PiFmAdv..."
 git submodule update --init --recursive
 echo "FMRADSTR: Moving and compiling PiFmAdv..."
