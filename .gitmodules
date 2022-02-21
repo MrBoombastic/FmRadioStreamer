@@ -1,0 +1,3 @@
+[submodule "PiFmAdv"]
+	path = PiFmAdv
+	url = https://github.com/miegl/PiFmAdv.git
