@@ -6,7 +6,6 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -15,19 +14,6 @@ var index embed.FS
 
 //go:embed static/*
 var static embed.FS
-
-// musicList returns slice of all files in 'music' directory
-func musicList() ([]string, error) {
-	files, err := ioutil.ReadDir("music/")
-	if err != nil {
-		return nil, err
-	}
-	var filesSlice []string
-	for _, item := range files {
-		filesSlice = append(filesSlice, item.Name())
-	}
-	return filesSlice, nil
-}
 
 var app = fiber.New()
 

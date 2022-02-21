@@ -18,7 +18,12 @@ func Get() Config {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(file)
 	configuration := Config{}
 	if err := json.NewDecoder(file).Decode(&configuration); err != nil {
 		log.Fatal(err)
@@ -32,7 +37,12 @@ func GetMap() map[string]interface{} {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(file)
 	var data map[string]interface{}
 	if err := json.NewDecoder(file).Decode(&data); err != nil {
 		log.Fatal(err)
@@ -88,4 +98,14 @@ func GetYouTubeAPIKey() string {
 // GetSSD1306 returns current screen state in boolean (Get wrapper)
 func GetSSD1306() bool {
 	return Get().SSD1306
+}
+
+// GetRT returns current RT (Get wrapper)
+func GetRT() string {
+	return Get().RT
+}
+
+// GetDynamicRTInterval returns current dynamic RT switching interval (Get wrapper)
+func GetDynamicRTInterval() uint {
+	return Get().DynamicRTInterval
 }

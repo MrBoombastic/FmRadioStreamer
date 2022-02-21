@@ -85,19 +85,28 @@ In the `docs` directory there are pictures of first version of this project. Wat
 - 39 - GND - for LEDs
 - 40 - GPIO 21 - button (frequency down)
 
-## Settings
+## JSON settings
 
-- freq: frequency, default 108.0 MHz
-- multiplier: frequency multiplier (when using physical buttons), default 0.1
-- PS: RDS station name, default "FmRadStr"
-- RT: RDS station description, default "RPi based radio streamer. It is working!"
-- PI: RDS station ID in hex, default "FFFF"
-- TP: RDS traffic programme, default "" (empty string)
-- PTY: RDS programme type, default 0
-- apikey: YouTube API V3 Key, default "" (empty string)
-- port: dashboard port, default 80
-- power: RaspberryPi output power, default 5
-- mpx: mpx output power ("volume"), default 30
-- preemph: pre-emphasis, "eu" or "us", default "eu"
-- antennaGPIO: GPIO antenna header, default 4, available: 4, 20, 32, 34
-- ssd1306: OLED screen model SSD1306, default true
+| Option            | Description                                                                  | Type (additional info) | Default                                  | Notes                                                 |
+|-------------------|------------------------------------------------------------------------------|------------------------|------------------------------------------|-------------------------------------------------------|
+| freq              | Frequency in MHz                                                             | number (float64)       | 108.0                                    |                                                       |
+| multiplier        | Frequency multiplier (used when using physical buttons)                      | number (float64)       | 0.1                                      |                                                       |
+| PS                | RDS station name                                                             | string (len: 8)        | FmRadStr                                 |                                                       |
+| RT                | RDS station text                                                             | string (len: 64)       | RPi based radio streamer. It is working! |                                                       |
+| PI                | RDS station ID                                                               | string (len: 4, hex)   | FFFF                                     |                                                       |
+| TP                | RDS traffic programme                                                        | string                 | (empty string)                           | I don't know the type of this setting.                |
+| PTY               | RDS programme type                                                           | number (uint)          | 0                                        | Warning: different meaning in EU and US! Range: 0-31. |
+| ytApiKey          | YouTube API V3 Key                                                           | string                 | (empty string)                           |                                                       |
+| port              | Web dashboard port                                                           | number (uint16)        | 80                                       |                                                       |
+| power             | RaspberryPi output power                                                     | number (uint8)         | 5                                        | Refer to PiFmAdv for more info.                       |
+| mpx               | Mpx output power ("volume")                                                  | number (uint)          | 30                                       | See above.                                            |
+| preemph           | pre-emphasis                                                                 | string                 | eu                                       | Possible values: "eu", "us".                          |
+| antennaGPIO       | GPIO antenna header                                                          | number (uint8)         | 4                                        | Possible values: 4, 20, 32, 34                        |
+| ssd1306           | OLED screen type SSD1306 enabled                                             | bool                   | true                                     |                                                       |
+| dynamicRT         | Switching RT between that saved in config and current playing audio filename | bool                   | true                                     |                                                       |
+| dynamicRTInterval | Dynamic RT switching interval in seconds                                     | number (uint)          | 20                                       |                                                       | 
+
+
+
+
+

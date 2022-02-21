@@ -1,14 +1,21 @@
 const configs = document.getElementById("config-row");
 const logs = document.getElementById("logs");
+const youtubeSearchButton = document.getElementById("youtube-search");
+const youtubeSwitchButton = document.getElementById("youtube-switch");
+const youtubeInput = document.getElementById("youtube-input");
+const youtubeThumbnail = document.getElementById("youtube-thumb");
+const yotubeURL = document.getElementById("youtube-url");
+
+let direct = false;
 
 const errorHandler = async (data, endpoint, errored = false) => {
-    endpoint = endpoint.replace("./api", "").split('?')[0]
+    endpoint = endpoint.replace("./api", "").split('?')[0];
     const status = data.status;
     if (!errored) data = await data.json().catch(() => data);
     logs.innerText += (endpoint + "  " + status + "  " + JSON.stringify(data) + "\n");
     logs.scrollTop = logs.scrollHeight - logs.clientHeight;
     notify(`HTTP ${status} - ${endpoint}`);
-    return data;
+    if (!errored) return data;
 };
 const niceFetch = (value, method = "GET", body, headers) => {
     return fetch(value, {method, body, headers})
@@ -34,7 +41,7 @@ const getConfig = async () => {
     for (let key in config) {
         configs.innerHTML += `<div class="col-md-6">
             <label for="${key}" class="text-white">${key}:</label>
-            <input type="${typeof config[key]}" class="form-control setting"
+            <input type="${typeof config[key]}" class="form-control setting bg-dark text-white"
                    id="${key}"
                    value="${config[key]}">
             </div>`;
@@ -67,12 +74,25 @@ function notify(message) {
     }, 1500);
 }
 
-document.getElementById("youtube-search").addEventListener("click", async () => {
+
+youtubeSearchButton.addEventListener("click", async () => {
     const data = await niceFetch(`./api/yt?q=${encodeURIComponent(document.getElementById("youtube-input").value)}&search=true`);
-    if (data.error) return;
+    if (data?.error) return;
     ["title", "channelTitle", "description"].forEach(prop => {
-        document.getElementById("youtube-" + prop).textContent = htmlDecode(data[prop]);
+        document.getElementById("youtube-" + prop).textContent = htmlDecode(data?.snippet?.[prop]);
     });
-    document.getElementById("youtube-thumb").src = data.thumbnails.high.url;
-    document.getElementById("youtube-url").href = data.url;
+    youtubeThumbnail.src = data.snippet.thumbnails.high.url;
+    yotubeURL.href = "https://youtu.be/" + data?.id?.videoId;
+});
+
+youtubeSwitchButton.addEventListener("click", async () => {
+    if (youtubeSwitchButton.checked) {
+        youtubeSearchButton.setAttribute("disabled", "disabled");
+        youtubeInput.setAttribute("placeholder", "https://www.youtube.com/watch?v=Vhh_GeBPOhs");
+        direct = true;
+    } else {
+        direct = false;
+        youtubeSearchButton.removeAttribute("disabled");
+        youtubeInput.setAttribute("placeholder", "Brick Hustley - Don't give up");
+    }
 });

@@ -8,5 +8,6 @@ require (
 	github.com/gofiber/fiber/v2 v2.27.0
 	github.com/stianeikeland/go-rpio/v4 v4.6.0
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
+	golang.org/x/sys v0.0.0-20220209214540-3681064d5158
 	periph.io/x/periph v3.6.8+incompatible
 )

@@ -24,7 +24,7 @@ func Init() {
 	for _, item := range buttons {
 		item.Input()
 		item.PullUp()
-		item.Detect(rpio.AnyEdge)
+		item.Detect(rpio.RiseEdge)
 	}
 }
 

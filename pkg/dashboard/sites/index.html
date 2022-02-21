@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<link rel="stylesheet" href="./static/bootstrap.min.css">
-<link rel="stylesheet" href="./static/styles.css">
-<script src="./static/bootstrap.min.js"></script>
-<script defer src="./static/scripts.js"></script>
+<link rel="stylesheet" href="../static/bootstrap.min.css">
+<link rel="stylesheet" href="../static/styles.css">
+<script src="../static/bootstrap.min.js"></script>
+<script defer src="../static/scripts.js"></script>
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="FmRadioStream Web Dashboard">
     <meta name="author" content="MrBoombastic">
-    <link rel='shortcut icon' type='image/x-icon' href='./static/favicon.ico'/>
+    <link rel='shortcut icon' type='image/x-icon' href='../static/favicon.ico'/>
     <title>FmRadioStreamer</title>
 </head>
 
@@ -19,7 +19,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">
-            <img src="./static/favicon.ico" alt="" width="28" height="28" class="d-inline-block align-text-top">
+            <img src="../static/favicon.ico" alt="" width="28" height="28" class="d-inline-block align-text-top">
             FmRadioStreamer</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,8 +40,8 @@
         <div class="col-md-3 col-sm-12" style="padding-bottom: 1rem">
             <div class="card bg-dark">
                 <div class="card-body">
-                    <button type="button" class="btn btn-outline-danger" onclick="niceFetch('./api/superstop')"
-                            style="width: 100%">Radio DOWN (a.k.a. Super Stop)
+                    <button type="button" class="btn btn-outline-danger" onclick="niceFetch('./api/offair')"
+                            style="width: 100%">OFF-AIR
                     </button>
                 </div>
             </div>
@@ -50,7 +50,7 @@
             <div class="card bg-dark">
                 <div class="card-body">
                     <p class="card-text text-white">Pick your song and play!</p>
-                    <input list="musicpickerlist" id="musicpicker" style="width: 100%">
+                    <input list="musicpickerlist" id="musicpicker" class="bg-dark text-white" style="width: 100%">
                     <datalist id="musicpickerlist">
                     </datalist>
                 </div>
@@ -59,7 +59,7 @@
                             onclick="niceFetch('./api/play?q=' + document.getElementById('musicpicker').value)">Play
                     </button>
                     <button type="button" class="btn btn-outline-info" onclick="refreshMusic()">Refresh</button>
-                    <button type="button" class="btn btn-outline-warning" onclick="niceFetch('./api/loudstop')">Stop
+                    <button type="button" class="btn btn-outline-warning" onclick="niceFetch('./api/stop')">Stop
                     </button>
                 </div>
             </div>
@@ -71,12 +71,18 @@
                 <div class="col-md-6 col-sm-12">
                     <div class="card bg-dark h-100">
                         <div class="card-body">
-                            <p class="card-title text-white">YouTube - search and download</p>
+                            <p class="card-title text-white">Search and download</p>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="youtube-switch">
+                                <label class="form-check-label text-white" for="youtube-switch">Pass input directly to
+                                    youtube-dl</label>
+                            </div>
                             <div class="input-group">
-                                <input type="text" class="form-control" id="youtube-input">
+                                <input type="text" class="form-control bg-dark text-white" id="youtube-input"
+                                       placeholder="Brick Hustley - Don't give up">
                                 <button id="youtube-search" type="button" class="btn btn-primary">Search</button>
                                 <button id="youtube-download" type="button" class="btn btn-success"
-                                        onclick="niceFetch(`./api/yt?q=${encodeURIComponent(document.getElementById('youtube-input').value)}`)">
+                                        onclick="niceFetch(`./api/${direct ? 'download' : 'yt'}?q=${encodeURIComponent(document.getElementById('youtube-input').value)}`)">
                                     Download
                                 </button>
                             </div>
