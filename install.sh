@@ -7,10 +7,10 @@ sudo sudo pip install --upgrade youtube_dl && echo "FMRADSTR: Successfully insta
 echo "FMRADSTR: Creating directories..."
 mkdir "core"
 echo "FMRADSTR: Downloading PiFmAdv..."
-git submodule update --init --recursive
+git submodule update --init --recursive && echo "FMRADSTR: Done!" || echo "FMRADSTR: Not a git repository! Downloading directly..." && git clone https://github.com/miegl/PiFmAdv.git
 echo "FMRADSTR: Moving and compiling PiFmAdv..."
 mv PiFmAdv/src/* core/ && echo "FMRADSTR: Moved it to core directory!" || echo "FMRADSTR: Failed to move it to core directory!"
 cd core && make clean && echo "FMRADSTR: Core cleaned!" || echo "FMRADSTR: Failed to clean core!"
 make && echo "FMRADSTR: Successfully compiled!" || echo "FMRADSTR: Failed to compile!"
 cd ../
-echo "Done. Please set YT API key in config.json and DO NOT FORGET to add 'gpu_freq=250' in /boot/config.txt. Enjoy! :)"
+echo "FMRADSTR: Done. Please set YT API key in config.json and DO NOT FORGET to add 'gpu_freq=250' in /boot/config.txt. Enjoy! :)"
