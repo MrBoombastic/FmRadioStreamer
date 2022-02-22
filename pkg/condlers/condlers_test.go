@@ -6,8 +6,22 @@ import (
 	"testing"
 )
 
-func TestMusicDir(t *testing.T) {
+var isPathFixed = false
+
+func fixPath() error {
+	if isPathFixed == true {
+		return nil
+	}
 	err := os.Chdir("../../")
+	if err != nil {
+		return err
+	} else {
+		isPathFixed = true
+		return nil
+	}
+}
+func TestMusicDir(t *testing.T) {
+	err := fixPath()
 	if err != nil {
 		t.Error(err)
 		return
@@ -24,12 +38,12 @@ func TestMusicDir(t *testing.T) {
 }
 
 func TestDownloadWav(t *testing.T) {
-	/*err := os.Chdir("../../")
+	err := fixPath()
 	if err != nil {
 		t.Error(err)
 		return
-	}*/
-	err := DownloadWav("https://www.youtube.com/watch?v=lp7zvP4GxQA")
+	}
+	err = DownloadWav("https://www.youtube.com/watch?v=lp7zvP4GxQA")
 	if err != nil {
 		t.Error(err)
 		return

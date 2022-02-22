@@ -6,8 +6,22 @@ import (
 	"testing"
 )
 
-func TestGet(t *testing.T) {
+var isPathFixed = false
+
+func fixPath() error {
+	if isPathFixed == true {
+		return nil
+	}
 	err := os.Chdir("../../")
+	if err != nil {
+		return err
+	} else {
+		isPathFixed = true
+		return nil
+	}
+}
+func TestGet(t *testing.T) {
+	err := fixPath()
 	if err != nil {
 		t.Error(err)
 		return
