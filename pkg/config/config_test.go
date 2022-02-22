@@ -28,8 +28,7 @@ func TestGet(t *testing.T) {
 	}
 	err = os.Rename("config.json.example", "config.json")
 	if err != nil {
-		t.Error(err)
-		return
+		t.Log(err)
 	}
 	get := Get()
 	if err != nil {
