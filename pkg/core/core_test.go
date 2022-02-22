@@ -6,8 +6,28 @@ import (
 	"testing"
 )
 
+var isPathFixed = false
+
+func fixPath() error {
+	if isPathFixed == true {
+		return nil
+	}
+	err := os.Chdir("../../")
+	if err != nil {
+		return err
+	} else {
+		isPathFixed = true
+		return nil
+	}
+}
+
 func TestGenerateOptions(t *testing.T) {
-	err := os.Rename("config.json.example", "config.json")
+	err := fixPath()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	err = os.Rename("config.json.example", "config.json")
 	if err != nil {
 		t.Log(err)
 	}
