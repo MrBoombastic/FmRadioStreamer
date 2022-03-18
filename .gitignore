@@ -1,13 +1,4 @@
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-TO_REWRITE/*
 build/
-.eslintrc.js
-temp/
-TO_REWRITE/core/*
-!ytdl-temp/placeholder.txt
-ytdl-temp/*
 .idea
+!music/piano-kozco-com.wav
+music/

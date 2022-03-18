@@ -36,15 +36,15 @@ func DownloadWav(URL string) error {
 	if err != nil {
 		return err
 	}
-	err = OpusToWav()
+	err = opusToWav()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// OpusToWav converts first found Opus file in "music" directory with "TEMP_" prefix to Wav.
-func OpusToWav() error {
+// opusToWav converts first found Opus file in "music" directory with "TEMP_" prefix to Wav.
+func opusToWav() error {
 	// Getting list of music files in "music/" directory
 	list, err := MusicDir()
 	if err != nil {
