@@ -9,5 +9,4 @@ require (
 	github.com/stianeikeland/go-rpio/v4 v4.6.0
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9
-	periph.io/x/periph v3.6.8+incompatible
 )
