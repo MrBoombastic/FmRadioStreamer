@@ -11,4 +11,5 @@ require (
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9
 	periph.io/x/conn/v3 v3.6.10
 	periph.io/x/devices/v3 v3.6.15
+	periph.io/x/host/v3 v3.7.2
 )
