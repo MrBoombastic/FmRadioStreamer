@@ -37,13 +37,13 @@ func TestMusicDir(t *testing.T) {
 	}
 }
 
-func TestDownloadWav(t *testing.T) {
+func TestDownload(t *testing.T) {
 	err := fixPath()
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	err = DownloadWav("https://www.youtube.com/watch?v=lp7zvP4GxQA")
+	err = Download("https://www.youtube.com/watch?v=lp7zvP4GxQA")
 	if err != nil {
 		t.Error(err)
 		return
@@ -54,7 +54,7 @@ func TestDownloadWav(t *testing.T) {
 		return
 	}
 	//
-	wanted := []string{"Jarre arr. by Rob Hubbard - Zoolook (Oscilloscope View).wav", "piano-kozco-com.wav"}
+	wanted := []string{"Jarre arr. by Rob Hubbard - Zoolook (Oscilloscope View).opus", "piano-kozco-com.wav"}
 	if !reflect.DeepEqual(got, wanted) {
 		t.Errorf("got %v, wanted %v", got, wanted)
 	}

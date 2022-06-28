@@ -71,7 +71,7 @@ func yt(ctx *fiber.Ctx) {
 			log.Println(err)
 		}
 		leds.BlueLedEnabled = true
-		err = condlers.DownloadWav("https://youtu.be/" + result.Items[0].ID.VideoID)
+		err = condlers.Download("https://youtu.be/" + result.Items[0].ID.VideoID)
 		leds.BlueLedEnabled = false
 		if err != nil {
 			log.Println(err)
@@ -87,7 +87,7 @@ func download(ctx *fiber.Ctx) {
 		log.Println(err)
 	}
 	leds.BlueLedEnabled = true
-	err = condlers.DownloadWav(query)
+	err = condlers.Download(query)
 	leds.BlueLedEnabled = false
 	if err != nil {
 		log.Println(err)
