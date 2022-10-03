@@ -1,5 +1,6 @@
 {
   "freq": 108.0,
+  "format": "opus",
   "multiplier": 0.1,
   "PS": "FmRadStr",
   "RT": "RPi based radio streamer. It is working!",

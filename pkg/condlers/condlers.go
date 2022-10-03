@@ -8,12 +8,12 @@ import (
 )
 
 // Download downloads specific video using youtube-dl, extracts audio from it and converts it to opus.
-func Download(URL string) error {
+func Download(URL string, format string) error {
 	youtubeDl := goydl.NewYoutubeDl()
 	youtubeDl.Options.Output.Value = "music/%(title)s.%(ext)s"
 	youtubeDl.Options.Format.Value = "bestaudio" //may break at some point, change to "best" if needed
 	youtubeDl.Options.ExtractAudio.Value = true
-	youtubeDl.Options.AudioFormat.Value = "opus"
+	youtubeDl.Options.AudioFormat.Value = format
 	youtubeDl.Options.AudioQuality.Value = "0" //best quality
 
 	// This breaks my RPi, so I commented it out...

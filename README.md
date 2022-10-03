@@ -84,26 +84,44 @@ In the `docs` directory there are pictures of first version of this project. Wat
 - 39 - GND - for LEDs
 - 40 - GPIO 21 - button (frequency down)
 
+## Which format should I chose?
+
+Downloading and converting benchmark:
+
+- Song URL: https://www.youtube.com/watch?v=SaoBbCC66I4
+- Results:
+
+| Format | First run time | Second run time | File size |
+|--------|----------------|-----------------|-----------|
+| MP3    | 6:17           | 6:21            | 12 431 KB |
+| WAV    | 4:20  hehe     | 4:17            | 6 499 KB  |
+| Opus   | 3:32           | 3:38            | 69 891 KB |
+
+For pretty good audio quality, low file size and best conversion time, use Opus. If for
+some reason you can't use Opus format and have outdated `libsndfile1-dev` package, use WAV.
+Use MP3 if you don't want to re-encode your existing music library.
+
 ## JSON settings
 
-| Option            | Description                                                                  | Type (additional info) | Default                                  | Notes                                                 |
-|-------------------|------------------------------------------------------------------------------|------------------------|------------------------------------------|-------------------------------------------------------|
-| freq              | Frequency in MHz                                                             | number (float64)       | 108.0                                    |                                                       |
-| multiplier        | Frequency multiplier (used when using physical buttons)                      | number (float64)       | 0.1                                      |                                                       |
-| PS                | RDS station name                                                             | string (len: 8)        | FmRadStr                                 |                                                       |
-| RT                | RDS station text                                                             | string (len: 64)       | RPi based radio streamer. It is working! |                                                       |
-| PI                | RDS station ID                                                               | string (len: 4, hex)   | FFFF                                     |                                                       |
-| TP                | RDS traffic programme                                                        | string                 | (empty string)                           | I don't know the type of this setting.                |
-| PTY               | RDS programme type                                                           | number (uint)          | 0                                        | Warning: different meaning in EU and US! Range: 0-31. |
-| ytApiKey          | YouTube API V3 Key                                                           | string                 | (empty string)                           |                                                       |
-| port              | Web dashboard port                                                           | number (uint16)        | 80                                       |                                                       |
-| power             | RaspberryPi output power                                                     | number (uint8)         | 5                                        | Refer to PiFmAdv for more info.                       |
-| mpx               | Mpx output power ("volume")                                                  | number (uint)          | 30                                       | See above.                                            |
-| preemph           | pre-emphasis                                                                 | string                 | eu                                       | Possible values: "eu", "us".                          |
-| antennaGPIO       | GPIO antenna header                                                          | number (uint8)         | 4                                        | Possible values: 4, 20, 32, 34                        |
-| ssd1306           | OLED screen type SSD1306 enabled                                             | bool                   | true                                     |                                                       |
-| dynamicRT         | Switching RT between that saved in config and current playing audio filename | bool                   | true                                     |                                                       |
-| dynamicRTInterval | Dynamic RT switching interval in seconds                                     | number (uint)          | 20                                       |                                                       | 
+| Option            | Description                                                                  | Type (additional info) | Default                                  | Notes                                                                                 |
+|-------------------|------------------------------------------------------------------------------|------------------------|------------------------------------------|---------------------------------------------------------------------------------------|
+| freq              | Frequency in MHz                                                             | number (float64)       | 108.0                                    |                                                                                       |
+| format            | Audio format for saved files                                                 | string                 | opus                                     | limited to `libsndfile1-dev`: "wav" available, "mp3" only if it is upgraded to 1.1.0+ |                       | 
+| multiplier        | Frequency multiplier (used when using physical buttons)                      | number (float64)       | 0.1                                      |                                                                                       |
+| PS                | RDS station name                                                             | string (len: 8)        | FmRadStr                                 |                                                                                       |
+| RT                | RDS station text                                                             | string (len: 64)       | RPi based radio streamer. It is working! |                                                                                       |
+| PI                | RDS station ID                                                               | string (len: 4, hex)   | FFFF                                     |                                                                                       |
+| TP                | RDS traffic programme                                                        | string                 | (empty string)                           | I don't know the type of this setting.                                                |
+| PTY               | RDS programme type                                                           | number (uint)          | 0                                        | Warning: different meaning in EU and US! Range: 0-31.                                 |
+| ytApiKey          | YouTube API V3 Key                                                           | string                 | (empty string)                           |                                                                                       |
+| port              | Web dashboard port                                                           | number (uint16)        | 80                                       |                                                                                       |
+| power             | RaspberryPi output power                                                     | number (uint8)         | 5                                        | Refer to PiFmAdv for more info.                                                       |
+| mpx               | Mpx output power ("volume")                                                  | number (uint)          | 30                                       | See above.                                                                            |
+| preemph           | pre-emphasis                                                                 | string                 | eu                                       | Possible values: "eu", "us".                                                          |
+| antennaGPIO       | GPIO antenna header                                                          | number (uint8)         | 4                                        | Possible values: 4, 20, 32, 34                                                        |
+| ssd1306           | OLED screen type SSD1306 enabled                                             | bool                   | true                                     |                                                                                       |
+| dynamicRT         | Switching RT between that saved in config and current playing audio filename | bool                   | true                                     |                                                                                       |
+| dynamicRTInterval | Dynamic RT switching interval in seconds                                     | number (uint)          | 20                                       |                                                                                       | 
 
 
 
