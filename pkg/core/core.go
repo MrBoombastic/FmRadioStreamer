@@ -46,7 +46,7 @@ func run(name string, args []string) error {
 	/*
 		stdout, err := PiFmAdv.StdoutPipe()
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 	*/
 	err = PiFmAdv.Start()

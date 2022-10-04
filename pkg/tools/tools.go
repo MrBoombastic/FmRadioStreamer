@@ -11,6 +11,9 @@ import (
 	"net/http"
 	urltool "net/url"
 	"os"
+	"os/exec"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -84,4 +87,22 @@ func CheckRoot() {
 		log.Println("WARNING: Not running as root! Exiting...")
 		os.Exit(0)
 	}
+}
+
+func CheckLibsndfileVersion() (float64, error) {
+	out, err := exec.Command("sudo", "apt-cache", "policy", "libsndfile1-dev").Output()
+	if err != nil {
+		return 0, err
+	}
+	// Trimming unnecessary output
+	dirtyVersion := strings.Split(string(out), "\n")[1]
+	dirtyVersion = strings.TrimSpace(dirtyVersion)
+	dirtyVersion = strings.Split(dirtyVersion, ": ")[1]
+	MMP := strings.Split(dirtyVersion, ".") //Major, Minor, Patches
+	// Compiling Major and Minor to float
+	version, err := strconv.ParseFloat(fmt.Sprintf("%v.%v", MMP[0], MMP[1]), 4)
+	if err != nil {
+		return 0, err
+	}
+	return version, nil
 }

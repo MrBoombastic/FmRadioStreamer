@@ -71,7 +71,8 @@ func yt(ctx *fiber.Ctx) {
 			log.Println(err)
 		}
 		leds.BlueLedEnabled = true
-		err = condlers.Download("https://youtu.be/" + result.Items[0].ID.VideoID)
+		cfg := config.Get()
+		err = condlers.Download("https://youtu.be/"+result.Items[0].ID.VideoID, cfg.Format)
 		leds.BlueLedEnabled = false
 		if err != nil {
 			log.Println(err)
@@ -87,7 +88,8 @@ func download(ctx *fiber.Ctx) {
 		log.Println(err)
 	}
 	leds.BlueLedEnabled = true
-	err = condlers.Download(query)
+	cfg := config.Get()
+	err = condlers.Download(query, cfg.Format)
 	leds.BlueLedEnabled = false
 	if err != nil {
 		log.Println(err)

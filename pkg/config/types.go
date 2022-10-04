@@ -3,6 +3,7 @@ package config
 // Config is config.json structure of all available settings
 type Config struct {
 	Frequency         float64 `json:"freq"`
+	Format            string  `json:"format"`
 	Multiplier        float64 `json:"multiplier"`
 	PS                string  `json:"PS"`
 	RT                string  `json:"RT"`
