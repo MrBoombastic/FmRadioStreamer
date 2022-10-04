@@ -101,6 +101,41 @@ For pretty good audio quality, low file size and best conversion time, use Opus.
 some reason you can't use Opus format and have outdated `libsndfile1-dev` package, use WAV.
 Use MP3 if you don't want to re-encode your existing music library.
 
+## MP3 support
+
+1. Update your RPi (optional, but recommended).
+
+```bash
+sudo bash -c 'for i in update {,dist-}upgrade auto{remove,clean}; do apt-get $i -y; done'
+```
+
+2. Edit `/etc/apt/sources.list` file using your favourite editor, for example `sudo vim /etc/apt/sources.list`. In my
+   case, the file looks like this:
+
+```bash
+deb http://raspbian.raspberrypi.org/raspbian/ bullseye main contrib non-free rpi
+# Uncomment line below then 'apt-get update' to enable 'apt-get source'
+#deb-src http://raspbian.raspberrypi.org/raspbian/ bullseye main contrib non-free rpi
+```
+
+Replace `bullseye` with `bookworm`.
+
+```bash
+deb http://raspbian.raspberrypi.org/raspbian/ bookworm main contrib non-free rpi
+```
+
+3. Run `sudo apt update`. It wil say that 69420 packages can be updated - ignore that.
+4. Run `sudo apt install libsndfile1-dev`. It will update only this package and its dependencies.
+5. Confirm that `libsndfile1-dev` is now version 1.1.0 or later. Run `sudo apt-cache policy libsndfile1-dev`. My output:
+
+```bash
+libsndfile1-dev:
+  Installed: 1.1.0-2 
+(...)
+```
+
+5. Repeat step 1, but now revert `bookworm` to `bullseye`. Done. 🎉
+
 ## JSON settings
 
 | Option            | Description                                                                  | Type (additional info) | Default                                  | Notes                                                                                 |
