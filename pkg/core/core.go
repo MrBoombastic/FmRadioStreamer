@@ -65,12 +65,12 @@ func run(name string, args []string) error {
 	}
 	cmderr, _ := io.ReadAll(stderr)
 	if fmt.Sprintf("%s", cmderr) != "" {
-		log.Printf("PiFmAdv %s", cmderr)
+		log.Printf("PiFmAdv: %s", cmderr)
 	}
 	// Stdout commented out for clearer command output, safe to undo!
 	/*
 		cmdout, _ := io.ReadAll(stdout)
-		fmt.Printf("%s\n", cmdout)
+		fmt.Printf("PiFmADV: %s", cmdout)
 	*/
 	return nil
 }
