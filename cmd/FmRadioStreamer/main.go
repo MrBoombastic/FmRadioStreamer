@@ -18,7 +18,18 @@ import (
 )
 
 func main() {
+	// Checking if running via sudo
 	tools.CheckRoot()
+	// Checking libsndfile version
+	libsndfileVersion, err := tools.CheckLibsndfileVersion()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if libsndfileVersion >= 1.1 {
+		log.Println("INFO: This system can play MP3, Opus and WAV files.")
+	} else {
+		log.Println("INFO: This system can play only Opus and WAV files. MP3 is not supported. Update libsndfile1-dev.")
+	}
 	// Exit handler
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -28,11 +39,14 @@ func main() {
 	cfg := config.Get()
 	// Get local IP
 	tools.RefreshLocalIP()
-	log.Println("Your local IP is:", tools.LocalIP)
+	log.Println("INFO: Your local IP is:", tools.LocalIP)
 	log.Println("Starting peripherals")
 
 	// Init GPIO pins and leds
-	tools.InitGPIO()
+	err = tools.InitGPIO()
+	if err != nil {
+		log.Fatal(err)
+	}
 	leds.Init()
 	wg.Add(1)
 	go leds.QuadGreensLoop(&wg, ctx)
@@ -42,7 +56,12 @@ func main() {
 	if cfg.SSD1306 {
 		// Init screen
 		wg.Add(1)
-		go ssd1306.Init(&wg, ctx)
+		go func() {
+			err := ssd1306.Init(&wg, ctx)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}()
 	}
 
 	// Init buttons
@@ -59,7 +78,12 @@ func main() {
 
 	// Starting dashboard and core with no music
 	log.Println("Starting dashboard")
-	go dashboard.Init()
+	go func() {
+		err := dashboard.Init()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 	log.Println("Starting core")
 	core.Play("")
 	log.Println("Core started")
