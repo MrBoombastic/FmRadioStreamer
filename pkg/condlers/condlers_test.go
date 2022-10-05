@@ -43,7 +43,7 @@ func TestDownload(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	err = Download("https://www.youtube.com/watch?v=lp7zvP4GxQA", "mp3")
+	err = Download("https://www.youtube.com/watch?v=lp7zvP4GxQA", "opus")
 	if err != nil {
 		t.Error(err)
 		return
