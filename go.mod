@@ -10,7 +10,7 @@ require (
 	golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec
 	periph.io/x/conn/v3 v3.7.0
 	periph.io/x/devices/v3 v3.6.15
-	periph.io/x/host/v3 v3.7.2
+	periph.io/x/host/v3 v3.8.0
 )
 
 require (
