@@ -29,8 +29,10 @@ func GenerateOptions(audio string) []string {
 		"--mpx", fmt.Sprintf("%v", cfg.Mpx),
 		"--ctl", "rds_ctl",
 	}
-	if audio != "" {
+	if audio != "" && audio != "-" {
 		options = append(options, "--audio", fmt.Sprintf("./music/%v", audio))
+	} else if audio == "-" {
+		options = append(options, "--audio", "-")
 	}
 	return options
 }
@@ -89,7 +91,7 @@ func Kill() {
 	}
 }
 
-//Play generates options with GenerateOptions function and uses them when starting PiFimAdv
+// Play generates options with GenerateOptions function and launches PiFmAdv
 func Play(audio string) {
 	// Make sure that previous playback is stopped
 	Kill()
@@ -102,7 +104,46 @@ func Play(audio string) {
 	}()
 }
 
-//
+// Sox generates options with GenerateOptions function, launches SoX, then pipes output to PiFmAdv
+func Sox(path string) {
+	// Make sure that previous playback is stopped
+	Kill()
+	go func() {
+		options := GenerateOptions("-")
+		textoptions := fmt.Sprintf("sox %v -t wav - | sudo core/pi_fm_adv %v", path, strings.Join(options, " "))
+
+		// Go is doing some weird things when using "|" in exec.Command, so we will run command through temp script
+		file, err := os.Create("temp.sh")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer func(file *os.File) {
+			err := file.Close()
+			if err != nil {
+				log.Println(err)
+				return
+			}
+		}(file)
+
+		_, err = file.WriteString(textoptions)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		cmd, err := exec.Command("/bin/sh", "temp.sh").Output()
+		if err != nil {
+			fmt.Println(err)
+		}
+		// AlLoCaTiOnS aRe BaD!
+		_, err = os.Stdout.Write(cmd)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}()
+}
+
 var alternateRT = config.GetRT()
 var currentRTState = 0
 

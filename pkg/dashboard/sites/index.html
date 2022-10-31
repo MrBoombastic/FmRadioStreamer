@@ -56,7 +56,7 @@
                 </div>
                 <div class="btn-group" role="group" aria-label="Basic mixed styles example">
                     <button type="button" class="btn btn-success"
-                            onclick="niceFetch('./api/play?q=' + document.getElementById('musicpicker').value)">Play
+                            onclick="niceFetch('./api/playFile?q=' + document.getElementById('musicpicker').value)">Play
                     </button>
                     <button type="button" class="btn btn-outline-info" onclick="refreshMusic()">Refresh</button>
                     <button type="button" class="btn btn-outline-warning" onclick="niceFetch('./api/stop')">Stop
@@ -71,19 +71,32 @@
                 <div class="col-md-6 col-sm-12">
                     <div class="card bg-dark h-100">
                         <div class="card-body">
-                            <p class="card-title text-white">Search and download</p>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="youtube-switch">
-                                <label class="form-check-label text-white" for="youtube-switch">Pass input directly to
-                                    youtube-dl</label>
-                            </div>
+                            <p class="card-title text-white">Audio Center</p>
                             <div class="input-group">
                                 <input type="text" class="form-control bg-dark text-white" id="youtube-input"
                                        placeholder="Brick Hustley - Don't give up">
                                 <button id="youtube-search" type="button" class="btn btn-primary">Search</button>
                                 <button id="youtube-download" type="button" class="btn btn-success"
-                                        onclick="niceFetch(`./api/${direct ? 'download' : 'yt'}?q=${encodeURIComponent(document.getElementById('youtube-input').value)}`)">
+                                        onclick="niceFetch(`./api/yt?q=${encodeURIComponent(document.getElementById('youtube-input').value)}`)">
                                     Download
+                                </button>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-dark text-white" id="ytdl-input"
+                                       placeholder="https://www.youtube.com/watch?v=Vhh_GeBPOhs">
+                                <button id="ytdl-download" type="button" class="btn btn-success"
+                                        onclick="niceFetch(`./api/youtubeDl?q=${encodeURIComponent(document.getElementById('ytdl-input').value)}`)">
+                                    Download
+                                </button>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-dark text-white" id="stream-input"
+                                       placeholder="http://localhost:8000/stream.mp3">
+                                <button id="stream" type="button" class="btn btn-success"
+                                        onclick="niceFetch(`./api/playStream?q=${encodeURIComponent(document.getElementById('stream-input').value)}`)">
+                                    Stream
                                 </button>
                             </div>
                         </div>

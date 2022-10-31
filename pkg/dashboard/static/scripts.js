@@ -1,12 +1,10 @@
 const configs = document.getElementById("config-row");
 const logs = document.getElementById("logs");
 const youtubeSearchButton = document.getElementById("youtube-search");
-const youtubeSwitchButton = document.getElementById("youtube-switch");
 const youtubeInput = document.getElementById("youtube-input");
 const youtubeThumbnail = document.getElementById("youtube-thumb");
 const yotubeURL = document.getElementById("youtube-url");
 
-let direct = false;
 
 const errorHandler = async (data, endpoint, errored = false) => {
     endpoint = endpoint.replace("./api", "").split('?')[0];
@@ -83,16 +81,4 @@ youtubeSearchButton.addEventListener("click", async () => {
     });
     youtubeThumbnail.src = data.snippet.thumbnails.high.url;
     yotubeURL.href = "https://youtu.be/" + data?.id?.videoId;
-});
-
-youtubeSwitchButton.addEventListener("click", async () => {
-    if (youtubeSwitchButton.checked) {
-        youtubeSearchButton.setAttribute("disabled", "disabled");
-        youtubeInput.setAttribute("placeholder", "https://www.youtube.com/watch?v=Vhh_GeBPOhs");
-        direct = true;
-    } else {
-        direct = false;
-        youtubeSearchButton.removeAttribute("disabled");
-        youtubeInput.setAttribute("placeholder", "Brick Hustley - Don't give up");
-    }
 });

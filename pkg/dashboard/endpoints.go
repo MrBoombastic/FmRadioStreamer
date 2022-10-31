@@ -80,8 +80,8 @@ func yt(ctx *fiber.Ctx) {
 	}
 }
 
-// download endpoint performs downloading audio from other sites
-func download(ctx *fiber.Ctx) {
+// youtubeDl endpoint performs downloading audio from other sites
+func youtubeDl(ctx *fiber.Ctx) {
 	query := ctx.Query("q")
 	err := ctx.SendStatus(200)
 	if err != nil {
@@ -96,10 +96,20 @@ func download(ctx *fiber.Ctx) {
 	}
 }
 
-// play endpoint plays selected file
-func play(ctx *fiber.Ctx) {
+// playFile endpoint plays selected file
+func playFile(ctx *fiber.Ctx) {
 	query := ctx.Query("q")
 	core.Play(query)
+	err := ctx.SendStatus(200)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+// playStream endpoint plays remote file via SoX
+func playStream(ctx *fiber.Ctx) {
+	query := ctx.Query("q")
+	core.Sox(query)
 	err := ctx.SendStatus(200)
 	if err != nil {
 		log.Println(err)
