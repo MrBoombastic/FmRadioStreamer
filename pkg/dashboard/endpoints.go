@@ -109,11 +109,20 @@ func playFile(ctx *fiber.Ctx) {
 // playStream endpoint plays remote file via SoX
 func playStream(ctx *fiber.Ctx) {
 	query := ctx.Query("q")
-	core.Sox(query)
-	err := ctx.SendStatus(200)
-	if err != nil {
-		log.Println(err)
-	}
+	go func() {
+		err := core.Sox(query)
+		if err != nil {
+			log.Println(err)
+			err = ctx.SendStatus(500)
+			if err != nil {
+				log.Println(err)
+			}
+		}
+		err = ctx.SendStatus(200)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 }
 
 // save endpoint updates current config

@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="FmRadioStream Web Dashboard">
+    <meta name="description" content="FmRadioStreamer Web Dashboard">
     <meta name="author" content="MrBoombastic">
     <link rel='shortcut icon' type='image/x-icon' href='../static/favicon.ico'/>
     <title>FmRadioStreamer</title>
@@ -86,6 +86,9 @@
                                         onclick="niceFetch(`./api/playStream?q=${encodeURIComponent(document.getElementById('stream-input').value)}`)">
                                     Stream
                                 </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="niceFetch('./api/stop')">
+                                    Stop
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -98,7 +101,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="card mb-3 bg-dark h-100">
+                    <div class="card mb-3 bg-dark">
                         <div class="row g-0">
                             <div class="col-4">
                                 <a href id="youtube-url" target="_blank">

@@ -84,8 +84,15 @@ func main() {
 			log.Fatal(err)
 		}
 	}()
+
 	log.Println("Starting core")
-	core.Play("")
+	go func() {
+		err = core.Play("")
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
 	log.Println("Core started")
 	log.Println("Starting procedure done!")
 

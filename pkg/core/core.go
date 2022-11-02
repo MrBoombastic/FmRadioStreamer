@@ -42,7 +42,7 @@ func run(name string, args []string) error {
 	PiFmAdv := exec.Command(name, args...)
 	stderr, err := PiFmAdv.StderrPipe()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	// Stdout commented out for clearer command output, safe to undo!
 	/*
@@ -78,70 +78,76 @@ func run(name string, args []string) error {
 }
 
 // Kill stops PiFmAdv using pkill and SIGINT
-func Kill() {
+func Kill() error {
 	cmd := exec.Command("pkill", "-2", "pi_fm_adv")
 	err := cmd.Start()
 	if err != nil {
-		log.Fatal("ERROR: pkill:", err)
+		return fmt.Errorf("pkill: %v", err)
 	}
 	err = cmd.Wait()
 	// Preventing RPi overloading
 	if err != nil {
-		log.Println("INFO: pkill:", err)
+		fmt.Println(err)
+		if err.Error() == "exit status 1" {
+			return nil
+		}
+		return fmt.Errorf("pkill: %v", err)
 	}
+	return nil
 }
 
 // Play generates options with GenerateOptions function and launches PiFmAdv
-func Play(audio string) {
+func Play(audio string) error {
 	// Make sure that previous playback is stopped
-	Kill()
-	go func() {
-		options := GenerateOptions(audio)
-		err := run("core/pi_fm_adv", options)
-		if err != nil {
-			log.Println(err)
-		}
-	}()
+	err := Kill()
+	if err != nil {
+		return err
+	}
+	options := GenerateOptions(audio)
+	err = run("core/pi_fm_adv", options)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Sox generates options with GenerateOptions function, launches SoX, then pipes output to PiFmAdv
-func Sox(path string) {
+func Sox(path string) error {
 	// Make sure that previous playback is stopped
-	Kill()
-	go func() {
-		options := GenerateOptions("-")
-		textoptions := fmt.Sprintf("sox %v -t wav - | sudo core/pi_fm_adv %v", path, strings.Join(options, " "))
+	err := Kill()
+	if err != nil {
+		return err
+	}
+	options := GenerateOptions("-")
+	textoptions := fmt.Sprintf("sox %v -t wav - | sudo core/pi_fm_adv %v", path, strings.Join(options, " "))
 
-		// Go is doing some weird things when using "|" in exec.Command, so we will run command through temp script
-		file, err := os.Create("temp.sh")
+	// Go is doing some weird things when using "|" in exec.Command, so we will run command through temp script
+	file, err := os.Create("temp.sh")
+	if err != nil {
+		return err
+	}
+	defer func(file *os.File) {
+		err := file.Close()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return
 		}
-		defer func(file *os.File) {
-			err := file.Close()
-			if err != nil {
-				log.Println(err)
-				return
-			}
-		}(file)
+	}(file)
 
-		_, err = file.WriteString(textoptions)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		cmd, err := exec.Command("/bin/sh", "temp.sh").Output()
-		if err != nil {
-			fmt.Println(err)
-		}
-		// AlLoCaTiOnS aRe BaD!
-		_, err = os.Stdout.Write(cmd)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}()
+	_, err = file.WriteString(textoptions)
+	if err != nil {
+		return err
+	}
+	cmd, err := exec.Command("/bin/sh", "temp.sh").Output()
+	if err != nil {
+		return err
+	}
+	// AlLoCaTiOnS aRe BaD!
+	_, err = os.Stdout.Write(cmd)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 var alternateRT = config.GetRT()
