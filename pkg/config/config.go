@@ -2,7 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"log"
 	"os"
 )
@@ -54,9 +54,9 @@ func GetMap() map[string]interface{} {
 func Save(newConfig Config) {
 	currentConfig = newConfig
 	file, err := json.MarshalIndent(currentConfig, "", "  ")
-	err = ioutil.WriteFile("config.json", file, 0644)
+	err = os.WriteFile("config.json", file, 0644)
 	if err != nil {
-		log.Println(err)
+		logs.PiFmAdvError(err)
 	}
 
 }

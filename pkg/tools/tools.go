@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"github.com/stianeikeland/go-rpio/v4"
-	"io/ioutil"
-	"log"
+	"io"
 	"net"
 	"net/http"
 	urltool "net/url"
@@ -24,7 +24,7 @@ var LocalIP net.IP
 func RefreshLocalIP() {
 	conn, err := net.Dial("udp", "8.8.8.8:80") // It will not actually connect
 	if err != nil {
-		log.Println("WARNING: Failed to get local IP address! Falling back to localhost...")
+		logs.PiFmAdvWarn("Failed to get local IP address! Falling back to localhost...")
 		LocalIP = net.ParseIP("127.0.0.1")
 	}
 	defer conn.Close()
@@ -66,13 +66,12 @@ func SearchYouTube(query string) (YouTubeAPIResult, error) {
 	if res.Body != nil {
 		defer res.Body.Close()
 	}
-	body, readErr := ioutil.ReadAll(res.Body)
+	body, readErr := io.ReadAll(res.Body)
 	if readErr != nil {
 		return YouTubeAPIResult{}, readErr
 	}
 
 	result := YouTubeAPIResult{}
-	//fmt.Println(string(body))
 	jsonErr := json.Unmarshal(body, &result)
 	if jsonErr != nil {
 		return YouTubeAPIResult{}, jsonErr
@@ -84,7 +83,7 @@ func SearchYouTube(query string) (YouTubeAPIResult, error) {
 // CheckRoot checks if user has root permissions. If not, exits application.
 func CheckRoot() {
 	if os.Geteuid() != 0 {
-		log.Println("WARNING: Not running as root! Exiting...")
+		logs.FmRadStrError("Not running as root! Exiting...")
 		os.Exit(0)
 	}
 }

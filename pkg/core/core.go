@@ -1,8 +1,10 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"golang.org/x/sys/unix"
 	"io"
 	"log"
@@ -66,20 +68,26 @@ func run(name string, args []string) error {
 		}
 	}
 	cmderr, _ := io.ReadAll(stderr)
-	if fmt.Sprintf("%s", cmderr) != "" {
-		log.Printf("PiFmAdv: %s", cmderr)
+	formattedError := strings.TrimSpace(fmt.Sprintf("%s", cmderr))
+	if formattedError != "" {
+		if strings.Contains(formattedError, "WARNING:") {
+			formattedError = strings.Replace(formattedError, "WARNING: ", "", 1)
+			logs.PiFmAdvWarn(formattedError)
+		} else {
+			logs.PiFmAdvError(formattedError)
+		}
 	}
 	// Stdout commented out for clearer command output, safe to undo!
 	/*
 		cmdout, _ := io.ReadAll(stdout)
-		fmt.Printf("PiFmADV: %s", cmdout)
+		logs.PiFmAdv.Info().Send("%v", cmdout)
 	*/
 	return nil
 }
 
 // Kill stops PiFmAdv using pkill and SIGINT
 func Kill() error {
-	cmd := exec.Command("pkill", "-2", "pi_fm_adv")
+	cmd := exec.Command("sudo", "pkill", "-2", "pi_fm_adv")
 	err := cmd.Start()
 	if err != nil {
 		return fmt.Errorf("pkill: %v", err)
@@ -87,7 +95,6 @@ func Kill() error {
 	err = cmd.Wait()
 	// Preventing RPi overloading
 	if err != nil {
-		fmt.Println(err)
 		if err.Error() == "exit status 1" {
 			return nil
 		}
@@ -129,7 +136,7 @@ func Sox(path string) error {
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			log.Println(err)
+			log.Fatalln(err)
 			return
 		}
 	}(file)
@@ -140,7 +147,9 @@ func Sox(path string) error {
 	}
 	cmd, err := exec.Command("/bin/sh", "temp.sh").Output()
 	if err != nil {
-		return err
+		if err.Error() != "exit status 2" {
+			return err
+		}
 	}
 	// AlLoCaTiOnS aRe BaD!
 	_, err = os.Stdout.Write(cmd)
@@ -154,44 +163,38 @@ var alternateRT = config.GetRT()
 var currentRTState = 0
 
 // RotateRT enables switching RT between that saved in config and current playing audio filename
-func RotateRT() {
+func RotateRT() error {
 	err := os.Remove("rds_ctl")
 	if err != nil {
-		log.Println("ERROR: Cannot remove rds_ctl pipe file. Missing?")
+		return errors.New("cannot remove rds_ctl pipe file, maybe it's missing")
 	}
 	err = unix.Mkfifo("rds_ctl", 0666)
 	if err != nil {
-		log.Println("ERROR: Cannot create pipe file: ", err)
-		return
+		return fmt.Errorf("cannot create pipe file: %v", err)
 	}
 	f, err := os.OpenFile("rds_ctl", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
-		log.Println("ERROR: Cannot open pipe file: ", err)
-		return
+		return fmt.Errorf("cannot open pipe file: %v", err)
 	}
 	for {
 		if currentRTState == 0 {
 			_, err := f.WriteString("AB ON\n")
 			if err != nil {
-				log.Println("ERROR: Cannot update dynamic RT text (A/B flag)")
-				break
+				return errors.New("cannot update dynamic RT text (A/B flag)")
 			}
 			_, err = f.WriteString(fmt.Sprintf("RT %s", config.GetRT()))
 			if err != nil {
-				log.Println("ERROR: Cannot update dynamic RT text")
-				break
+				return errors.New("cannot update dynamic RT text")
 			}
 			currentRTState++
 		} else {
 			_, err := f.WriteString("AB OFF\n")
 			if err != nil {
-				log.Println("ERROR: Cannot update dynamic RT text (A/B flag)")
-				break
+				return errors.New("ERROR: Cannot update dynamic RT text (A/B flag)")
 			}
 			_, err = f.WriteString(fmt.Sprintf("RT %s", alternateRT))
 			if err != nil {
-				log.Println("ERROR: Cannot update dynamic RT text")
-				break
+				return errors.New("ERROR: Cannot update dynamic RT text")
 			}
 			currentRTState--
 		}

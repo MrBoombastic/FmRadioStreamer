@@ -8,6 +8,7 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/dashboard"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"log"
@@ -26,9 +27,9 @@ func main() {
 		log.Fatal(err)
 	}
 	if libsndfileVersion >= 1.1 {
-		log.Println("INFO: This system can play MP3, Opus and WAV files.")
+		logs.FmRadStrInfo("This system can play MP3, Opus and WAV files.")
 	} else {
-		log.Println("INFO: This system can play only Opus and WAV files. MP3 is not supported. Update libsndfile1-dev.")
+		logs.FmRadStrInfo("This system can play only Opus and WAV files. MP3 is not supported. Update libsndfile1-dev.")
 	}
 	// Exit handler
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -39,8 +40,8 @@ func main() {
 	cfg := config.Get()
 	// Get local IP
 	tools.RefreshLocalIP()
-	log.Println("INFO: Your local IP is:", tools.LocalIP)
-	log.Println("Starting peripherals")
+	logs.FmRadStrInfo(fmt.Sprintf("Your local IP is: %v", tools.LocalIP))
+	logs.FmRadStrInfo("Starting peripherals")
 
 	// Init GPIO pins and leds
 	err = tools.InitGPIO()
@@ -68,16 +69,19 @@ func main() {
 	buttons.Init()
 	wg.Add(1)
 	go buttons.Listen(&wg, ctx)
-	log.Println("Peripherals started")
+	logs.FmRadStrInfo("Peripherals started")
 
+	// Init Dynamic Radio Text
 	if cfg.DynamicRT {
-		log.Println("Starting dynamic RDS control")
-		go core.RotateRT()
-		log.Println("Dynamic RDS control started")
+		go func() {
+			err := core.RotateRT()
+			if err != nil {
+				logs.FmRadStrError(err)
+			}
+		}()
 	}
 
 	// Starting dashboard and core with no music
-	log.Println("Starting dashboard")
 	go func() {
 		err := dashboard.Init()
 		if err != nil {
@@ -85,7 +89,7 @@ func main() {
 		}
 	}()
 
-	log.Println("Starting core")
+	logs.FmRadStrInfo("Starting core")
 	go func() {
 		err = core.Play("")
 		if err != nil {
@@ -93,8 +97,8 @@ func main() {
 		}
 	}()
 
-	log.Println("Core started")
-	log.Println("Starting procedure done!")
+	logs.FmRadStrInfo("Core started")
+	logs.FmRadStrInfo("Ready!")
 
 	wg.Wait()
 
@@ -103,8 +107,8 @@ func main() {
 	// This should be executed, but it works fine whithout it and invoking it crashes my RPi :(
 	// tools.StopGPIO()
 	fmt.Println() // Usually "^C" is printed in the console, so it will be more pretty to go to next line
-	log.Println("Gracefully exiting")
-	log.Println("Killing core")
-	core.Kill()
-	log.Println("Gracefully exited")
+	logs.FmRadStrInfo("Gracefully exiting")
+	logs.FmRadStrInfo("Killing core")
+	_ = core.Kill()
+	logs.FmRadStrInfo("Gracefully exited. Bye!")
 }

@@ -4,9 +4,9 @@ import (
 	"embed"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
-	"log"
 	"net/http"
 )
 
@@ -49,7 +49,7 @@ func Init() error {
 
 	// Start!
 	port := config.GetPort()
-	log.Printf("INFO: Launching dashboard at http://localhost:%v\n", port)
+	logs.FmRadStrInfo(fmt.Sprintf("Launching dashboard at http://localhost:%v", port))
 	err := app.Listen(fmt.Sprintf(":%v", config.GetPort()))
 	if err != nil {
 		return err
