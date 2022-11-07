@@ -8,7 +8,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.39.0
 	github.com/stianeikeland/go-rpio/v4 v4.6.0
 	golang.org/x/image v0.1.0
-	golang.org/x/sys v0.1.0
+	golang.org/x/sys v0.2.0
 	periph.io/x/conn/v3 v3.7.0
 	periph.io/x/devices/v3 v3.7.0
 	periph.io/x/host/v3 v3.8.0
