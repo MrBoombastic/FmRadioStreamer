@@ -32,7 +32,7 @@ func stop(ctx *fiber.Ctx) {
 
 // offair kill PiFmAdv entirely
 func offair(ctx *fiber.Ctx) {
-	err := core.Kill()
+	err := tools.Pkill("pi_fm_adv")
 	if err != nil {
 		logs.FmRadStrError(err)
 		_ = ctx.SendStatus(500)

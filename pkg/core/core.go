@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"golang.org/x/sys/unix"
 	"io"
 	"log"
@@ -85,28 +86,10 @@ func run(name string, args []string) error {
 	return nil
 }
 
-// Kill stops PiFmAdv using pkill and SIGINT
-func Kill() error {
-	cmd := exec.Command("sudo", "pkill", "-2", "pi_fm_adv")
-	err := cmd.Start()
-	if err != nil {
-		return fmt.Errorf("pkill: %v", err)
-	}
-	err = cmd.Wait()
-	// Preventing RPi overloading
-	if err != nil {
-		if err.Error() == "exit status 1" {
-			return nil
-		}
-		return fmt.Errorf("pkill: %v", err)
-	}
-	return nil
-}
-
 // Play generates options with GenerateOptions function and launches PiFmAdv
 func Play(audio string) error {
 	// Make sure that previous playback is stopped
-	err := Kill()
+	err := tools.Pkill("pi_fm_adv")
 	if err != nil {
 		return err
 	}
@@ -121,7 +104,7 @@ func Play(audio string) error {
 // Sox generates options with GenerateOptions function, launches SoX, then pipes output to PiFmAdv
 func Sox(path string) error {
 	// Make sure that previous playback is stopped
-	err := Kill()
+	err := tools.Pkill("pi_fm_adv")
 	if err != nil {
 		return err
 	}

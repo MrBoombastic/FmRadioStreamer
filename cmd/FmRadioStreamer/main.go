@@ -109,6 +109,6 @@ func main() {
 	fmt.Println() // Usually "^C" is printed in the console, so it will be more pretty to go to next line
 	logs.FmRadStrInfo("Gracefully exiting")
 	logs.FmRadStrInfo("Killing core")
-	_ = core.Kill()
+	_ = tools.Pkill("pi_fm_adv")
 	logs.FmRadStrInfo("Gracefully exited. Bye!")
 }

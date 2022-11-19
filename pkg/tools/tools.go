@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-// LocalIP stores local IP of the devices
+// LocalIP stores local IP of the device
 var LocalIP net.IP
 
 // RefreshLocalIP fetches current local IP and saves it to LocalIP variable
@@ -45,6 +45,24 @@ func StopGPIO() error {
 	err := rpio.Close()
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+// Pkill is a function wrapping pkill command
+func Pkill(process string) error {
+	cmd := exec.Command("sudo", "pkill", "-2", process)
+	err := cmd.Start()
+	if err != nil {
+		return fmt.Errorf("pkill init: %v", err)
+	}
+	err = cmd.Wait()
+	// Preventing RPi overloading
+	if err != nil {
+		if err.Error() == "exit status 1" {
+			return nil
+		}
+		return fmt.Errorf("pkill result: %v", err)
 	}
 	return nil
 }
