@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
+	"github.com/arduino/go-apt-client"
 	"github.com/stianeikeland/go-rpio/v4"
 	"io"
 	"net"
 	"net/http"
 	urltool "net/url"
 	"os"
-	"os/exec"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -89,19 +88,14 @@ func CheckRoot() {
 }
 
 func CheckLibsndfileVersion() (float64, error) {
-	out, err := exec.Command("sudo", "apt-cache", "policy", "libsndfile1-dev").Output()
+	lib, err := apt.Search("libsndfile1-dev")
+	if err != nil || len(lib) < 1 {
+		return 0, err
+	}
+	ver := lib[0].Version
+	floatVer, err := strconv.ParseFloat(ver[0:3], 64)
 	if err != nil {
 		return 0, err
 	}
-	// Trimming unnecessary output
-	dirtyVersion := strings.Split(string(out), "\n")[1]
-	dirtyVersion = strings.TrimSpace(dirtyVersion)
-	dirtyVersion = strings.Split(dirtyVersion, ": ")[1]
-	MMP := strings.Split(dirtyVersion, ".") //Major, Minor, Patches
-	// Compiling Major and Minor to float
-	version, err := strconv.ParseFloat(fmt.Sprintf("%v.%v", MMP[0], MMP[1]), 4)
-	if err != nil {
-		return 0, err
-	}
-	return version, nil
+	return floatVer, nil
 }
