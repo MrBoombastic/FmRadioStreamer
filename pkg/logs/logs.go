@@ -4,12 +4,10 @@ import "github.com/BOOMfinity/golog"
 
 var FmRadStr golog.Logger
 var PiFmAdv golog.Logger
-var Pkill golog.Logger
 
 func init() {
 	FmRadStr = golog.New("FmRadioStreamer")
 	PiFmAdv = golog.New("PiFmAdv")
-	Pkill = golog.New("pkill")
 }
 
 func FmRadStrInfo(info interface{}) {
@@ -33,17 +31,5 @@ func PiFmAdvWarn(warn interface{}) {
 }
 
 func PiFmAdvError(err interface{}) {
-	PiFmAdv.Error().Send("%v", err)
-}
-
-func PkillInfo(info interface{}) {
-	PiFmAdv.Info().Send("%v", info)
-}
-
-func PkillWarn(warn interface{}) {
-	PiFmAdv.Warn().Send("%v", warn)
-}
-
-func PkillError(err interface{}) {
 	PiFmAdv.Error().Send("%v", err)
 }

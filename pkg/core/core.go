@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
-	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
+	"github.com/pbar1/pkill-go"
 	"golang.org/x/sys/unix"
 	"io"
 	"log"
@@ -89,7 +89,7 @@ func run(name string, args []string) error {
 // Play generates options with GenerateOptions function and launches PiFmAdv
 func Play(audio string) error {
 	// Make sure that previous playback is stopped
-	err := tools.Pkill("pi_fm_adv")
+	_, err := pkill.Pkill("pi_fm_adv", os.Interrupt)
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func Play(audio string) error {
 // Sox generates options with GenerateOptions function, launches SoX, then pipes output to PiFmAdv
 func Sox(path string) error {
 	// Make sure that previous playback is stopped
-	err := tools.Pkill("pi_fm_adv")
+	_, err := pkill.Pkill("pi_fm_adv", os.Interrupt)
 	if err != nil {
 		return err
 	}

@@ -11,6 +11,7 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
+	"github.com/pbar1/pkill-go"
 	"log"
 	"os"
 	"os/signal"
@@ -109,6 +110,6 @@ func main() {
 	fmt.Println() // Usually "^C" is printed in the console, so it will be more pretty to go to next line
 	logs.FmRadStrInfo("Gracefully exiting")
 	logs.FmRadStrInfo("Killing core")
-	_ = tools.Pkill("pi_fm_adv")
+	_, _ = pkill.Pkill("pi_fm_adv", os.Interrupt)
 	logs.FmRadStrInfo("Gracefully exited. Bye!")
 }

@@ -49,24 +49,6 @@ func StopGPIO() error {
 	return nil
 }
 
-// Pkill is a function wrapping pkill command
-func Pkill(process string) error {
-	cmd := exec.Command("sudo", "pkill", "-2", process)
-	err := cmd.Start()
-	if err != nil {
-		return fmt.Errorf("pkill init: %v", err)
-	}
-	err = cmd.Wait()
-	// Preventing RPi overloading
-	if err != nil {
-		if err.Error() == "exit status 1" {
-			return nil
-		}
-		return fmt.Errorf("pkill result: %v", err)
-	}
-	return nil
-}
-
 // SearchYouTube queries YouTube API and returns first found video
 func SearchYouTube(query string) (YouTubeAPIResult, error) {
 	url := fmt.Sprintf("https://youtube.googleapis.com/youtube/v3/search?key=%v&q=%v&part=snippet&maxResults=1&type=video", config.GetYouTubeAPIKey(), urltool.QueryEscape(query))

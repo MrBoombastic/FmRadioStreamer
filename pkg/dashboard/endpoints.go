@@ -9,7 +9,9 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"github.com/gofiber/fiber/v2"
+	"github.com/pbar1/pkill-go"
 	"log"
+	"os"
 )
 
 // music endpoint returns contents of `music` directory
@@ -32,7 +34,7 @@ func stop(ctx *fiber.Ctx) {
 
 // offair kill PiFmAdv entirely
 func offair(ctx *fiber.Ctx) {
-	err := tools.Pkill("pi_fm_adv")
+	_, err := pkill.Pkill("pi_fm_adv", os.Interrupt)
 	if err != nil {
 		logs.FmRadStrError(err)
 		_ = ctx.SendStatus(500)
