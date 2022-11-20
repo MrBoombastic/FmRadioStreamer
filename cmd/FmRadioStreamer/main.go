@@ -23,14 +23,12 @@ import (
 func main() {
 	// Checking if running via sudo
 	if !tools.CheckRoot() {
-		logs.FmRadStrError("Not running as root! Exiting...")
-		os.Exit(0)
+		logs.FmRadStrFatal("Not running as root! Exiting...")
 	}
 	// Checking libsndfile version
 	libsndfileVersion, err := tools.CheckLibsndfileVersion()
 	if err != nil {
-		logs.FmRadStrError("Couldn't check libsndfile1-dev version. Possibly dependencies are not installed. Exiting...")
-		os.Exit(0)
+		logs.FmRadStrFatal("Couldn't check libsndfile1-dev version. Possibly dependencies are not installed. Exiting...")
 	}
 	if libsndfileVersion >= 1.1 {
 		logs.FmRadStrInfo("This system can play MP3, Opus and WAV files.")
@@ -43,7 +41,10 @@ func main() {
 	var wg sync.WaitGroup
 
 	// Get current configuration
-	cfg := config.Get()
+	cfg, err := config.Get()
+	if err != nil {
+		logs.FmRadStrFatal("Couldn't retrieve config. Exiting...")
+	}
 	// Get local IP
 	tools.RefreshLocalIP()
 	logs.FmRadStrInfo(fmt.Sprintf("Your local IP is: %v", tools.LocalIP))

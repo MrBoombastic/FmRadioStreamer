@@ -14,8 +14,8 @@ func FmRadStrInfo(info interface{}) {
 	FmRadStr.Info().Send("%v", info)
 }
 
-func FmRadStrWarn(warn interface{}) {
-	FmRadStr.Warn().Send("%v", warn)
+func FmRadStrFatal(warn interface{}) {
+	FmRadStr.Fatal().Send("%v", warn)
 }
 
 func FmRadStrError(err interface{}) {
@@ -32,4 +32,13 @@ func PiFmAdvWarn(warn interface{}) {
 
 func PiFmAdvError(err interface{}) {
 	PiFmAdv.Error().Send("%v", err)
+}
+
+// PiFmAdvHandleError uses PiFmAdvError and returns true, if app should return
+func PiFmAdvHandleError(err error) bool {
+	if err != nil {
+		PiFmAdvError(err)
+		return true
+	}
+	return false
 }

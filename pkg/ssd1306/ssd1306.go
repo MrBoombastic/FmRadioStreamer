@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
@@ -108,7 +109,7 @@ func Refresh() {
 	if Screen == nil {
 		return
 	}
-	cfg := config.Get()
+	cfg, _ := config.Get()
 	Screen.StopScroll()
 	createImg()
 	writer(2, 11, cfg.PS)
@@ -132,6 +133,6 @@ func Refresh() {
 
 	err := Screen.Scroll(ssd1306.Left, ssd1306.FrameRate25, 16, 48)
 	if err != nil {
-		log.Println(err)
+		logs.FmRadStrError(err)
 	}
 }

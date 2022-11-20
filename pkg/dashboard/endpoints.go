@@ -10,7 +10,6 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"github.com/gofiber/fiber/v2"
 	"github.com/pbar1/pkill-go"
-	"log"
 	"os"
 )
 
@@ -67,8 +66,7 @@ func yt(ctx *fiber.Ctx) {
 	} else {
 		_ = ctx.SendStatus(200)
 		leds.BlueLedEnabled = true
-		cfg := config.Get()
-		err = condlers.Download("https://youtu.be/"+result.Items[0].ID.VideoID, cfg.Format)
+		err = condlers.Download("https://youtu.be/"+result.Items[0].ID.VideoID, config.GetFormat())
 		leds.BlueLedEnabled = false
 		if err != nil {
 			logs.FmRadStrError(err)
@@ -81,8 +79,7 @@ func youtubeDl(ctx *fiber.Ctx) {
 	query := ctx.Query("q")
 	_ = ctx.SendStatus(200)
 	leds.BlueLedEnabled = true
-	cfg := config.Get()
-	err := condlers.Download(query, cfg.Format)
+	err := condlers.Download(query, config.GetFormat())
 	leds.BlueLedEnabled = false
 	if err != nil {
 		logs.FmRadStrError(err)
@@ -131,6 +128,7 @@ func configuration(ctx *fiber.Ctx) {
 	configMap := config.GetMap()
 	err := ctx.JSON(configMap)
 	if err != nil {
-		log.Println(err)
+		logs.FmRadStrError(err)
+		_ = ctx.SendStatus(500)
 	}
 }

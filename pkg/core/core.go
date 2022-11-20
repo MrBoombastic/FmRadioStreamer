@@ -14,7 +14,7 @@ import (
 
 // GenerateOptions generates options to pass to PiFmAdv
 func GenerateOptions(params tools.Params) []string {
-	cfg := config.Get()
+	cfg, _ := config.Get()
 	options := []string{
 		"--ps", cfg.PS,
 		"--rt", cfg.RT,
@@ -90,9 +90,9 @@ func Play(params tools.Params) error {
 		if err != nil {
 			errorText := err.Error()
 			if errorText == "exit status 2" || errorText == "signal: interrupt" {
-				logs.PiFmAdvInfo("Expected PiFmAdv kill")
+				logs.PiFmAdvInfo("Expected exit")
 			} else {
-				errorString := "Unexpected PiFmAdv error."
+				errorString := "Unexpected error."
 				if !config.GetVerbose() {
 					errorString += " Use verbose option next time to get more information."
 				}

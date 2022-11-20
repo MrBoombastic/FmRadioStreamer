@@ -8,7 +8,6 @@ import (
 	"github.com/arduino/go-apt-client"
 	"github.com/stianeikeland/go-rpio/v4"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	urltool "net/url"
@@ -107,7 +106,7 @@ func TextToFile(text string, filename string) error {
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			log.Fatalln(err)
+			logs.FmRadStrError(err)
 			return
 		}
 	}(file)
