@@ -19,4 +19,5 @@ type Config struct {
 	SSD1306           bool    `json:"ssd1306"`
 	DynamicRT         bool    `json:"dynamicRT"`
 	DynamicRTInterval uint    `json:"dynamicRTInterval"`
+	Verbose           bool    `json:"verbose"`
 }

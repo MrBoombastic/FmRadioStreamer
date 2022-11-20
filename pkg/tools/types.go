@@ -1,6 +1,8 @@
 package tools
 
-import "time"
+import (
+	"time"
+)
 
 // YouTubeAPIResult is a structure of found videos from YouTube API
 type YouTubeAPIResult struct {
@@ -46,4 +48,16 @@ type YouTubeAPIResult struct {
 			PublishTime          time.Time `json:"publishTime"`
 		} `json:"snippet"`
 	} `json:"items"`
+}
+type AudioType string
+
+var (
+	SilenceType AudioType = "silence"
+	StreamType  AudioType = "stream"
+	FileType    AudioType = "audiofile"
+)
+
+type Params struct {
+	Type  AudioType
+	Audio string
 }

@@ -28,7 +28,11 @@ func music(ctx *fiber.Ctx) {
 
 // stop endpoint plays silence
 func stop(ctx *fiber.Ctx) {
-	core.Play("")
+	err := core.Play(tools.Params{Type: tools.SilenceType})
+	if err != nil {
+		logs.PiFmAdvError(err)
+		_ = ctx.SendStatus(500)
+	}
 	_ = ctx.SendStatus(200)
 }
 
@@ -88,9 +92,10 @@ func youtubeDl(ctx *fiber.Ctx) {
 // playFile endpoint plays selected file
 func playFile(ctx *fiber.Ctx) {
 	query := ctx.Query("q")
-	err := core.Play(query)
+	err := core.Play(tools.Params{Type: tools.FileType, Audio: query})
 	if err != nil {
 		logs.PiFmAdvError(err)
+		_ = ctx.SendStatus(500)
 	}
 	_ = ctx.SendStatus(200)
 }
@@ -98,7 +103,7 @@ func playFile(ctx *fiber.Ctx) {
 // playStream endpoint plays remote file via SoX
 func playStream(ctx *fiber.Ctx) {
 	query := ctx.Query("q")
-	err := core.Sox(query)
+	err := core.Play(tools.Params{Type: tools.StreamType, Audio: query})
 	if err != nil {
 		logs.PiFmAdvError(err)
 		_ = ctx.SendStatus(500)

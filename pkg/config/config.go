@@ -109,3 +109,8 @@ func GetRT() string {
 func GetDynamicRTInterval() uint {
 	return Get().DynamicRTInterval
 }
+
+// GetVerbose returns if app should be spitting out stdout from child processes
+func GetVerbose() bool {
+	return Get().Verbose
+}

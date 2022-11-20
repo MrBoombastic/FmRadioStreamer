@@ -8,10 +8,12 @@ import (
 	"github.com/arduino/go-apt-client"
 	"github.com/stianeikeland/go-rpio/v4"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	urltool "net/url"
 	"os"
+	"os/exec"
 	"strconv"
 	"time"
 )
@@ -79,12 +81,9 @@ func SearchYouTube(query string) (YouTubeAPIResult, error) {
 	return result, nil
 }
 
-// CheckRoot checks if user has root permissions. If not, exits application.
-func CheckRoot() {
-	if os.Geteuid() != 0 {
-		logs.FmRadStrError("Not running as root! Exiting...")
-		os.Exit(0)
-	}
+// CheckRoot checks if user has root permissions
+func CheckRoot() bool {
+	return os.Geteuid() == 0
 }
 
 func CheckLibsndfileVersion() (float64, error) {
@@ -98,4 +97,38 @@ func CheckLibsndfileVersion() (float64, error) {
 		return 0, err
 	}
 	return floatVer, nil
+}
+
+func TextToFile(text string, filename string) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Fatalln(err)
+			return
+		}
+	}(file)
+
+	_, err = file.WriteString(text)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func ExecCommand(name string, verbose bool, args ...string) error {
+	cmd := exec.Command(name, args...)
+	// Redirecting stdout and stdin from child process to master process
+	if verbose {
+		cmd.Stdout = os.Stdout
+	}
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	return nil
 }

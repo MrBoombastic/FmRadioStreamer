@@ -9,6 +9,7 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/dashboard"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/rt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"github.com/pbar1/pkill-go"
@@ -21,11 +22,15 @@ import (
 
 func main() {
 	// Checking if running via sudo
-	tools.CheckRoot()
+	if !tools.CheckRoot() {
+		logs.FmRadStrError("Not running as root! Exiting...")
+		os.Exit(0)
+	}
 	// Checking libsndfile version
 	libsndfileVersion, err := tools.CheckLibsndfileVersion()
 	if err != nil {
-		log.Fatal(err)
+		logs.FmRadStrError("Couldn't check libsndfile1-dev version. Possibly dependencies are not installed. Exiting...")
+		os.Exit(0)
 	}
 	if libsndfileVersion >= 1.1 {
 		logs.FmRadStrInfo("This system can play MP3, Opus and WAV files.")
@@ -74,8 +79,9 @@ func main() {
 
 	// Init Dynamic Radio Text
 	if cfg.DynamicRT {
+		rt.Primary, rt.Secondary = cfg.RT, cfg.RT
 		go func() {
-			err := core.RotateRT()
+			err := rt.Rotate(config.GetDynamicRTInterval())
 			if err != nil {
 				logs.FmRadStrError(err)
 			}
@@ -92,7 +98,7 @@ func main() {
 
 	logs.FmRadStrInfo("Starting core")
 	go func() {
-		err = core.Play("")
+		err = core.Play(tools.Params{Type: tools.SilenceType})
 		if err != nil {
 			log.Fatal(err)
 		}
