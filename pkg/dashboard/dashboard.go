@@ -52,9 +52,5 @@ func Init(cfg *config.SafeConfig) error {
 	port := cfg.Port
 	cfg.Unlock()
 	logs.FmRadStrInfo(fmt.Sprintf("Launching dashboard at http://localhost:%v", port))
-	err := app.Listen(fmt.Sprintf(":%v", port))
-	if err != nil {
-		return err
-	}
-	return nil
+	return app.Listen(fmt.Sprintf(":%v", port))
 }

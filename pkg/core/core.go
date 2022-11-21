@@ -38,8 +38,8 @@ func GenerateOptions(params tools.Params) []string {
 	return options
 }
 
-// run starts playing music, silence or stream via PiFmAdv. Needs mutex lock!
-func run(name string, params tools.Params) error {
+// run starts playing music, silence or stream via PiFmAdv.
+func run(name string, params tools.Params, verbose bool) error {
 	// Support for "dynamic" RDS - getting current playing file name - only in FileType mode!
 	if params.Type == tools.FileType {
 		extension := filepath.Ext(params.Audio)
@@ -56,7 +56,7 @@ func run(name string, params tools.Params) error {
 	// Actual playing audio starts here!
 	if params.Type == tools.FileType || params.Type == tools.SilenceType {
 		logs.FmRadStrInfo(fmt.Sprintf("Executing %v as a child process. Output below:", name))
-		err := tools.ExecCommand(name, params.Cfg.Verbose, GenerateOptions(params)...)
+		err := tools.ExecCommand(name, verbose, GenerateOptions(params)...)
 		if err != nil {
 			return err
 		}
@@ -71,7 +71,7 @@ func run(name string, params tools.Params) error {
 			return err
 		}
 		logs.FmRadStrInfo(fmt.Sprintf("Executing streaming shell script as a child process. Output below:"))
-		err = tools.ExecCommand("/bin/sh", params.Cfg.Verbose, "temp.sh")
+		err = tools.ExecCommand("/bin/sh", verbose, "temp.sh")
 		if err != nil {
 			return err
 		}
@@ -88,20 +88,21 @@ func Play(params tools.Params) error {
 	}
 	go func() {
 		params.Cfg.Lock()
-		err := run("core/pi_fm_adv", params)
+		verbose := params.Cfg.Verbose
+		params.Cfg.Unlock()
+		err := run("core/pi_fm_adv", params, verbose)
 		if err != nil {
 			errorText := err.Error()
 			if errorText == "exit status 2" || errorText == "signal: interrupt" {
 				logs.PiFmAdvInfo("Expected exit")
 			} else {
 				errorString := "Unexpected error."
-				if !params.Cfg.Verbose {
+				if !verbose {
 					errorString += " Use verbose option next time to get more information."
 				}
 				logs.PiFmAdvError(fmt.Sprintf("%v %v", errorString, err))
 			}
 		}
-		params.Cfg.Unlock()
 	}()
 	return nil
 }

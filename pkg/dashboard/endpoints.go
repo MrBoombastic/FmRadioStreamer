@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/condlers"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
@@ -27,7 +26,7 @@ func music(ctx *RadioContext) {
 
 // stop endpoint plays silence
 func stop(ctx *RadioContext) {
-	err := core.Play(tools.Params{Type: tools.SilenceType})
+	err := core.Play(tools.Params{Type: tools.SilenceType, Cfg: ctx.Cfg})
 	if err != nil {
 		logs.PiFmAdvError(err)
 		_ = ctx.Fiber.SendStatus(500)
@@ -98,7 +97,7 @@ func youtubeDl(ctx *RadioContext) {
 // playFile endpoint plays selected file
 func playFile(ctx *RadioContext) {
 	query := ctx.Fiber.Query("q")
-	err := core.Play(tools.Params{Type: tools.FileType, Audio: query})
+	err := core.Play(tools.Params{Type: tools.FileType, Audio: query, Cfg: ctx.Cfg})
 	if err != nil {
 		logs.PiFmAdvError(err)
 		_ = ctx.Fiber.SendStatus(500)
@@ -109,7 +108,7 @@ func playFile(ctx *RadioContext) {
 // playStream endpoint plays remote file via SoX
 func playStream(ctx *RadioContext) {
 	query := ctx.Fiber.Query("q")
-	err := core.Play(tools.Params{Type: tools.StreamType, Audio: query})
+	err := core.Play(tools.Params{Type: tools.StreamType, Audio: query, Cfg: ctx.Cfg})
 	if err != nil {
 		logs.PiFmAdvError(err)
 		_ = ctx.Fiber.SendStatus(500)
@@ -139,7 +138,6 @@ func configuration(ctx *RadioContext) {
 	ctx.Cfg.Lock()
 	configMap := tools.ConfigToMap(ctx.Cfg)
 	ctx.Cfg.Unlock()
-	fmt.Println(configMap)
 	err := ctx.Fiber.JSON(configMap)
 	if err != nil {
 		logs.FmRadStrError(err)

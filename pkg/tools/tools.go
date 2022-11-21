@@ -132,6 +132,7 @@ func ExecCommand(name string, verbose bool, args ...string) error {
 	return nil
 }
 
+// ConfigToMap converts given config to map. Needs mutex locked!
 func ConfigToMap(cfg *config.SafeConfig) map[string]interface{} {
 	var data map[string]interface{}
 	raw, _ := json.Marshal(cfg.Config)
