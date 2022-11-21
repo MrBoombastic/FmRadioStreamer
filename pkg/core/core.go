@@ -38,7 +38,7 @@ func GenerateOptions(params tools.Params) []string {
 	return options
 }
 
-// run starts playing music, silence or stream via PiFmAdv
+// run starts playing music, silence or stream via PiFmAdv. Needs mutex lock!
 func run(name string, params tools.Params) error {
 	// Support for "dynamic" RDS - getting current playing file name - only in FileType mode!
 	if params.Type == tools.FileType {
@@ -56,9 +56,7 @@ func run(name string, params tools.Params) error {
 	// Actual playing audio starts here!
 	if params.Type == tools.FileType || params.Type == tools.SilenceType {
 		logs.FmRadStrInfo(fmt.Sprintf("Executing %v as a child process. Output below:", name))
-		params.Cfg.Lock()
 		err := tools.ExecCommand(name, params.Cfg.Verbose, GenerateOptions(params)...)
-		params.Cfg.Unlock()
 		if err != nil {
 			return err
 		}
@@ -73,9 +71,7 @@ func run(name string, params tools.Params) error {
 			return err
 		}
 		logs.FmRadStrInfo(fmt.Sprintf("Executing streaming shell script as a child process. Output below:"))
-		params.Cfg.Lock()
 		err = tools.ExecCommand("/bin/sh", params.Cfg.Verbose, "temp.sh")
-		params.Cfg.Unlock()
 		if err != nil {
 			return err
 		}
@@ -91,6 +87,7 @@ func Play(params tools.Params) error {
 		return err
 	}
 	go func() {
+		params.Cfg.Lock()
 		err := run("core/pi_fm_adv", params)
 		if err != nil {
 			errorText := err.Error()
@@ -98,14 +95,13 @@ func Play(params tools.Params) error {
 				logs.PiFmAdvInfo("Expected exit")
 			} else {
 				errorString := "Unexpected error."
-				params.Cfg.Lock()
 				if !params.Cfg.Verbose {
 					errorString += " Use verbose option next time to get more information."
 				}
-				params.Cfg.Unlock()
 				logs.PiFmAdvError(fmt.Sprintf("%v %v", errorString, err))
 			}
 		}
+		params.Cfg.Unlock()
 	}()
 	return nil
 }
