@@ -136,9 +136,7 @@ func save(ctx *RadioContext) {
 
 // configuration endpoint returns current config
 func configuration(ctx *RadioContext) {
-	fmt.Println("chuj")
 	ctx.Cfg.Lock()
-	fmt.Println("chuj2")
 	configMap := tools.ConfigToMap(ctx.Cfg)
 	ctx.Cfg.Unlock()
 	fmt.Println(configMap)
