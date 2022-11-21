@@ -50,8 +50,8 @@ func StopGPIO() error {
 }
 
 // SearchYouTube queries YouTube API and returns first found video
-func SearchYouTube(query string) (YouTubeAPIResult, error) {
-	url := fmt.Sprintf("https://youtube.googleapis.com/youtube/v3/search?key=%v&q=%v&part=snippet&maxResults=1&type=video", config.GetYouTubeAPIKey(), urltool.QueryEscape(query))
+func SearchYouTube(query string, apikey string) (YouTubeAPIResult, error) {
+	url := fmt.Sprintf("https://youtube.googleapis.com/youtube/v3/search?key=%v&q=%v&part=snippet&maxResults=1&type=video", apikey, urltool.QueryEscape(query))
 	client := http.Client{
 		Timeout: time.Second * 5,
 	}
@@ -130,4 +130,12 @@ func ExecCommand(name string, verbose bool, args ...string) error {
 		return err
 	}
 	return nil
+}
+
+func ConfigToMap(cfg *config.SafeConfig) map[string]interface{} {
+	var data map[string]interface{}
+	raw, _ := json.Marshal(cfg.Config)
+	fmt.Println(raw)
+	_ = json.Unmarshal(raw, &data)
+	return data
 }

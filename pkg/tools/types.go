@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"time"
 )
 
@@ -60,4 +61,5 @@ var (
 type Params struct {
 	Type  AudioType
 	Audio string
+	Cfg   *config.SafeConfig
 }

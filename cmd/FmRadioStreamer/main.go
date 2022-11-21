@@ -61,6 +61,13 @@ func main() {
 	wg.Add(1)
 	go leds.BlueLedLoop(&wg, ctx)
 
+	// Init buttons
+	buttons.Init()
+	wg.Add(1)
+	go buttons.Listen(&wg, ctx, cfg)
+
+	// Init screen
+	cfg.Lock()
 	if cfg.SSD1306 {
 		// Init screen
 		wg.Add(1)
@@ -72,26 +79,23 @@ func main() {
 		}()
 	}
 
-	// Init buttons
-	buttons.Init()
-	wg.Add(1)
-	go buttons.Listen(&wg, ctx)
-	logs.FmRadStrInfo("Peripherals started")
-
-	// Init Dynamic Radio Text
+	// Init RT
+	rtInterval := cfg.DynamicRTInterval
 	if cfg.DynamicRT {
 		rt.Primary, rt.Secondary = cfg.RT, cfg.RT
 		go func() {
-			err := rt.Rotate(config.GetDynamicRTInterval())
+			err := rt.Rotate(rtInterval)
 			if err != nil {
 				logs.FmRadStrError(err)
 			}
 		}()
 	}
+	cfg.Unlock()
+	logs.FmRadStrInfo("Peripherals started")
 
 	// Starting dashboard and core with no music
 	go func() {
-		err := dashboard.Init()
+		err := dashboard.Init(cfg)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -99,7 +103,7 @@ func main() {
 
 	logs.FmRadStrInfo("Starting core")
 	go func() {
-		err = core.Play(tools.Params{Type: tools.SilenceType})
+		err = core.Play(tools.Params{Type: tools.SilenceType, Cfg: cfg})
 		if err != nil {
 			log.Fatal(err)
 		}

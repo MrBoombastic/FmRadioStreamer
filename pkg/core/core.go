@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/rt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
@@ -14,7 +13,9 @@ import (
 
 // GenerateOptions generates options to pass to PiFmAdv
 func GenerateOptions(params tools.Params) []string {
-	cfg, _ := config.Get()
+	params.Cfg.Lock()
+	cfg := params.Cfg
+	params.Cfg.Unlock()
 	options := []string{
 		"--ps", cfg.PS,
 		"--rt", cfg.RT,
@@ -55,14 +56,16 @@ func run(name string, params tools.Params) error {
 	// Actual playing audio starts here!
 	if params.Type == tools.FileType || params.Type == tools.SilenceType {
 		logs.FmRadStrInfo(fmt.Sprintf("Executing %v as a child process. Output below:", name))
-		err := tools.ExecCommand(name, config.GetVerbose(), GenerateOptions(params)...)
+		params.Cfg.Lock()
+		err := tools.ExecCommand(name, params.Cfg.Verbose, GenerateOptions(params)...)
+		params.Cfg.Unlock()
 		if err != nil {
 			return err
 		}
 	}
 	// Using workaround when playing stream
 	if params.Type == tools.StreamType {
-		textoptions := fmt.Sprintf("sox %v -t wav - | sudo core/pi_fm_adv %v", params.Audio, strings.Join(GenerateOptions(tools.Params{Type: tools.StreamType}), " "))
+		textoptions := fmt.Sprintf("sox %v -t wav - | sudo core/pi_fm_adv %v", params.Audio, GenerateOptions(params))
 
 		// Go is doing some weird things when using "|" in exec.Command, so we will run command through temp script
 		err := tools.TextToFile(textoptions, "temp.sh")
@@ -70,7 +73,9 @@ func run(name string, params tools.Params) error {
 			return err
 		}
 		logs.FmRadStrInfo(fmt.Sprintf("Executing streaming shell script as a child process. Output below:"))
-		err = tools.ExecCommand("/bin/sh", config.GetVerbose(), "temp.sh")
+		params.Cfg.Lock()
+		err = tools.ExecCommand("/bin/sh", params.Cfg.Verbose, "temp.sh")
+		params.Cfg.Unlock()
 		if err != nil {
 			return err
 		}
@@ -93,9 +98,11 @@ func Play(params tools.Params) error {
 				logs.PiFmAdvInfo("Expected exit")
 			} else {
 				errorString := "Unexpected error."
-				if !config.GetVerbose() {
+				params.Cfg.Lock()
+				if !params.Cfg.Verbose {
 					errorString += " Use verbose option next time to get more information."
 				}
+				params.Cfg.Unlock()
 				logs.PiFmAdvError(fmt.Sprintf("%v %v", errorString, err))
 			}
 		}

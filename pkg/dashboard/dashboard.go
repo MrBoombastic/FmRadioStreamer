@@ -22,7 +22,7 @@ var app = fiber.New(fiber.Config{
 })
 
 // Init starts the dashboard
-func Init() error {
+func Init(cfg *config.SafeConfig) error {
 	// Handle static files
 	app.Use("/static/", filesystem.New(filesystem.Config{
 		Root:       http.FS(static),
@@ -37,7 +37,7 @@ func Init() error {
 		}
 		handler := foundEndpoint
 		if handler != nil {
-			handler(c)
+			handler(&RadioContext{Fiber: c, Cfg: cfg})
 		}
 		return nil
 	})
@@ -48,9 +48,11 @@ func Init() error {
 	}))
 
 	// Start!
-	port := config.GetPort()
+	cfg.Lock()
+	port := cfg.Port
+	cfg.Unlock()
 	logs.FmRadStrInfo(fmt.Sprintf("Launching dashboard at http://localhost:%v", port))
-	err := app.Listen(fmt.Sprintf(":%v", config.GetPort()))
+	err := app.Listen(fmt.Sprintf(":%v", port))
 	if err != nil {
 		return err
 	}

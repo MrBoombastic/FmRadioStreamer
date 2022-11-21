@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 // Config is config.json structure of all available settings
 type Config struct {
 	Frequency         float64 `json:"freq"`
@@ -20,4 +22,9 @@ type Config struct {
 	DynamicRT         bool    `json:"dynamicRT"`
 	DynamicRTInterval uint    `json:"dynamicRTInterval"`
 	Verbose           bool    `json:"verbose"`
+}
+
+type SafeConfig struct {
+	sync.Mutex
+	Config
 }

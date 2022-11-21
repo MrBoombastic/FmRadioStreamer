@@ -2,11 +2,17 @@ package dashboard
 
 import (
 	"errors"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/gofiber/fiber/v2"
 )
 
+type RadioContext struct {
+	Fiber *fiber.Ctx
+	Cfg   *config.SafeConfig
+}
+
 // endpointsList is a map with all endpoints
-var endpointsList = map[string]func(ctx *fiber.Ctx){
+var endpointsList = map[string]func(ctx *RadioContext){
 	"config":     configuration,
 	"music":      music,
 	"stop":       stop,
@@ -19,7 +25,7 @@ var endpointsList = map[string]func(ctx *fiber.Ctx){
 }
 
 // findEndpoint finds endpoint by name
-func findEndpoint(name string) (func(ctx *fiber.Ctx), error) {
+func findEndpoint(name string) (func(ctx *RadioContext), error) {
 	if endpointsList[name] != nil {
 		return endpointsList[name], nil
 	} else {
