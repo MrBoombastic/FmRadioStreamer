@@ -38,7 +38,7 @@ func GenerateOptions(params tools.Params) []string {
 	return options
 }
 
-// run starts playing music, silence or stream via PiFmAdv.
+// run starts playing music, silence or stream via PiFmAdv. Also launches dynamic RT.
 func run(name string, params tools.Params, verbose *bool) error {
 	// Support for "dynamic" RDS - getting current playing file name - only in FileType mode!
 	if params.Type == tools.FileType {
