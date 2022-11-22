@@ -14,7 +14,7 @@ import (
 // GenerateOptions generates options to pass to PiFmAdv
 func GenerateOptions(params tools.Params) []string {
 	params.Cfg.Lock()
-	cfg := params.Cfg
+	cfg := params.Cfg.Config
 	params.Cfg.Unlock()
 	options := []string{
 		"--ps", cfg.PS,
@@ -39,7 +39,7 @@ func GenerateOptions(params tools.Params) []string {
 }
 
 // run starts playing music, silence or stream via PiFmAdv.
-func run(name string, params tools.Params, verbose bool) error {
+func run(name string, params tools.Params, verbose *bool) error {
 	// Support for "dynamic" RDS - getting current playing file name - only in FileType mode!
 	if params.Type == tools.FileType {
 		extension := filepath.Ext(params.Audio)
@@ -56,7 +56,7 @@ func run(name string, params tools.Params, verbose bool) error {
 	// Actual playing audio starts here!
 	if params.Type == tools.FileType || params.Type == tools.SilenceType {
 		logs.FmRadStrInfo(fmt.Sprintf("Executing %v as a child process. Output below:", name))
-		err := tools.ExecCommand(name, verbose, GenerateOptions(params)...)
+		err := tools.ExecCommand(name, *verbose, GenerateOptions(params)...)
 		if err != nil {
 			return err
 		}
@@ -71,7 +71,7 @@ func run(name string, params tools.Params, verbose bool) error {
 			return err
 		}
 		logs.FmRadStrInfo(fmt.Sprintf("Executing streaming shell script as a child process. Output below:"))
-		err = tools.ExecCommand("/bin/sh", verbose, "temp.sh")
+		err = tools.ExecCommand("/bin/sh", *verbose, "temp.sh")
 		if err != nil {
 			return err
 		}
@@ -87,9 +87,7 @@ func Play(params tools.Params) error {
 		return err
 	}
 	go func() {
-		params.Cfg.Lock()
-		verbose := params.Cfg.Verbose
-		params.Cfg.Unlock()
+		verbose := &params.Cfg.Verbose
 		err := run("core/pi_fm_adv", params, verbose)
 		if err != nil {
 			errorText := err.Error()
@@ -97,7 +95,7 @@ func Play(params tools.Params) error {
 				logs.PiFmAdvInfo("Expected exit")
 			} else {
 				errorString := "Unexpected error."
-				if !verbose {
+				if !*verbose {
 					errorString += " Use verbose option next time to get more information."
 				}
 				logs.PiFmAdvError(fmt.Sprintf("%v %v", errorString, err))
