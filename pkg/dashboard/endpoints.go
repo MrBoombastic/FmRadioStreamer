@@ -44,7 +44,7 @@ func offair(ctx *RadioContext) {
 	_ = ctx.Fiber.SendStatus(200)
 	ctx.Cfg.Lock()
 	if ctx.Cfg.SSD1306 {
-		ssd1306.MiniMessage("OFF-AIR")
+		ssd1306.MiniMessage("OFF-AIR", ctx.Cfg)
 	}
 	ctx.Cfg.Unlock()
 }
@@ -83,11 +83,12 @@ func yt(ctx *RadioContext) {
 // youtubeDl endpoint performs downloading audio from other sites
 func youtubeDl(ctx *RadioContext) {
 	query := ctx.Fiber.Query("q")
-	_ = ctx.Fiber.SendStatus(200)
+	_ = ctx.Fiber.SendStatus(202)
 	leds.BlueLedEnabled = true
 	ctx.Cfg.Lock()
-	err := condlers.Download(query, ctx.Cfg.Format)
+	format := ctx.Cfg.Format
 	ctx.Cfg.Unlock()
+	err := condlers.Download(query, format)
 	leds.BlueLedEnabled = false
 	if err != nil {
 		logs.FmRadStrError(err)
@@ -118,16 +119,17 @@ func playStream(ctx *RadioContext) {
 
 // save endpoint updates current config
 func save(ctx *RadioContext) {
-	newCfg := new(config.SafeConfig)
+	newCfg := new(config.Config)
 	if err := ctx.Fiber.BodyParser(newCfg); err != nil {
 		logs.PiFmAdvError(err)
 		_ = ctx.Fiber.SendStatus(500)
 
 	}
 	ctx.Cfg.Lock()
+	ctx.Cfg.Config = *newCfg
 	config.Save(newCfg)
-	if ctx.Cfg.SSD1306 {
-		ssd1306.Refresh()
+	if newCfg.SSD1306 {
+		ssd1306.Refresh(ctx.Cfg)
 	}
 	ctx.Cfg.Unlock()
 	_ = ctx.Fiber.SendStatus(200)

@@ -46,12 +46,11 @@ func writer(x int, y int, s string) {
 		Src:  &image.Uniform{C: image1bit.On},
 		Face: basicfont.Face7x13,
 		Dot:  fixed.P(x, y)}
-
 	drawer.DrawString(s)
 }
 
 // Init sets up screen and handles shutting it down
-func Init(wg *sync.WaitGroup, ctx context.Context) error {
+func Init(wg *sync.WaitGroup, ctx context.Context, cfg *config.SafeConfig) error {
 	defer wg.Done()
 	for {
 		select {
@@ -84,7 +83,7 @@ func Init(wg *sync.WaitGroup, ctx context.Context) error {
 				}
 				scr, err := ssd1306.NewI2C(screenConnection, &ssd1306.DefaultOpts)
 				screen = scr
-				Refresh()
+				Refresh(cfg)
 			}
 		}
 	}
@@ -106,11 +105,11 @@ func draw() {
 }
 
 // MiniMessage shows custom message in bottom-left corer of screen for 2 seconds
-func MiniMessage(message string) {
+func MiniMessage(message string, cfg *config.SafeConfig) {
 	if screen == nil {
 		return
 	}
-	screen.StopScroll()
+	_ = screen.StopScroll()
 	for x := 2; x <= 90; x++ {
 		for y := 49; y <= 63; y++ {
 			img.Set(x, y, image1bit.Off)
@@ -119,16 +118,15 @@ func MiniMessage(message string) {
 	writer(2, 62, message)
 	draw()
 	time.Sleep(2 * time.Second)
-	Refresh()
+	Refresh(cfg)
 }
 
 // Refresh draws every possible element on the screen
-func Refresh() {
+func Refresh(cfg *config.SafeConfig) {
 	if screen == nil {
 		return
 	}
-	cfg, _ := config.Get()
-	screen.StopScroll()
+	_ = screen.StopScroll()
 	createImg()
 	writer(2, 11, cfg.PS)
 	writer(71, 11, fmt.Sprintf("%.1f FM", cfg.Frequency))

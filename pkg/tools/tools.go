@@ -136,7 +136,6 @@ func ExecCommand(name string, verbose bool, args ...string) error {
 func ConfigToMap(cfg *config.SafeConfig) map[string]interface{} {
 	var data map[string]interface{}
 	raw, _ := json.Marshal(cfg.Config)
-	fmt.Println(raw)
 	_ = json.Unmarshal(raw, &data)
 	return data
 }

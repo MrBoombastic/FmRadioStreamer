@@ -20,8 +20,8 @@ func Get() (*SafeConfig, error) {
 }
 
 // Save saves new config. Needs mutex locked!
-func Save(cfg *SafeConfig) {
-	file, err := json.MarshalIndent(cfg.Config, "", "  ")
+func Save(cfg *Config) {
+	file, err := json.MarshalIndent(cfg, "", "  ")
 	err = os.WriteFile("config.json", file, 0644)
 	if err != nil {
 		logs.PiFmAdvError(err)

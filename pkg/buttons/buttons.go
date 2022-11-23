@@ -42,18 +42,16 @@ func Listen(wg *sync.WaitGroup, ctx context.Context, cfg *config.SafeConfig) {
 				if item.EdgeDetected() {
 					if i == 0 {
 						cfg.Lock()
-						currentFrequency := cfg.Frequency
-						currentMultiplier := cfg.Multiplier
-						if currentFrequency-currentMultiplier < 76.0 {
+						if cfg.Frequency-cfg.Multiplier < 76.0 {
 							go leds.YellowBlink()
 							if cfg.SSD1306 {
-								ssd1306.MiniMessage("MIN FREQ!")
+								ssd1306.MiniMessage("MIN FREQ!", cfg)
 							}
 						} else {
 							cfg.Frequency = math.Floor((cfg.Frequency-cfg.Multiplier)*10) / 10
-							config.Save(cfg)
+							config.Save(&cfg.Config)
 							if cfg.SSD1306 {
-								ssd1306.Refresh()
+								ssd1306.Refresh(cfg)
 							}
 						}
 						cfg.Unlock()
@@ -63,13 +61,13 @@ func Listen(wg *sync.WaitGroup, ctx context.Context, cfg *config.SafeConfig) {
 						if cfg.Frequency+cfg.Multiplier > 108.0 {
 							go leds.YellowBlink()
 							if cfg.SSD1306 {
-								ssd1306.MiniMessage("MAX FREQ!")
+								ssd1306.MiniMessage("MAX FREQ!", cfg)
 							}
 						} else {
 							cfg.Frequency = math.Floor((cfg.Frequency-cfg.Multiplier)*10) / 10
-							config.Save(cfg)
+							config.Save(&cfg.Config)
 							if cfg.SSD1306 {
-								ssd1306.Refresh()
+								ssd1306.Refresh(cfg)
 							}
 						}
 						cfg.Unlock()
@@ -89,9 +87,9 @@ func Listen(wg *sync.WaitGroup, ctx context.Context, cfg *config.SafeConfig) {
 							cfg.Multiplier = 0.1
 						}
 						if cfg.SSD1306 {
-							ssd1306.Refresh()
+							ssd1306.Refresh(cfg)
 						}
-						config.Save(cfg)
+						config.Save(&cfg.Config)
 						cfg.Unlock()
 					}
 					if i == 3 {

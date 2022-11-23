@@ -72,7 +72,7 @@ func main() {
 		// Init screen
 		wg.Add(1)
 		go func() {
-			err := ssd1306.Init(&wg, ctx)
+			err := ssd1306.Init(&wg, ctx, cfg)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -118,7 +118,7 @@ func main() {
 
 	// This should be executed, but it works fine whithout it and invoking it crashes my RPi :(
 	// tools.StopGPIO()
-	fmt.Println() // Usually "^C" is printed in the console, so it will be more pretty to go to next line
+
 	logs.FmRadStrInfo("Gracefully exiting")
 	logs.FmRadStrInfo("Killing core")
 	_, _ = pkill.Pkill("pi_fm_adv", os.Interrupt)
