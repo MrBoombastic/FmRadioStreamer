@@ -1,7 +1,7 @@
 echo "FMRADSTR: Updating repositories..."
 sudo apt update
 echo "FMRADSTR: Trying to install apt dependencies..."
-sudo apt install ffmpeg libsndfile1-dev libsoxr-dev git build-essential python3-pip sox-fmt-all && echo "FMRADSTR: Successfully installed apt dependencies!" || echo "FMRADSTR: Failed to install apt dependencies!"
+sudo apt install ffmpeg libsndfile1-dev libsoxr-dev git build-essential python3-pip libsox-fmt-all && echo "FMRADSTR: Successfully installed apt dependencies!" || echo "FMRADSTR: Failed to install apt dependencies!"
 echo "FMRADSTR: Trying to install/upgrade youtube-dl..."
 sudo sudo pip install --upgrade youtube_dl && echo "FMRADSTR: Successfully installed youtube-dl!" || echo "FMRADSTR: Failed to install youtube-dl!"
 echo "FMRADSTR: Creating directories..."
