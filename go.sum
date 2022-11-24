@@ -1,9 +1,7 @@
 github.com/BOOMfinity/golog v1.0.5 h1:BHTWTR+xMQN0GdIMy2l6KgEB+fcsluTCrmbQnCw4gao=
 github.com/BOOMfinity/golog v1.0.5/go.mod h1:4OoXZjkP5D+ycQJa8LxFMIbHSvaJrdMatNE0vwDstxY=
-github.com/BrianAllred/goydl v0.0.0-20200922193158-6eeb623d0fe8 h1:jSnpkKA8r7Ow7YuLiHsXc0fPQzdHktFGnLUmGAl+owM=
-github.com/BrianAllred/goydl v0.0.0-20200922193158-6eeb623d0fe8/go.mod h1:hpSBK67Uduw/SGy6bObP8YrAZjcw0WR+gV/KTl9o2Lc=
-github.com/TheKinrar/goydl v0.0.0-20210916211739-e36980173c4c h1:s3HHnf6ApzBy4i1U4oAcmxfzhmG4bh8bFZkpwsm4dkc=
-github.com/TheKinrar/goydl v0.0.0-20210916211739-e36980173c4c/go.mod h1:k11RIIJu+RUSYGKq/ZmKAlDSiFpPGU6UB+5u3YxgE+o=
+github.com/MrBoombastic/goydl v0.0.0-20221124182300-537de59ec099 h1:VMkZ10FY/VbeaHNV/TfejbFqXqjryr+xiw84C+IWNtY=
+github.com/MrBoombastic/goydl v0.0.0-20221124182300-537de59ec099/go.mod h1:oHlwZ3/jDSPjrSHgg/St4jpLRP97Ff9ZWU5/oZYcHbw=
 github.com/andybalholm/brotli v1.0.4 h1:V7DdXeJtZscaqfNuAdSRuRFzuiKlHSC/Zh3zl9qY3JY=
 github.com/andybalholm/brotli v1.0.4/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
 github.com/arduino/go-apt-client v0.0.0-20190812130613-5613f843fdc8 h1:HpmeqWCUoU+dPrz8V4KGDMDxvR+WyeJ0g6DSSqnptuY=

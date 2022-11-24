@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/BOOMfinity/golog v1.0.5
-	github.com/TheKinrar/goydl v0.0.0-20210916211739-e36980173c4c
+	github.com/MrBoombastic/goydl v0.0.0-20221124182300-537de59ec099
 	github.com/arduino/go-apt-client v0.0.0-20190812130613-5613f843fdc8
 	github.com/gofiber/fiber/v2 v2.40.1
 	github.com/pbar1/pkill-go v1.0.0
@@ -17,7 +17,6 @@ require (
 )
 
 require (
-	github.com/BrianAllred/goydl v0.0.0-20200922193158-6eeb623d0fe8 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

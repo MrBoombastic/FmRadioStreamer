@@ -3,7 +3,7 @@
 package condlers
 
 import (
-	"github.com/TheKinrar/goydl"
+	"github.com/MrBoombastic/goydl"
 	"os"
 )
 
