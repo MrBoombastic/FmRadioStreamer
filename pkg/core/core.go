@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// GenerateOptions generates options to pass to PiFmAdv
+// GenerateOptions generates options to pass to PiFmAdv.
 func GenerateOptions(params tools.Params) []string {
 	params.Cfg.Lock()
 	cfg := params.Cfg.Config
@@ -79,7 +79,7 @@ func run(name string, params tools.Params, verbose *bool) error {
 	return nil
 }
 
-// Play kills old instance of PiFmAdv and launches new one using new parameters
+// Play kills old instance of PiFmAdv and launches new one using new parameters.
 func Play(params tools.Params) error {
 	// Make sure that previous playback is stopped
 	_, err := pkill.Pkill("pi_fm_adv", os.Interrupt)

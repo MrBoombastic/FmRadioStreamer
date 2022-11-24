@@ -4,7 +4,6 @@ import (
 	"embed"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
-	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"net/http"
@@ -21,8 +20,8 @@ var app = fiber.New(fiber.Config{
 	DisableStartupMessage: true,
 })
 
-// Init starts the dashboard
-func Init(cfg *config.SafeConfig) error {
+// Init starts the dashboard.
+func Init(cfg *config.SafeConfig, port uint16) error {
 	// Handle static files
 	app.Use("/static/", filesystem.New(filesystem.Config{
 		Root:       http.FS(static),
@@ -48,9 +47,5 @@ func Init(cfg *config.SafeConfig) error {
 	}))
 
 	// Start!
-	cfg.Lock()
-	port := cfg.Port
-	cfg.Unlock()
-	logs.FmRadStrInfo(fmt.Sprintf("Launching dashboard at http://localhost:%v", port))
 	return app.Listen(fmt.Sprintf(":%v", port))
 }

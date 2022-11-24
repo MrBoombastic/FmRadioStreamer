@@ -10,16 +10,16 @@ import (
 
 var currentRTState = 0
 
-// Primary is used to display RT - both static and dynamic
+// Primary is used to display RT - both static and dynamic.
 var Primary string
 
-// Secondary is only used when dynamic RT is enabled
+// Secondary is only used when dynamic RT is enabled.
 var Secondary string
 
-// Rotating switches dynamic RT on or off
+// Rotating switches dynamic RT on or off.
 var Rotating = false
 
-// Rotate enables switching RT between that saved in config and current playing audio filename
+// Rotate enables switching RT between that saved in config and current playing audio filename.
 func Rotate(interval uint) error {
 	err := os.Remove("rds_ctl")
 	if err != nil {

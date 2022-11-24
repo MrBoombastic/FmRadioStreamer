@@ -13,7 +13,6 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"github.com/pbar1/pkill-go"
-	"log"
 	"os"
 	"os/signal"
 	"sync"
@@ -45,15 +44,15 @@ func main() {
 	if err != nil {
 		logs.FmRadStrFatal("Couldn't retrieve config. Exiting...")
 	}
-	// Get local IP
-	tools.RefreshLocalIP()
-	logs.FmRadStrInfo(fmt.Sprintf("Your local IP is: %v", tools.LocalIP))
+	// Print dashboard URL
+	logs.FmRadStrInfo(fmt.Sprintf("Your local IP is: %v", tools.GetLocalIP()))
+
 	logs.FmRadStrInfo("Starting peripherals")
 
 	// Init GPIO pins and leds
 	err = tools.InitGPIO()
 	if err != nil {
-		log.Fatal(err)
+		logs.FmRadStrFatal(err)
 	}
 	leds.Init()
 	wg.Add(1)
@@ -74,7 +73,7 @@ func main() {
 		go func() {
 			err := ssd1306.Init(&wg, ctx, cfg)
 			if err != nil {
-				log.Fatal(err)
+				logs.FmRadStrFatal(err)
 			}
 		}()
 	}
@@ -90,14 +89,16 @@ func main() {
 			}
 		}()
 	}
-	cfg.Unlock()
 	logs.FmRadStrInfo("Peripherals started")
 
 	// Starting dashboard and core with no music
+	port := cfg.Port
+	logs.FmRadStrInfo(fmt.Sprintf("Launching dashboard at http://localhost:%v", port))
+	cfg.Unlock()
 	go func() {
-		err := dashboard.Init(cfg)
+		err := dashboard.Init(cfg, port)
 		if err != nil {
-			log.Fatal(err)
+			logs.FmRadStrFatal(err)
 		}
 	}()
 
@@ -105,7 +106,7 @@ func main() {
 	go func() {
 		err = core.Play(tools.Params{Type: tools.SilenceType, Cfg: cfg})
 		if err != nil {
-			log.Fatal(err)
+			logs.FmRadStrFatal(err)
 		}
 	}()
 

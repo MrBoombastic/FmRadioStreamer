@@ -21,7 +21,7 @@ const niceFetch = (value, method = "GET", body, headers) => {
         .catch(async e => await errorHandler(e, value, true));
 };
 const refreshMusic = async () => {
-    const musicList = await niceFetch("./api/music");
+    const musicList = await niceFetch("./api/dir");
     const musicPicker = document.getElementById("musicpickerlist");
     musicPicker.innerHTML = '';
     musicList.forEach(elem => {

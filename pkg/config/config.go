@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// Get returns current config saved in config file with mutex.
 func Get() (*SafeConfig, error) {
 	data, err := os.ReadFile("./config.json")
 	if err != nil {
@@ -19,11 +20,11 @@ func Get() (*SafeConfig, error) {
 	return cfg, nil
 }
 
-// Save saves new config. Needs mutex locked!
+// Save saves new config to config file. Needs mutex locked!
 func Save(cfg *Config) {
 	file, err := json.MarshalIndent(cfg, "", "  ")
 	err = os.WriteFile("config.json", file, 0644)
 	if err != nil {
-		logs.PiFmAdvError(err)
+		logs.FmRadStrFatal(err)
 	}
 }

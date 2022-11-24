@@ -12,8 +12,8 @@ import (
 	"os"
 )
 
-// music endpoint returns contents of `music` directory
-func music(ctx *RadioContext) {
+// dir endpoint returns contents of `dir` directory.
+func dir(ctx *RadioContext) {
 	filesSlice, err := condlers.MusicDir()
 	if err != nil {
 		_ = ctx.Fiber.SendStatus(500)
@@ -24,7 +24,7 @@ func music(ctx *RadioContext) {
 	}
 }
 
-// stop endpoint plays silence
+// stop endpoint plays silence.
 func stop(ctx *RadioContext) {
 	err := core.Play(tools.Params{Type: tools.SilenceType, Cfg: ctx.Cfg})
 	if err != nil {
@@ -34,7 +34,7 @@ func stop(ctx *RadioContext) {
 	_ = ctx.Fiber.SendStatus(200)
 }
 
-// offair kill PiFmAdv entirely
+// offair kills PiFmAdv entirely.
 func offair(ctx *RadioContext) {
 	_, err := pkill.Pkill("pi_fm_adv", os.Interrupt)
 	if err != nil {
@@ -49,7 +49,7 @@ func offair(ctx *RadioContext) {
 	ctx.Cfg.Unlock()
 }
 
-// yt endpoint performs searching or downloading audio from YouTube
+// yt endpoint performs searching or downloading audio from YouTube.
 func yt(ctx *RadioContext) {
 	search := ctx.Fiber.Query("search")
 	query := ctx.Fiber.Query("q")
@@ -71,8 +71,9 @@ func yt(ctx *RadioContext) {
 		_ = ctx.Fiber.SendStatus(200)
 		leds.BlueLedEnabled = true
 		ctx.Cfg.Lock()
-		err = condlers.Download("https://youtu.be/"+result.Items[0].ID.VideoID, ctx.Cfg.Format)
+		format := ctx.Cfg.Format
 		ctx.Cfg.Unlock()
+		err = condlers.Download("https://youtu.be/"+result.Items[0].ID.VideoID, format)
 		leds.BlueLedEnabled = false
 		if err != nil {
 			logs.FmRadStrError(err)
@@ -80,7 +81,7 @@ func yt(ctx *RadioContext) {
 	}
 }
 
-// youtubeDl endpoint performs downloading audio from other sites
+// youtubeDl endpoint performs downloading audio from other sites.
 func youtubeDl(ctx *RadioContext) {
 	query := ctx.Fiber.Query("q")
 	_ = ctx.Fiber.SendStatus(202)
@@ -95,7 +96,7 @@ func youtubeDl(ctx *RadioContext) {
 	}
 }
 
-// playFile endpoint plays selected file
+// playFile endpoint plays selected file.
 func playFile(ctx *RadioContext) {
 	query := ctx.Fiber.Query("q")
 	err := core.Play(tools.Params{Type: tools.FileType, Audio: query, Cfg: ctx.Cfg})
@@ -106,7 +107,7 @@ func playFile(ctx *RadioContext) {
 	_ = ctx.Fiber.SendStatus(200)
 }
 
-// playStream endpoint plays remote file via SoX
+// playStream endpoint plays remote file via SoX.
 func playStream(ctx *RadioContext) {
 	query := ctx.Fiber.Query("q")
 	err := core.Play(tools.Params{Type: tools.StreamType, Audio: query, Cfg: ctx.Cfg})
@@ -117,7 +118,7 @@ func playStream(ctx *RadioContext) {
 	_ = ctx.Fiber.SendStatus(200)
 }
 
-// save endpoint updates current config
+// save endpoint updates current config.
 func save(ctx *RadioContext) {
 	newCfg := new(config.Config)
 	if err := ctx.Fiber.BodyParser(newCfg); err != nil {
@@ -135,7 +136,7 @@ func save(ctx *RadioContext) {
 	_ = ctx.Fiber.SendStatus(200)
 }
 
-// configuration endpoint returns current config
+// configuration endpoint returns current config.
 func configuration(ctx *RadioContext) {
 	ctx.Cfg.Lock()
 	configMap := tools.ConfigToMap(ctx.Cfg)

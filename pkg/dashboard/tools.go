@@ -11,10 +11,10 @@ type RadioContext struct {
 	Cfg   *config.SafeConfig
 }
 
-// endpointsList is a map with all endpoints
+// endpointsList is a map with all endpoints.
 var endpointsList = map[string]func(ctx *RadioContext){
 	"config":     configuration,
-	"music":      music,
+	"dir":        dir,
 	"stop":       stop,
 	"offair":     offair,
 	"yt":         yt,
@@ -24,7 +24,7 @@ var endpointsList = map[string]func(ctx *RadioContext){
 	"save":       save,
 }
 
-// findEndpoint finds endpoint by name
+// findEndpoint finds endpoint by name.
 func findEndpoint(name string) (func(ctx *RadioContext), error) {
 	if endpointsList[name] != nil {
 		return endpointsList[name], nil

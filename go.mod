@@ -6,7 +6,6 @@ require (
 	github.com/BOOMfinity/golog v1.0.5
 	github.com/TheKinrar/goydl v0.0.0-20210916211739-e36980173c4c
 	github.com/arduino/go-apt-client v0.0.0-20190812130613-5613f843fdc8
-	github.com/go-cmd/cmd v1.4.1
 	github.com/gofiber/fiber/v2 v2.40.0
 	github.com/pbar1/pkill-go v1.0.0
 	github.com/stianeikeland/go-rpio/v4 v4.6.0

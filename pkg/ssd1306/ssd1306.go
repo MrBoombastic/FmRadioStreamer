@@ -10,7 +10,6 @@ import (
 	"golang.org/x/image/font/basicfont"
 	"golang.org/x/image/math/fixed"
 	"image"
-	"log"
 	"periph.io/x/conn/v3/i2c"
 	"periph.io/x/conn/v3/i2c/i2creg"
 	"periph.io/x/devices/v3/ssd1306"
@@ -24,12 +23,13 @@ import (
 var screenConnection i2c.BusCloser
 var img *image1bit.VerticalLSB
 
-// screen is an open handle to the display controller
+// screen is an open handle to the display controller.
 var screen *ssd1306.Dev
 
-// inverted defines wheter screen colours are normal or reverted (blue-on-black or black-on-blue)
+// inverted defines wheter screen colours are normal or reverted (blue-on-black or black-on-blue).
 var inverted = false
 
+// Invert inverts screen colours.
 func Invert() error {
 	inverted = !inverted
 	err := screen.Invert(inverted)
@@ -39,7 +39,7 @@ func Invert() error {
 	return nil
 }
 
-// writer writes text on img
+// writer writes text on img.
 func writer(x int, y int, s string) {
 	drawer := font.Drawer{
 		Dst:  img,
@@ -49,7 +49,7 @@ func writer(x int, y int, s string) {
 	drawer.DrawString(s)
 }
 
-// Init sets up screen and handles shutting it down
+// Init sets up screen and handles shutting it down.
 func Init(wg *sync.WaitGroup, ctx context.Context, cfg *config.SafeConfig) error {
 	defer wg.Done()
 	for {
@@ -89,22 +89,22 @@ func Init(wg *sync.WaitGroup, ctx context.Context, cfg *config.SafeConfig) error
 	}
 }
 
-// createImg creates empty img
+// createImg creates empty img.
 func createImg() {
 	img = image1bit.NewVerticalLSB(screen.Bounds())
 }
 
-// draw draws img on screen
+// draw draws img on screen.
 func draw() {
 	if img == nil {
 		createImg()
 	}
 	if err := screen.Draw(screen.Bounds(), img, image.Point{}); err != nil {
-		log.Fatal(err)
+		logs.FmRadStrFatal(err)
 	}
 }
 
-// MiniMessage shows custom message in bottom-left corer of screen for 2 seconds
+// MiniMessage shows custom message in bottom-left corer of screen for 2 seconds.
 func MiniMessage(message string, cfg *config.SafeConfig) {
 	if screen == nil {
 		return
@@ -121,7 +121,7 @@ func MiniMessage(message string, cfg *config.SafeConfig) {
 	Refresh(cfg)
 }
 
-// Refresh draws every possible element on the screen
+// Refresh draws every possible element on the screen.
 func Refresh(cfg *config.SafeConfig) {
 	if screen == nil {
 		return
@@ -142,7 +142,7 @@ func Refresh(cfg *config.SafeConfig) {
 	writer(0, 42, cfg.RT[16:maxRT])
 	writer(99, 62, fmt.Sprintf("%.1fx", cfg.Multiplier))
 
-	ip := strings.Split(tools.LocalIP.String(), ".")[2:4]
+	ip := strings.Split(tools.GetLocalIP(), ".")[2:4]
 	writer(0, 62, fmt.Sprintf(".%v:%d", strings.Join(ip, "."), cfg.Port))
 
 	draw()

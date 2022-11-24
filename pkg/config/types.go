@@ -2,7 +2,7 @@ package config
 
 import "sync"
 
-// Config is config.json structure of all available settings
+// Config is config.json structure of all available settings.
 type Config struct {
 	Frequency         float64 `json:"freq"`
 	Format            string  `json:"format"`
@@ -24,6 +24,7 @@ type Config struct {
 	Verbose           bool    `json:"verbose"`
 }
 
+// SafeConfig is just Config combined with mutex.
 type SafeConfig struct {
 	sync.Mutex
 	Config
