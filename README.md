@@ -156,7 +156,8 @@ libsndfile1-dev:
 | antennaGPIO       | GPIO antenna header                                                          | number (uint8)         | 4                                        | Possible values: 4, 20, 32, 34                                                        |
 | ssd1306           | OLED screen type SSD1306 enabled                                             | bool                   | true                                     |                                                                                       |
 | dynamicRT         | Switching RT between that saved in config and current playing audio filename | bool                   | true                                     |                                                                                       |
-| dynamicRTInterval | Dynamic RT switching interval in seconds                                     | number (uint)          | 20                                       |                                                                                       | 
+| dynamicRTInterval | Dynamic RT switching interval in seconds                                     | number (uint)          | 20                                       |                                                                                       |
+| verbose           | Additional logs in console                                                   | bool                   | false                                    |                                                                                       |
 
 
 
