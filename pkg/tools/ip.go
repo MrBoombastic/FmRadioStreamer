@@ -23,9 +23,9 @@ func fetchLocalIP() net.IP {
 func GetLocalIP() string {
 	if localIP != nil {
 		return localIP.String()
-	} else {
-		ip := fetchLocalIP()
-		localIP = ip
-		return ip.String()
 	}
+	ip := fetchLocalIP()
+	localIP = ip
+	return ip.String()
+
 }
