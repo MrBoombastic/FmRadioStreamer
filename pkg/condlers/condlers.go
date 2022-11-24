@@ -3,11 +3,11 @@
 package condlers
 
 import (
-	"github.com/TheKinrar/goydl"
-	"io/ioutil"
+	"github.com/MrBoombastic/goydl"
+	"os"
 )
 
-// Download downloads specific video using youtube-dl, extracts audio from it and converts it to opus.
+// Download downloads specific video (from given URL) using youtube-dl, extracts audio from it and converts it to chosen format.
 func Download(URL string, format string) error {
 	youtubeDl := goydl.NewYoutubeDl()
 	youtubeDl.Options.Output.Value = "music/%(title)s.%(ext)s"
@@ -30,9 +30,9 @@ func Download(URL string, format string) error {
 	return nil
 }
 
-// MusicDir returns slice of all files in the 'music' directory
+// MusicDir returns slice of all files in the 'music' directory.
 func MusicDir() ([]string, error) {
-	files, err := ioutil.ReadDir("music/")
+	files, err := os.ReadDir("music/")
 	if err != nil {
 		return nil, err
 	}

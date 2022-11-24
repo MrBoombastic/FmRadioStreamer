@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
 	"golang.org/x/image/math/fixed"
 	"image"
-	"log"
 	"periph.io/x/conn/v3/i2c"
 	"periph.io/x/conn/v3/i2c/i2creg"
 	"periph.io/x/devices/v3/ssd1306"
@@ -23,38 +23,56 @@ import (
 var screenConnection i2c.BusCloser
 var img *image1bit.VerticalLSB
 
-// Screen is an open handle to the display controller
-var Screen *ssd1306.Dev
+// screen is an open handle to the display controller.
+var screen *ssd1306.Dev
 
-// Inverted defines wheter screen colours are normal or reverted (blue-on-black or black-on-blue)
-var Inverted = false
+// inverted defines wheter screen colours are normal or reverted (blue-on-black or black-on-blue).
+var inverted = false
 
-// writer writes text on img
+// Invert inverts screen colours.
+func Invert() error {
+	inverted = !inverted
+	err := screen.Invert(inverted)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// writer writes text on img.
 func writer(x int, y int, s string) {
 	drawer := font.Drawer{
 		Dst:  img,
 		Src:  &image.Uniform{C: image1bit.On},
 		Face: basicfont.Face7x13,
 		Dot:  fixed.P(x, y)}
-
 	drawer.DrawString(s)
 }
 
-// Init sets up screen and handles shutting it down
-func Init(wg *sync.WaitGroup, ctx context.Context) error {
+// Init sets up screen and handles shutting it down.
+func Init(wg *sync.WaitGroup, ctx context.Context, cfg *config.SafeConfig) error {
 	defer wg.Done()
 	for {
 		select {
 		case <-ctx.Done():
-			Screen.StopScroll()
+			err := screen.StopScroll()
+			if err != nil {
+				return err
+			}
 			createImg()
 			draw()
-			Screen.Invert(false)
-			screenConnection.Close()
+			err = screen.Invert(false)
+			if err != nil {
+				return err
+			}
+			err = screenConnection.Close()
+			if err != nil {
+				return err
+			}
 			return nil
 
 		case <-time.After(time.Second):
-			if Screen == nil {
+			if screen == nil {
 				_, err := host.Init()
 				if err != nil {
 					return err
@@ -64,34 +82,34 @@ func Init(wg *sync.WaitGroup, ctx context.Context) error {
 					return err
 				}
 				scr, err := ssd1306.NewI2C(screenConnection, &ssd1306.DefaultOpts)
-				Screen = scr
-				Refresh()
+				screen = scr
+				Refresh(cfg)
 			}
 		}
 	}
 }
 
-// createImg creates empty img
+// createImg creates empty img.
 func createImg() {
-	img = image1bit.NewVerticalLSB(Screen.Bounds())
+	img = image1bit.NewVerticalLSB(screen.Bounds())
 }
 
-// draw draws img on Screen
+// draw draws img on screen.
 func draw() {
 	if img == nil {
 		createImg()
 	}
-	if err := Screen.Draw(Screen.Bounds(), img, image.Point{}); err != nil {
-		log.Fatal(err)
+	if err := screen.Draw(screen.Bounds(), img, image.Point{}); err != nil {
+		logs.FmRadStrFatal(err)
 	}
 }
 
-// MiniMessage shows custom message in bottom-left corer of screen for 2 seconds
-func MiniMessage(message string) {
-	if Screen == nil {
+// MiniMessage shows custom message in bottom-left corer of screen for 2 seconds.
+func MiniMessage(message string, cfg *config.SafeConfig) {
+	if screen == nil {
 		return
 	}
-	Screen.StopScroll()
+	_ = screen.StopScroll()
 	for x := 2; x <= 90; x++ {
 		for y := 49; y <= 63; y++ {
 			img.Set(x, y, image1bit.Off)
@@ -100,16 +118,15 @@ func MiniMessage(message string) {
 	writer(2, 62, message)
 	draw()
 	time.Sleep(2 * time.Second)
-	Refresh()
+	Refresh(cfg)
 }
 
-// Refresh draws every possible element on the screen
-func Refresh() {
-	if Screen == nil {
+// Refresh draws every possible element on the screen.
+func Refresh(cfg *config.SafeConfig) {
+	if screen == nil {
 		return
 	}
-	cfg := config.Get()
-	Screen.StopScroll()
+	_ = screen.StopScroll()
 	createImg()
 	writer(2, 11, cfg.PS)
 	writer(71, 11, fmt.Sprintf("%.1f FM", cfg.Frequency))
@@ -125,13 +142,13 @@ func Refresh() {
 	writer(0, 42, cfg.RT[16:maxRT])
 	writer(99, 62, fmt.Sprintf("%.1fx", cfg.Multiplier))
 
-	ip := strings.Split(tools.LocalIP.String(), ".")[2:4]
+	ip := strings.Split(tools.GetLocalIP(), ".")[2:4]
 	writer(0, 62, fmt.Sprintf(".%v:%d", strings.Join(ip, "."), cfg.Port))
 
 	draw()
 
-	err := Screen.Scroll(ssd1306.Left, ssd1306.FrameRate25, 16, 48)
+	err := screen.Scroll(ssd1306.Left, ssd1306.FrameRate25, 16, 48)
 	if err != nil {
-		log.Println(err)
+		logs.FmRadStrError(err)
 	}
 }

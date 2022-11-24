@@ -15,5 +15,6 @@
   "antennaGPIO": 4,
   "ssd1306": true,
   "dynamicRT": true,
-  "dynamicRTInterval": 20
+  "dynamicRTInterval": 20,
+  "verbose": false
 }

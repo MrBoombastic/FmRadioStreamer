@@ -62,7 +62,7 @@ The minimum requirement is the RaspberryPi. FmRadioStreamer SHOULD work without 
 In the `docs` directory there are pictures of first version of this project. Watch on your own risk!
 ![Image](docs/hwv2rev2_1.jpg?raw=true "Image")
 ![Image](docs/hwv2rev2_2.jpg?raw=true "Image")
-![Image](docs/dashboard.png?raw=true "Dashboard screenshot")
+![Image](docs/dashboard_new.png?raw=true "Dashboard screenshot")
 ![Image](docs/sdrsharp.png?raw=true "SDR# screenshot")
 
 ## GPIO

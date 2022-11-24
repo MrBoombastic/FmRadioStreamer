@@ -8,9 +8,11 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/dashboard"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/rt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
-	"log"
+	"github.com/pbar1/pkill-go"
 	"os"
 	"os/signal"
 	"sync"
@@ -19,16 +21,18 @@ import (
 
 func main() {
 	// Checking if running via sudo
-	tools.CheckRoot()
+	if !tools.CheckRoot() {
+		logs.FmRadStrFatal("Not running as root! Exiting...")
+	}
 	// Checking libsndfile version
 	libsndfileVersion, err := tools.CheckLibsndfileVersion()
 	if err != nil {
-		log.Fatal(err)
+		logs.FmRadStrFatal("Couldn't check libsndfile1-dev version. Possibly dependencies are not installed. Exiting...")
 	}
 	if libsndfileVersion >= 1.1 {
-		log.Println("INFO: This system can play MP3, Opus and WAV files.")
+		logs.FmRadStrInfo("This system can play MP3, Opus and WAV files.")
 	} else {
-		log.Println("INFO: This system can play only Opus and WAV files. MP3 is not supported. Update libsndfile1-dev.")
+		logs.FmRadStrInfo("This system can play only Opus and WAV files. MP3 is not supported. Update libsndfile1-dev.")
 	}
 	// Exit handler
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -36,16 +40,19 @@ func main() {
 	var wg sync.WaitGroup
 
 	// Get current configuration
-	cfg := config.Get()
-	// Get local IP
-	tools.RefreshLocalIP()
-	log.Println("INFO: Your local IP is:", tools.LocalIP)
-	log.Println("Starting peripherals")
+	cfg, err := config.Get()
+	if err != nil {
+		logs.FmRadStrFatal("Couldn't retrieve config. Exiting...")
+	}
+	// Print dashboard URL
+	logs.FmRadStrInfo(fmt.Sprintf("Your local IP is: %v", tools.GetLocalIP()))
+
+	logs.FmRadStrInfo("Starting peripherals")
 
 	// Init GPIO pins and leds
 	err = tools.InitGPIO()
 	if err != nil {
-		log.Fatal(err)
+		logs.FmRadStrFatal(err)
 	}
 	leds.Init()
 	wg.Add(1)
@@ -53,41 +60,58 @@ func main() {
 	wg.Add(1)
 	go leds.BlueLedLoop(&wg, ctx)
 
+	// Init buttons
+	buttons.Init()
+	wg.Add(1)
+	go buttons.Listen(&wg, ctx, cfg)
+
+	// Init screen
+	cfg.Lock()
 	if cfg.SSD1306 {
 		// Init screen
 		wg.Add(1)
 		go func() {
-			err := ssd1306.Init(&wg, ctx)
+			err := ssd1306.Init(&wg, ctx, cfg)
 			if err != nil {
-				log.Fatal(err)
+				logs.FmRadStrFatal(err)
 			}
 		}()
 	}
 
-	// Init buttons
-	buttons.Init()
-	wg.Add(1)
-	go buttons.Listen(&wg, ctx)
-	log.Println("Peripherals started")
-
+	// Init RT
+	rtInterval := cfg.DynamicRTInterval
 	if cfg.DynamicRT {
-		log.Println("Starting dynamic RDS control")
-		go core.RotateRT()
-		log.Println("Dynamic RDS control started")
+		rt.Primary, rt.Secondary = cfg.RT, cfg.RT
+		go func() {
+			err := rt.Rotate(rtInterval)
+			if err != nil {
+				logs.FmRadStrError(err)
+			}
+		}()
 	}
+	logs.FmRadStrInfo("Peripherals started")
 
 	// Starting dashboard and core with no music
-	log.Println("Starting dashboard")
+	port := cfg.Port
+	logs.FmRadStrInfo(fmt.Sprintf("Launching dashboard at http://localhost:%v", port))
+	cfg.Unlock()
 	go func() {
-		err := dashboard.Init()
+		err := dashboard.Init(cfg, port)
 		if err != nil {
-			log.Fatal(err)
+			logs.FmRadStrFatal(err)
 		}
 	}()
-	log.Println("Starting core")
-	core.Play("")
-	log.Println("Core started")
-	log.Println("Starting procedure done!")
+
+	logs.FmRadStrInfo("Starting core")
+	go func() {
+		err = core.Play(tools.Params{Type: tools.SilenceType, Cfg: cfg})
+		if err != nil {
+			logs.FmRadStrFatal(err)
+		}
+	}()
+
+	logs.FmRadStrInfo("Core started")
+	logs.FmRadStrInfo("Ready!")
 
 	wg.Wait()
 
@@ -95,9 +119,9 @@ func main() {
 
 	// This should be executed, but it works fine whithout it and invoking it crashes my RPi :(
 	// tools.StopGPIO()
-	fmt.Println() // Usually "^C" is printed in the console, so it will be more pretty to go to next line
-	log.Println("Gracefully exiting")
-	log.Println("Killing core")
-	core.Kill()
-	log.Println("Gracefully exited")
+
+	logs.FmRadStrInfo("Gracefully exiting")
+	logs.FmRadStrInfo("Killing core")
+	_, _ = pkill.Pkill("pi_fm_adv", os.Interrupt)
+	logs.FmRadStrInfo("Gracefully exited. Bye!")
 }

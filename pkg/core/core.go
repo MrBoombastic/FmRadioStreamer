@@ -2,20 +2,20 @@ package core
 
 import (
 	"fmt"
-	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
-	"golang.org/x/sys/unix"
-	"io"
-	"log"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/rt"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
+	"github.com/pbar1/pkill-go"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
-// GenerateOptions generate options to pass to PiFmAdv
-func GenerateOptions(audio string) []string {
-	cfg := config.Get()
+// GenerateOptions generates options to pass to PiFmAdv.
+func GenerateOptions(params tools.Params) []string {
+	params.Cfg.Lock()
+	cfg := params.Cfg.Config
+	params.Cfg.Unlock()
 	options := []string{
 		"--ps", cfg.PS,
 		"--rt", cfg.RT,
@@ -29,125 +29,78 @@ func GenerateOptions(audio string) []string {
 		"--mpx", fmt.Sprintf("%v", cfg.Mpx),
 		"--ctl", "rds_ctl",
 	}
-	if audio != "" {
-		options = append(options, "--audio", fmt.Sprintf("./music/%v", audio))
+	// When playing file, we need to add which one. Stream needs "-" every time, and silence needs nothing.
+	if params.Type == tools.FileType {
+		options = append(options, "--audio", fmt.Sprintf("./music/%v", params.Audio))
+	} else if params.Type == tools.StreamType {
+		options = append(options, "--audio", "-")
 	}
 	return options
 }
 
-// run starts playing music or silence via PiFmAdv
-func run(name string, args []string) error {
-	PiFmAdv := exec.Command(name, args...)
-	stderr, err := PiFmAdv.StderrPipe()
-	if err != nil {
-		log.Fatal(err)
+// run starts playing music, silence or stream via PiFmAdv. Also launches dynamic RT.
+func run(name string, params tools.Params, verbose *bool) error {
+	// Support for "dynamic" RDS - getting current playing file name - only in FileType mode!
+	if params.Type == tools.FileType {
+		extension := filepath.Ext(params.Audio)
+		audio := strings.TrimSuffix(params.Audio, extension)
+		rt.Secondary = strings.Replace(audio, "./music/", "", 1)
+		if len(rt.Secondary) > 64 {
+			rt.Secondary = rt.Secondary[0:63]
+		}
+		rt.Rotating = true
+	} else {
+		rt.Rotating = false
 	}
-	// Stdout commented out for clearer command output, safe to undo!
-	/*
-		stdout, err := PiFmAdv.StdoutPipe()
+
+	// Actual playing audio starts here!
+	if params.Type == tools.FileType || params.Type == tools.SilenceType {
+		logs.FmRadStrInfo(fmt.Sprintf("Executing %v as a child process. Output below:", name))
+		err := tools.ExecCommand(name, *verbose, GenerateOptions(params)...)
 		if err != nil {
-			log.Println(err)
-		}
-	*/
-	err = PiFmAdv.Start()
-	if err != nil {
-		return err
-	}
-	// Support for "dynamic" RDS - getting current playing file name
-	if args[len(args)-2] == "--audio" {
-		audio := args[len(args)-1]
-		extension := filepath.Ext(audio)
-		audio = strings.TrimSuffix(audio, extension)
-		alternateRT = strings.Replace(audio, "./music/", "", 1)
-		if len(alternateRT) > 64 {
-			alternateRT = alternateRT[0:63]
+			return err
 		}
 	}
-	cmderr, _ := io.ReadAll(stderr)
-	if fmt.Sprintf("%s", cmderr) != "" {
-		log.Printf("PiFmAdv: %s", cmderr)
+	// Using workaround when playing stream
+	if params.Type == tools.StreamType {
+		textoptions := fmt.Sprintf("sox %v -t wav - | sudo core/pi_fm_adv %v", params.Audio, GenerateOptions(params))
+
+		// Go is doing some weird things when using "|" in exec.Command, so we will run command through temp script
+		err := tools.TextToFile(textoptions, "temp.sh")
+		if err != nil {
+			return err
+		}
+		logs.FmRadStrInfo(fmt.Sprintf("Executing streaming shell script as a child process. Output below:"))
+		err = tools.ExecCommand("/bin/sh", *verbose, "temp.sh")
+		if err != nil {
+			return err
+		}
 	}
-	// Stdout commented out for clearer command output, safe to undo!
-	/*
-		cmdout, _ := io.ReadAll(stdout)
-		fmt.Printf("PiFmADV: %s", cmdout)
-	*/
 	return nil
 }
 
-// Kill stops PiFmAdv using pkill and SIGINT
-func Kill() {
-	cmd := exec.Command("pkill", "-2", "pi_fm_adv")
-	err := cmd.Start()
-	if err != nil {
-		log.Fatal("ERROR: pkill:", err)
-	}
-	err = cmd.Wait()
-	// Preventing RPi overloading
-	if err != nil {
-		log.Println("INFO: pkill:", err)
-	}
-}
-
-//Play generates options with GenerateOptions function and uses them when starting PiFimAdv
-func Play(audio string) {
+// Play kills old instance of PiFmAdv and launches new one using new parameters.
+func Play(params tools.Params) error {
 	// Make sure that previous playback is stopped
-	Kill()
+	_, err := pkill.Pkill("pi_fm_adv", os.Interrupt)
+	if err != nil {
+		return err
+	}
 	go func() {
-		options := GenerateOptions(audio)
-		err := run("core/pi_fm_adv", options)
+		verbose := &params.Cfg.Verbose
+		err := run("core/pi_fm_adv", params, verbose)
 		if err != nil {
-			log.Println(err)
+			errorText := err.Error()
+			if errorText == "exit status 2" || errorText == "signal: interrupt" {
+				logs.PiFmAdvInfo("Expected exit")
+			} else {
+				errorString := "Unexpected error."
+				if !*verbose {
+					errorString += " Use verbose option next time to get more information."
+				}
+				logs.PiFmAdvError(fmt.Sprintf("%v %v", errorString, err))
+			}
 		}
 	}()
-}
-
-//
-var alternateRT = config.GetRT()
-var currentRTState = 0
-
-// RotateRT enables switching RT between that saved in config and current playing audio filename
-func RotateRT() {
-	err := os.Remove("rds_ctl")
-	if err != nil {
-		log.Println("ERROR: Cannot remove rds_ctl pipe file. Missing?")
-	}
-	err = unix.Mkfifo("rds_ctl", 0666)
-	if err != nil {
-		log.Println("ERROR: Cannot create pipe file: ", err)
-		return
-	}
-	f, err := os.OpenFile("rds_ctl", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
-	if err != nil {
-		log.Println("ERROR: Cannot open pipe file: ", err)
-		return
-	}
-	for {
-		if currentRTState == 0 {
-			_, err := f.WriteString("AB ON\n")
-			if err != nil {
-				log.Println("ERROR: Cannot update dynamic RT text (A/B flag)")
-				break
-			}
-			_, err = f.WriteString(fmt.Sprintf("RT %s", config.GetRT()))
-			if err != nil {
-				log.Println("ERROR: Cannot update dynamic RT text")
-				break
-			}
-			currentRTState++
-		} else {
-			_, err := f.WriteString("AB OFF\n")
-			if err != nil {
-				log.Println("ERROR: Cannot update dynamic RT text (A/B flag)")
-				break
-			}
-			_, err = f.WriteString(fmt.Sprintf("RT %s", alternateRT))
-			if err != nil {
-				log.Println("ERROR: Cannot update dynamic RT text")
-				break
-			}
-			currentRTState--
-		}
-		time.Sleep(time.Second * time.Duration(config.GetDynamicRTInterval()))
-	}
+	return nil
 }

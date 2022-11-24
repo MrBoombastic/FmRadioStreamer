@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
 	"github.com/stianeikeland/go-rpio/v4"
 	"math"
@@ -18,7 +19,7 @@ var (
 	buttonInvert     = rpio.Pin(12)
 )
 
-// Init sets up four physical buttons.
+// Init sets up physical buttons.
 func Init() {
 	buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonMultiplier, buttonInvert}
 	for _, item := range buttons {
@@ -28,8 +29,8 @@ func Init() {
 	}
 }
 
-// Listen enables frequency, multipliier and screen invertion controlling with physical buttons
-func Listen(wg *sync.WaitGroup, ctx context.Context) {
+// Listen enables frequency, multipliier and screen invertion controlling with physical buttons.
+func Listen(wg *sync.WaitGroup, ctx context.Context, cfg *config.SafeConfig) {
 	buttons := [4]rpio.Pin{buttonDown, buttonUp, buttonMultiplier, buttonInvert}
 	defer wg.Done()
 	for {
@@ -40,57 +41,66 @@ func Listen(wg *sync.WaitGroup, ctx context.Context) {
 			for i, item := range buttons {
 				if item.EdgeDetected() {
 					if i == 0 {
-						currentFrequency := config.GetFrequency()
-						currentMultiplier := config.GetMultiplier()
-						if currentFrequency-currentMultiplier < 76.0 {
+						cfg.Lock()
+						if cfg.Frequency-cfg.Multiplier < 76.0 {
 							go leds.YellowBlink()
-							if config.GetSSD1306() {
-								ssd1306.MiniMessage("MIN FREQ!")
+							if cfg.SSD1306 {
+								ssd1306.MiniMessage("MIN FREQ!", cfg)
 							}
 						} else {
-							config.UpdateFrequency(math.Floor((config.GetFrequency()-config.GetMultiplier())*10) / 10)
-							if config.GetSSD1306() {
-								ssd1306.Refresh()
+							cfg.Frequency = math.Floor((cfg.Frequency-cfg.Multiplier)*10) / 10
+							config.Save(&cfg.Config)
+							if cfg.SSD1306 {
+								ssd1306.Refresh(cfg)
 							}
 						}
+						cfg.Unlock()
 					}
 					if i == 1 {
-						currentFrequency := config.GetFrequency()
-						currentMultiplier := config.GetMultiplier()
-						if currentFrequency+currentMultiplier > 108.0 {
+						cfg.Lock()
+						if cfg.Frequency+cfg.Multiplier > 108.0 {
 							go leds.YellowBlink()
-							if config.GetSSD1306() {
-								ssd1306.MiniMessage("MAX FREQ!")
+							if cfg.SSD1306 {
+								ssd1306.MiniMessage("MAX FREQ!", cfg)
 							}
 						} else {
-							config.UpdateFrequency(math.Floor((config.GetFrequency()+config.GetMultiplier())*10) / 10)
-							if config.GetSSD1306() {
-								ssd1306.Refresh()
+							cfg.Frequency = math.Floor((cfg.Frequency-cfg.Multiplier)*10) / 10
+							config.Save(&cfg.Config)
+							if cfg.SSD1306 {
+								ssd1306.Refresh(cfg)
 							}
 						}
+						cfg.Unlock()
 					}
 					if i == 2 {
-						switch currentMultiplier := config.GetMultiplier(); currentMultiplier {
+						cfg.Lock()
+						switch currentMultiplier := cfg.Multiplier; currentMultiplier {
 						case 0.1:
-							config.UpdateMultiplier(0.5)
+							cfg.Multiplier = 0.5
 						case 0.5:
-							config.UpdateMultiplier(1)
+							cfg.Multiplier = 1
 						case 1:
-							config.UpdateMultiplier(2)
+							cfg.Multiplier = 2
 						case 2:
-							config.UpdateMultiplier(5)
+							cfg.Multiplier = 5
 						default:
-							config.UpdateMultiplier(0.1)
+							cfg.Multiplier = 0.1
 						}
-						if config.GetSSD1306() {
-							ssd1306.Refresh()
+						if cfg.SSD1306 {
+							ssd1306.Refresh(cfg)
 						}
+						config.Save(&cfg.Config)
+						cfg.Unlock()
 					}
 					if i == 3 {
-						if config.GetSSD1306() {
-							ssd1306.Inverted = !ssd1306.Inverted
-							ssd1306.Screen.Invert(ssd1306.Inverted)
+						cfg.Lock()
+						if cfg.SSD1306 {
+							err := ssd1306.Invert()
+							if err != nil {
+								logs.FmRadStrError(err)
+							}
 						}
+						cfg.Unlock()
 					}
 				}
 			}

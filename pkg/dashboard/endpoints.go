@@ -5,128 +5,145 @@ import (
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/leds"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/logs"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/ssd1306"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/tools"
-	"github.com/gofiber/fiber/v2"
-	"log"
+	"github.com/pbar1/pkill-go"
+	"os"
 )
 
-// music endpoint returns contents of `music` directory
-func music(ctx *fiber.Ctx) {
+// dir endpoint returns contents of `dir` directory.
+func dir(ctx *RadioContext) {
 	filesSlice, err := condlers.MusicDir()
 	if err != nil {
-		err := ctx.SendStatus(500)
-		if err != nil {
-			log.Println(err)
-		}
+		_ = ctx.Fiber.SendStatus(500)
 	}
-	err = ctx.JSON(filesSlice)
+	err = ctx.Fiber.JSON(filesSlice)
 	if err != nil {
-		log.Println(err)
+		logs.FmRadStrError(err)
 	}
 }
 
-// stop endpoint plays silence
-func stop(ctx *fiber.Ctx) {
-	core.Play("")
-	err := ctx.SendStatus(200)
+// stop endpoint plays silence.
+func stop(ctx *RadioContext) {
+	err := core.Play(tools.Params{Type: tools.SilenceType, Cfg: ctx.Cfg})
 	if err != nil {
-		log.Println(err)
+		logs.PiFmAdvError(err)
+		_ = ctx.Fiber.SendStatus(500)
 	}
+	_ = ctx.Fiber.SendStatus(200)
 }
 
-// offair kill PiFmAdv entirely
-func offair(ctx *fiber.Ctx) {
-	core.Kill()
-	err := ctx.SendStatus(200)
+// offair kills PiFmAdv entirely.
+func offair(ctx *RadioContext) {
+	_, err := pkill.Pkill("pi_fm_adv", os.Interrupt)
 	if err != nil {
-		log.Println(err)
+		logs.FmRadStrError(err)
+		_ = ctx.Fiber.SendStatus(500)
 	}
-	if config.GetSSD1306() {
-		ssd1306.MiniMessage("OFF-AIR")
+	_ = ctx.Fiber.SendStatus(200)
+	ctx.Cfg.Lock()
+	if ctx.Cfg.SSD1306 {
+		ssd1306.MiniMessage("OFF-AIR", ctx.Cfg)
 	}
+	ctx.Cfg.Unlock()
 }
 
-// yt endpoint performs searching or downloading audio from YouTube
-func yt(ctx *fiber.Ctx) {
-	search := ctx.Query("search")
-	query := ctx.Query("q")
-	result, err := tools.SearchYouTube(query)
+// yt endpoint performs searching or downloading audio from YouTube.
+func yt(ctx *RadioContext) {
+	search := ctx.Fiber.Query("search")
+	query := ctx.Fiber.Query("q")
+	ctx.Cfg.Lock()
+	key := ctx.Cfg.YouTubeAPIKey
+	ctx.Cfg.Unlock()
+	result, err := tools.SearchYouTube(query, key)
 	if err != nil {
-		log.Println(err)
-		err := ctx.SendStatus(500)
-		if err != nil {
-			log.Println(err)
-		}
+		logs.FmRadStrError(err)
+		_ = ctx.Fiber.SendStatus(500)
 		return
 	}
 	if search == "true" {
-		err := ctx.JSON(result.Items[0])
+		err := ctx.Fiber.JSON(result.Items[0])
 		if err != nil {
-			log.Println(err)
+			logs.FmRadStrError(err)
 		}
 	} else {
-		err := ctx.SendStatus(200)
-		if err != nil {
-			log.Println(err)
-		}
+		_ = ctx.Fiber.SendStatus(200)
 		leds.BlueLedEnabled = true
-		cfg := config.Get()
-		err = condlers.Download("https://youtu.be/"+result.Items[0].ID.VideoID, cfg.Format)
+		ctx.Cfg.Lock()
+		format := ctx.Cfg.Format
+		ctx.Cfg.Unlock()
+		err = condlers.Download("https://youtu.be/"+result.Items[0].ID.VideoID, format)
 		leds.BlueLedEnabled = false
 		if err != nil {
-			log.Println(err)
+			logs.FmRadStrError(err)
 		}
 	}
 }
 
-// download endpoint performs downloading audio from other sites
-func download(ctx *fiber.Ctx) {
-	query := ctx.Query("q")
-	err := ctx.SendStatus(200)
-	if err != nil {
-		log.Println(err)
-	}
+// youtubeDl endpoint performs downloading audio from other sites.
+func youtubeDl(ctx *RadioContext) {
+	query := ctx.Fiber.Query("q")
+	_ = ctx.Fiber.SendStatus(202)
 	leds.BlueLedEnabled = true
-	cfg := config.Get()
-	err = condlers.Download(query, cfg.Format)
+	ctx.Cfg.Lock()
+	format := ctx.Cfg.Format
+	ctx.Cfg.Unlock()
+	err := condlers.Download(query, format)
 	leds.BlueLedEnabled = false
 	if err != nil {
-		log.Println(err)
+		logs.FmRadStrError(err)
 	}
 }
 
-// play endpoint plays selected file
-func play(ctx *fiber.Ctx) {
-	query := ctx.Query("q")
-	core.Play(query)
-	err := ctx.SendStatus(200)
+// playFile endpoint plays selected file.
+func playFile(ctx *RadioContext) {
+	query := ctx.Fiber.Query("q")
+	err := core.Play(tools.Params{Type: tools.FileType, Audio: query, Cfg: ctx.Cfg})
 	if err != nil {
-		log.Println(err)
+		logs.PiFmAdvError(err)
+		_ = ctx.Fiber.SendStatus(500)
 	}
+	_ = ctx.Fiber.SendStatus(200)
 }
 
-// save endpoint updates current config
-func save(ctx *fiber.Ctx) {
-	newConfig := new(config.Config)
-	if err := ctx.BodyParser(newConfig); err != nil {
-		log.Fatalln("ERROR: Failed to parse new config!")
-	}
-	config.Save(*newConfig)
-	if config.GetSSD1306() {
-		ssd1306.Refresh()
-	}
-	err := ctx.SendStatus(200)
+// playStream endpoint plays remote file via SoX.
+func playStream(ctx *RadioContext) {
+	query := ctx.Fiber.Query("q")
+	err := core.Play(tools.Params{Type: tools.StreamType, Audio: query, Cfg: ctx.Cfg})
 	if err != nil {
-		log.Println(err)
+		logs.PiFmAdvError(err)
+		_ = ctx.Fiber.SendStatus(500)
 	}
+	_ = ctx.Fiber.SendStatus(200)
 }
 
-// configuration endpoint returns current config
-func configuration(ctx *fiber.Ctx) {
-	configMap := config.GetMap()
-	err := ctx.JSON(configMap)
+// save endpoint updates current config.
+func save(ctx *RadioContext) {
+	newCfg := new(config.Config)
+	if err := ctx.Fiber.BodyParser(newCfg); err != nil {
+		logs.PiFmAdvError(err)
+		_ = ctx.Fiber.SendStatus(500)
+
+	}
+	ctx.Cfg.Lock()
+	ctx.Cfg.Config = *newCfg
+	config.Save(newCfg)
+	if newCfg.SSD1306 {
+		ssd1306.Refresh(ctx.Cfg)
+	}
+	ctx.Cfg.Unlock()
+	_ = ctx.Fiber.SendStatus(200)
+}
+
+// configuration endpoint returns current config.
+func configuration(ctx *RadioContext) {
+	ctx.Cfg.Lock()
+	configMap := tools.ConfigToMap(ctx.Cfg)
+	ctx.Cfg.Unlock()
+	err := ctx.Fiber.JSON(configMap)
 	if err != nil {
-		log.Println(err)
+		logs.FmRadStrError(err)
+		_ = ctx.Fiber.SendStatus(500)
 	}
 }
