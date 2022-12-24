@@ -28,7 +28,6 @@ var endpointsList = map[string]func(ctx *RadioContext){
 func findEndpoint(name string) (func(ctx *RadioContext), error) {
 	if endpointsList[name] != nil {
 		return endpointsList[name], nil
-	} else {
-		return nil, errors.New("404")
 	}
+	return nil, errors.New("404")
 }
