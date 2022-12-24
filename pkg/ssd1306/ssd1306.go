@@ -81,7 +81,7 @@ func Init(wg *sync.WaitGroup, ctx context.Context, cfg *config.SafeConfig) error
 				if err != nil {
 					return err
 				}
-				scr, err := ssd1306.NewI2C(screenConnection, &ssd1306.DefaultOpts)
+				scr, _ := ssd1306.NewI2C(screenConnection, &ssd1306.DefaultOpts)
 				screen = scr
 				Refresh(cfg)
 			}
