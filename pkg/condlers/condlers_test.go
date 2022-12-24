@@ -15,10 +15,9 @@ func fixPath() error {
 	err := os.Chdir("../../")
 	if err != nil {
 		return err
-	} else {
-		isPathFixed = true
-		return nil
 	}
+	isPathFixed = true
+	return nil
 }
 func TestMusicDir(t *testing.T) {
 	err := fixPath()
