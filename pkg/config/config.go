@@ -23,6 +23,9 @@ func Get() (*SafeConfig, error) {
 // Save saves new config to config file. Needs mutex locked!
 func Save(cfg *Config) {
 	file, err := json.MarshalIndent(cfg, "", "  ")
+	if err != nil {
+		logs.FmRadStrFatal(err)
+	}
 	err = os.WriteFile("config.json", file, 0644)
 	if err != nil {
 		logs.FmRadStrFatal(err)

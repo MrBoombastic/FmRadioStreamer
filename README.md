@@ -4,6 +4,7 @@ Raspberry Pi based FM streamer with OLED, buttons and LEDs support.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/MrBoombastic/FmRadioStreamer.svg)](https://pkg.go.dev/github.com/MrBoombastic/FmRadioStreamer)
 [![CodeFactor](https://www.codefactor.io/repository/github/mrboombastic/fmradiostreamer/badge)](https://www.codefactor.io/repository/github/mrboombastic/fmradiostreamer)
+[![Go Report Card](https://goreportcard.com/badge/github.com/MrBoombastic/FmRadioStreamer)](https://goreportcard.com/report/github.com/MrBoombastic/FmRadioStreamer)
 
 ## Building
 
