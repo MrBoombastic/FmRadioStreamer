@@ -1,6 +1,6 @@
 module github.com/MrBoombastic/FmRadioStreamer
 
-go 1.19
+go 1.20
 
 require (
 	github.com/BOOMfinity/golog v1.0.5
