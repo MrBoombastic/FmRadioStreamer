@@ -3,7 +3,7 @@ module github.com/MrBoombastic/FmRadioStreamer
 go 1.20
 
 require (
-	github.com/BOOMfinity/golog v1.0.5
+	github.com/BOOMfinity/golog v1.0.6
 	github.com/MrBoombastic/goydl v0.0.0-20221124182300-537de59ec099
 	github.com/arduino/go-apt-client v0.0.0-20190812130613-5613f843fdc8
 	github.com/gofiber/fiber/v2 v2.42.0
