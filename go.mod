@@ -6,7 +6,7 @@ require (
 	github.com/BOOMfinity/golog v1.0.6
 	github.com/MrBoombastic/goydl v0.0.0-20221124182300-537de59ec099
 	github.com/arduino/go-apt-client v0.0.0-20190812130613-5613f843fdc8
-	github.com/gofiber/fiber/v2 v2.49.0
+	github.com/gofiber/fiber/v2 v2.49.1
 	github.com/pbar1/pkill-go v1.0.0
 	github.com/stianeikeland/go-rpio/v4 v4.6.0
 	golang.org/x/image v0.11.0
@@ -27,6 +27,6 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.48.0 // indirect
+	github.com/valyala/fasthttp v1.49.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 )
