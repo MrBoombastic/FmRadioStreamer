@@ -10,7 +10,7 @@ require (
 	github.com/pbar1/pkill-go v1.0.0
 	github.com/stianeikeland/go-rpio/v4 v4.6.0
 	golang.org/x/image v0.11.0
-	golang.org/x/sys v0.11.0
+	golang.org/x/sys v0.12.0
 	periph.io/x/conn/v3 v3.7.0
 	periph.io/x/devices/v3 v3.7.1
 	periph.io/x/host/v3 v3.8.2
