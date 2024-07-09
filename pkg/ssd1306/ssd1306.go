@@ -77,7 +77,7 @@ func Init(wg *sync.WaitGroup, ctx context.Context, cfg *config.SafeConfig) error
 				if err != nil {
 					return err
 				}
-				screenConnection, err = i2creg.Open("1")
+				screenConnection, err = i2creg.Open("")
 				if err != nil {
 					return err
 				}

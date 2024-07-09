@@ -22,6 +22,7 @@ type Config struct {
 	DynamicRT         bool    `json:"dynamicRT"`
 	DynamicRTInterval uint    `json:"dynamicRTInterval"`
 	Verbose           bool    `json:"verbose"`
+	Ytdlp             bool    `json:"ytdlp"`
 }
 
 // SafeConfig is just Config combined with mutex.

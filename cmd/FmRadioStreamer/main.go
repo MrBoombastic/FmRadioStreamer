@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/buttons"
+	"github.com/MrBoombastic/FmRadioStreamer/pkg/condlers"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/config"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/core"
 	"github.com/MrBoombastic/FmRadioStreamer/pkg/dashboard"
@@ -29,10 +30,8 @@ func main() {
 	if err != nil {
 		logs.FmRadStrFatal("Couldn't check libsndfile1-dev version. Possibly dependencies are not installed. Exiting...")
 	}
-	if libsndfileVersion >= 1.1 {
-		logs.FmRadStrInfo("This system can play MP3, Opus and WAV files.")
-	} else {
-		logs.FmRadStrInfo("This system can play only Opus and WAV files. MP3 is not supported. Update libsndfile1-dev.")
+	if libsndfileVersion < 1.1 {
+		logs.FmRadStrWarn("This system can play only Opus and WAV files. MP3 is not supported. Update libsndfile1-dev.")
 	}
 	// Exit handler
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -46,6 +45,16 @@ func main() {
 	}
 	// Print dashboard URL
 	logs.FmRadStrInfo(fmt.Sprintf("Your local IP is: %v", tools.GetLocalIP()))
+
+	// Check yt-dlp
+	if cfg.Ytdlp {
+		logs.FmRadStrInfo("Checking yt-dlp...")
+		info, err := condlers.CheckYtdlp()
+		if err != nil {
+			logs.FmRadStrLog.Error().Send("Checking yt-dlp failed: %v", err)
+		}
+		logs.FmRadStrLog.Info().Send("Using yt-dlp version: %v", info.Version)
+	}
 
 	logs.FmRadStrInfo("Starting peripherals")
 

@@ -3,27 +3,20 @@
 package condlers
 
 import (
-	"github.com/MrBoombastic/goydl"
+	"context"
+	"github.com/lrstanley/go-ytdlp"
 	"os"
 )
 
-// Download downloads specific video (from given URL) using youtube-dl, extracts audio from it and converts it to chosen format.
-func Download(URL string, format string) error {
-	youtubeDl := goydl.NewYoutubeDl()
-	youtubeDl.Options.Output.Value = "music/%(title)s.%(ext)s"
-	youtubeDl.Options.Format.Value = "bestaudio" //may break at some point, change to "best" if needed
-	youtubeDl.Options.ExtractAudio.Value = true
-	youtubeDl.Options.AudioFormat.Value = format
-	youtubeDl.Options.AudioQuality.Value = "0" //best quality
+func CheckYtdlp() (*ytdlp.ResolvedInstall, error) {
+	return ytdlp.Install(context.TODO(), nil)
+}
 
-	// This breaks my RPi, so I commented it out...
-	// go io.Copy(os.Stdout, youtubeDl.Stdout)
-	// go io.Copy(os.Stderr, youtubeDl.Stderr)
-	cmd, err := youtubeDl.Download(URL)
-	if err != nil {
-		return err
-	}
-	err = cmd.Wait()
+// Download downloads specific video (from given URL) using yt-dlp, extracts audio from it and converts it to chosen format.
+func Download(URL string, format string) (err error) {
+	dl := ytdlp.New().FormatSort("ba").ExtractAudio().AudioQuality("0").RecodeVideo(format).Output("music/%(title)s.%(ext)s")
+	// .Proggres()
+	_, err = dl.Run(context.TODO(), URL)
 	if err != nil {
 		return err
 	}
