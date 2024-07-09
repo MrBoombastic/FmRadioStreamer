@@ -9,7 +9,7 @@ require (
 	github.com/lrstanley/go-ytdlp v0.0.0-20240709033402-534d082b449c
 	github.com/pbar1/pkill-go v1.0.0
 	github.com/stianeikeland/go-rpio/v4 v4.6.0
-	golang.org/x/image v0.12.0
+	golang.org/x/image v0.18.0
 	golang.org/x/sys v0.22.0
 	periph.io/x/conn/v3 v3.7.0
 	periph.io/x/devices/v3 v3.7.1
