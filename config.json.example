@@ -16,5 +16,6 @@
   "ssd1306": true,
   "dynamicRT": true,
   "dynamicRTInterval": 20,
-  "verbose": false
+  "verbose": false,
+  "ytdlp": true
 }

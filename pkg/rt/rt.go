@@ -21,9 +21,17 @@ var Rotating = false
 
 // Rotate enables switching RT between that saved in config and current playing audio filename.
 func Rotate(interval uint) error {
-	err := os.Remove("rds_ctl")
+	// check if rds_ctl exists, if not then create it
+	_, err := os.Stat("rds_ctl")
+	if os.IsNotExist(err) {
+		err = unix.Mkfifo("rds_ctl", 0666)
+		if err != nil {
+			return fmt.Errorf("couldn't create pipe file: %v", err)
+		}
+	}
+	err = os.Remove("rds_ctl")
 	if err != nil {
-		return errors.New("cannot remove rds_ctl pipe file, maybe it's missing")
+		return errors.New("cannot remove rds_ctl pipe file")
 	}
 	err = unix.Mkfifo("rds_ctl", 0666)
 	if err != nil {

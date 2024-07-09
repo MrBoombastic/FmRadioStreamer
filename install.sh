@@ -1,9 +1,7 @@
 echo "FMRADSTR: Updating repositories..."
 sudo apt update
 echo "FMRADSTR: Trying to install apt dependencies..."
-sudo apt install ffmpeg libsndfile1-dev libsoxr-dev git build-essential python3-pip libsox-fmt-all && echo "FMRADSTR: Successfully installed apt dependencies!" || echo "FMRADSTR: Failed to install apt dependencies!"
-echo "FMRADSTR: Trying to install/upgrade youtube-dl..."
-sudo sudo pip install --upgrade youtube_dl && echo "FMRADSTR: Successfully installed youtube-dl!" || echo "FMRADSTR: Failed to install youtube-dl!"
+sudo apt install ffmpeg libsndfile1-dev libsoxr-dev git build-essential libsox-fmt-all && echo "FMRADSTR: Successfully installed apt dependencies!" || echo "FMRADSTR: Failed to install apt dependencies!"
 echo "FMRADSTR: Creating directories..."
 mkdir "core"
 mkdir "music"
@@ -14,6 +12,6 @@ mv PiFmAdv/src/* core/ && echo "FMRADSTR: Moved it to core directory!" || echo "
 cd core && make clean && echo "FMRADSTR: Core cleaned!" || echo "FMRADSTR: Failed to clean core!"
 make && echo "FMRADSTR: Successfully compiled!" || echo "FMRADSTR: Failed to compile!"
 cd ../
-echo "FMRADSTR: Done. Please set YT API key in config.json and DO NOT FORGET to add 'gpu_freq=250' in /boot/config.txt!"
+echo "FMRADSTR: Done. Please set YT API key in config.json and DO NOT FORGET to add 'gpu_freq=250' in /boot/firmware/config.txt!"
 echo "FMRADSTR WARNING: Make sure to always use up-to-date version of youtube_dl!"
 echo "FMRADSTR: Enjoy! :)"
